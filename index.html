@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>e-RMT - Sistem Pengurusan Rancangan Makanan Tambahan Sekolah</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Supabase JS Client v2 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- HTML5 QR Code Scanner Library -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <!-- QRCode.js Generator Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        @media print {
+            body * { visibility: hidden; }
+            #printableCardSection, #printableCardSection * { visibility: visible; }
+            #printableCardSection { position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print { display: none !important; }
+        }
+
+      /* --- STYLES FOR CIRCULAR NEON LOGIN MODAL (DARK SLATE THEME) --- */
+        .circle-login-card {
+            width: 100%;
+            max-width: 380px;
+            aspect-ratio: 1 / 1;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.96); /* Dark Slate Minimalist */
+            border: 2px solid #10b981; /* Soft Emerald Border */
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .circle-login-card h2 {
+            color: #ffffff;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .circle-login-card .subtitle {
+            color: #94a3b8;
+            font-size: 11px;
+            margin-bottom: 16px;
+        }
+
+        .circle-login-card form {
+            width: 88%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .circle-login-card .input-box {
+            position: relative;
+            width: 100%;
+        }
+
+        .circle-login-card .input-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .circle-login-card .input-box input {
+            width: 100%;
+            padding: 10px 14px 10px 38px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 25px;
+            outline: none;
+            color: #ffffff;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .circle-login-card .input-box input::placeholder {
+            color: #94a3b8;
+            opacity: 0.7;
+        }
+
+        .circle-login-card .input-box input:focus {
+            border-color: #10b981;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .circle-login-card .options {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .circle-login-card .btn-submit {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(90deg, #10b981, #059669);
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 4px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .circle-login-card .btn-submit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.5);
+        }
+
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 min-h-screen flex flex-col md:flex-row antialiased selection:bg-emerald-200">
+
+    <!-- Sidebar / Navigation -->
+    <aside class="w-full md:w-64 bg-slate-900 text-white flex-shrink-0 z-30 shadow-xl flex flex-col no-print">
+        <!-- Logo & Branding -->
+        <div class="p-5 flex items-center justify-between border-b border-slate-800">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-emerald-500/30">
+                    <i class="fa-solid font-bold fa-utensils"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight tracking-wide text-white">e-RMT Sekolah</h1>
+                    <p class="text-[10px] text-emerald-400 font-medium flex items-center gap-1">
+                        <i class="fa-solid fa-cloud text-[9px]"></i> Terhubung Supabase
+                    </p>
+                </div>
+            </div>
+            <button id="mobileMenuBtn" class="md:hidden text-slate-400 hover:text-white focus:outline-none">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Role Badge Display -->
+        <div class="px-4 pt-4 pb-2">
+            <label class="text-[10px] uppercase tracking-wider font-semibold text-slate-400 block mb-1">Status Mod Akses</label>
+            <div id="roleBadgeContainer" class="bg-slate-800 text-xs rounded-xl p-3 border border-slate-700 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <span id="roleBadgeIcon" class="w-2.5 h-2.5 rounded-full bg-blue-400"></span>
+                    <span id="roleBadgeText" class="font-semibold text-slate-200">Akses Awam / Ibu Bapa</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Navigation Links -->
+        <nav id="navMenu" class="hidden md:block flex-1 px-3 py-3 space-y-1 overflow-y-auto custom-scrollbar">
+            <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 text-white shadow-md shadow-emerald-900/30">
+                <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                <span>Dashboard Utama</span>
+            </a>
+            <a href="#" onclick="switchTab('kehadiran')" id="nav-kehadiran" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                <i class="fa-solid fa-qrcode w-5 text-center"></i>
+                <span>Semakan Kehadiran</span>
+            </a>
+            <a href="#" onclick="switchTab('menu')" id="nav-menu" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                <i class="fa-solid fa-utensils w-5 text-center"></i>
+                <span>Menu RMT Mingguan</span>
+            </a>
+            
+            <!-- Tab Pengurusan Data Murid (Khusus Admin) -->
+            <a href="#" onclick="handleAdminTabClick('pengurusan-murid')" id="nav-pengurusan-murid" class="nav-item admin-only hidden flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-users-gear w-5 text-center text-emerald-400"></i>
+                    <span>Pengurusan Data Murid</span>
+                </div>
+                <span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded uppercase font-bold">Admin</span>
+            </a>
+
+            <!-- Tab Laporan khusus Admin/PK HEM -->
+            <a href="#" onclick="handleAdminTabClick('laporan')" id="nav-laporan" class="nav-item admin-only hidden flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-file-invoice w-5 text-center text-emerald-400"></i>
+                    <span>Laporan & Tuntutan</span>
+                </div>
+                <span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded uppercase font-bold">Admin</span>
+            </a>
+        </nav>
+
+        <!-- School Info Footer & Login Button -->
+        <div class="p-4 border-t border-slate-800 bg-slate-950/50 space-y-3">
+            <div id="authButtonSection">
+                <button onclick="openLoginModal()" id="loginSideBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/40">
+                    <i class="fa-solid fa-right-to-bracket"></i> Log Masuk Admin / Guru
+                </button>
+                <button onclick="logoutAdmin()" id="logoutSideBtn" class="hidden w-full bg-slate-800 hover:bg-rose-950 text-rose-300 hover:text-rose-200 border border-slate-700 font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Log Keluar Mod Admin
+                </button>
+            </div>
+            <div class="flex items-center space-x-3 pt-1 border-t border-slate-800/80">
+                <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 text-xs">
+                    <i class="fa-solid fa-school"></i>
+                </div>
+                <div class="truncate">
+                    <p class="text-xs font-semibold text-slate-200 truncate">SK FELDA CHEMOMOI</p>
+                    <p class="text-[10px] text-slate-400">Kod Sekolah: CBA0020</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-y-auto custom-scrollbar h-screen no-print">
+        <!-- Top Bar Header -->
+        <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-20 shadow-sm">
+            <div>
+                <h2 id="pageTitle" class="text-xl font-bold text-slate-800">Dashboard Utama</h2>
+                <p id="pageSubtitle" class="text-xs text-slate-500">Ringkasan status harian & maklumat nutrisi murid RMT</p>
+            </div>
+            <div class="flex items-center space-x-3">
+                <div id="supabaseConnectionBadge" class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs px-3 py-1.5 rounded-full font-medium flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span id="dbStatusText">Supabase Online</span>
+                </div>
+                <div class="bg-slate-100 text-slate-700 text-xs px-3 py-1.5 rounded-full font-medium flex items-center gap-2">
+                    <i class="fa-regular fa-calendar text-emerald-600"></i>
+                    <span id="currentDate">Rabu, 9 September 2026</span>
+                </div>
+                <button onclick="openLoginModal()" id="topLoginBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition flex items-center gap-2 shadow">
+                    <i class="fa-solid fa-lock text-xs"></i> Log Masuk Guru RMT
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Dynamic Panels -->
+        <div class="p-4 sm:p-6 lg:p-8 space-y-6 flex-1">
+
+            <!-- TAB 1: DASHBOARD UTAMA -->
+            <section id="tab-dashboard" class="tab-panel space-y-6">
+                <!-- Top Stat Cards Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Total RMT Students (Akses Awam) -->
+                    <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Jumlah Murid Layak RMT</p>
+                                <h3 class="text-2xl font-bold text-slate-800 mt-1" id="statTotalStudents">0</h3>
+                                <p class="text-xs text-emerald-600 mt-2 flex items-center font-medium">
+                                    <i class="fa-solid fa-database text-[10px] mr-1"></i> Data dari Supabase
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Attendance Today (Akses Awam) -->
+                    <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Ambil Makanan Hari Ini</p>
+                                <h3 class="text-2xl font-bold text-slate-800 mt-1" id="statAttended">0 / 0</h3>
+                                <div class="w-full bg-slate-100 h-2 rounded-full mt-3 overflow-hidden">
+                                    <div id="attendanceProgressBar" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-user-check"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Food Waste Percentage (RESTRICTED: HANYA ADMIN/GURU RMT) -->
+                    <div id="cardWasteStat" class="admin-only hidden bg-white rounded-2xl p-5 border border-amber-100 shadow-sm hover:shadow-md transition relative overflow-hidden">
+                        <div class="absolute top-0 right-0 bg-amber-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl">Sulit Admin</div>
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Anggaran Pembaziran</p>
+                                <h3 class="text-2xl font-bold text-slate-800 mt-1" id="statWaste">2.4 <span class="text-sm font-normal text-slate-500">kg</span></h3>
+                                <p class="text-xs text-emerald-600 mt-2 flex items-center font-medium">
+                                    <i class="fa-solid fa-arrow-down text-[10px] mr-1"></i> -15% minggu ini
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-dumpster"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Status Bajet / Peruntukan (RESTRICTED: HANYA ADMIN/GURU RMT) -->
+                    <div id="cardBudgetStat" class="admin-only hidden bg-white rounded-2xl p-5 border border-purple-100 shadow-sm hover:shadow-md transition relative overflow-hidden">
+                        <div class="absolute top-0 right-0 bg-purple-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl">Kewangan Admin</div>
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Peruntukan RMT Hari Ini</p>
+                                <h3 class="text-2xl font-bold text-slate-800 mt-1" id="statDailyBudget">RM 0.00</h3>
+                                <p class="text-xs text-slate-500 mt-2 font-medium">
+                                    Kadar: <span class="text-purple-700 font-semibold">RM3.50 / murid</span>
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-wallet"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Public Notice Card -->
+                    <div id="cardPublicNotice" class="public-only bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-5 text-white shadow-sm flex flex-col justify-between">
+                        <div>
+                            <span class="text-[10px] bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded">e-RMT Info</span>
+                            <h4 class="font-bold text-sm mt-2">Program Pemakanan KPM</h4>
+                            <p class="text-xs text-slate-300 mt-1 leading-relaxed">Menyediakan sajian sihat, seimbang dan berkualiti untuk membendung kemiskinan nutrisi.</p>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-slate-700 text-[11px] text-slate-400">
+                            Dipantau oleh Pentadbir Sekolah
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Graphs Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Kehadiran Mingguan Chart -->
+                    <div class="lg:col-span-2 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="font-bold text-slate-800">Analisis Kehadiran RMT (Minggu Ini)</h3>
+                                <p class="text-xs text-slate-500">Perbandingan murid mengambil makanan berbanding murid hadir</p>
+                            </div>
+                            <span class="text-xs bg-slate-100 text-slate-600 font-medium px-2.5 py-1 rounded-md">Minggu Semasa</span>
+                        </div>
+                        <div class="h-64">
+                            <canvas id="attendanceChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Nutritional Breakdown Chart -->
+                    <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-bold text-slate-800">Imbangan Nutrisi Menu Hari Ini</h3>
+                                <span class="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-medium">Standard KPM</span>
+                            </div>
+                            <p class="text-xs text-slate-500 mb-4">Nasi Ayam Kukus + Sup Sayur + Tembikai</p>
+                            <div class="h-48 flex justify-center">
+                                <canvas id="nutritionChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500 flex justify-between">
+                            <span>Jumlah Kalori: <strong class="text-slate-800">420 kcal</strong></span>
+                            <span>Protein: <strong class="text-slate-800">18g</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Today's Menu Highlight Banner -->
+                <div class="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+                    <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <span class="bg-emerald-800/60 backdrop-blur text-emerald-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
+                                    Menu Hari Ini (Rabu)
+                                </span>
+                                <span class="bg-white/20 text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1">
+                                    <i class="fa-solid fa-circle text-[8px] text-emerald-300"></i> Terpelihara Halal
+                                </span>
+                            </div>
+                            <h3 class="text-2xl font-bold mt-3">Nasi Ayam Kukus + Sup Sayur + Tembikai</h3>
+                            <p class="text-emerald-100 text-sm mt-1">Disediakan oleh: <span class="font-semibold text-white">Kantin Cemerlang Enterprise</span></p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <button onclick="switchTab('kehadiran')" class="bg-white text-emerald-800 hover:bg-emerald-50 px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow">
+                                <i class="fa-solid fa-search"></i> Semak Senarai Murid
+                            </button>
+                            <button onclick="switchTab('menu')" class="bg-emerald-800/50 hover:bg-emerald-800 text-white px-4 py-2.5 rounded-xl text-xs font-medium transition">
+                                Jadual Mingguan
+                            </button>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-bowl-rice text-9xl absolute -bottom-6 -right-6 text-white/10 pointer-events-none"></i>
+                </div>
+            </section>
+
+     <!-- TAB 2: SEMAKAN KEHADIRAN MURID -->
+            <section id="tab-kehadiran" class="tab-panel hidden space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Modul Imbasan Pas / Kad Murid (ADMIN ONLY) -->
+                    <div class="admin-only hidden bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col items-center text-center">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mb-3">
+                            <i class="fa-solid fa-qrcode"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-800">Modul Imbasan Pas / Kad Murid</h3>
+                        <p class="text-xs text-slate-500 mt-1 max-w-xs">Gunakan Kamera Sebenar atau Simulasi Pilihan Nama Murid untuk merekod kehadiran ke Supabase.</p>
+                        
+                        <!-- Camera Scanner Button -->
+                        <button onclick="openCameraScannerModal()" class="w-full my-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3 px-4 rounded-xl shadow transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-camera text-base"></i> Buka Kamera Pengimbas QR
+                        </button>
+
+                        <div class="w-full border-t border-slate-100 my-2"></div>
+
+                        <!-- Manual/Simulation Fallback -->
+                        <div class="w-full space-y-2">
+                            <label class="text-xs font-semibold text-slate-600 block text-left">Simulasi Imbasan Pilihan Nama:</label>
+                            <div class="flex gap-2">
+                                <select id="scanStudentSelect" class="flex-1 bg-slate-50 border border-slate-200 text-xs rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500">
+                                    <!-- Populated dynamically -->
+                                </select>
+                                <button onclick="triggerQRScan()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition">
+                                    Imbas
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Student List Controls & Filter (Akan Melebar dalam Mod Awam) -->
+                    <div id="attendanceTableContainer" class="lg:col-span-3 bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between transition-all duration-300">
+                        <div>
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                                <div>
+                                    <h3 class="font-bold text-slate-800">Senarai Pengambilan Makanan Murid</h3>
+                                    <p class="text-xs text-slate-500">Status harian pengambilan hidangan RMT mengikut kelas</p>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <!-- Butang Cetak (Sentiasa Dipaparkan) -->
+                                    <button onclick="printAttendanceReport()" class="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold px-3 py-2 rounded-xl border border-emerald-200 transition flex items-center gap-1.5 shadow-sm">
+                                        <i class="fa-solid fa-print"></i> Cetak Senarai
+                                    </button>
+
+                                    <!-- Butang Admin (Hanya Muncul Apabila Admin Log Masuk) -->
+<div class="admin-only hidden flex items-center gap-2">
+    <button onclick="markAllPresent()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1">
+        <i class="fa-solid fa-check-double text-emerald-600"></i> Tandakan Semua Hadir
+    </button>
+    <button onclick="resetAttendanceForSelectedDate()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-3 py-2 rounded-xl border border-rose-200 transition flex items-center gap-1">
+        <i class="fa-solid fa-rotate-left"></i> Batal / Reset Tarikh Ini
+    </button>
+</div>
+                                </div>
+                            </div>
+
+                            <!-- Search, Filter & Date Picker Bar -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Tarikh Kehadiran:</label>
+                                    <input type="date" id="attendanceDatePicker" onchange="loadAttendanceForSelectedDate()" class="w-full bg-emerald-50 border border-emerald-300 text-emerald-800 font-bold text-xs rounded-xl p-2 outline-none focus:ring-2 focus:ring-emerald-500">
+                                </div>
+
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Carian:</label>
+                                    <div class="relative">
+                                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                                        <input type="text" id="searchStudentInput" onkeyup="filterStudents()" placeholder="Cari nama/MyKid..." class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl pl-9 pr-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Kelas:</label>
+                                    <select id="filterClassSelect" onchange="filterStudents()" class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl p-2 outline-none focus:ring-2 focus:ring-emerald-500">
+                                        <option value="ALL">Semua Kelas (Tahun 1 - 6)</option>
+                                        <!-- Tahun 1 -->
+                                        <option value="1 Azkiya">Tahun 1 Azkiya</option>
+                                        <option value="1 Najihin">Tahun 1 Najihin</option>
+                                        <!-- Tahun 2 -->
+                                        <option value="2 Azkiya">Tahun 2 Azkiya</option>
+                                        <option value="2 Najihin">Tahun 2 Najihin</option>
+                                        <!-- Tahun 3 -->
+                                        <option value="3 Azkiya">Tahun 3 Azkiya</option>
+                                        <option value="3 Najihin">Tahun 3 Najihin</option>
+                                        <!-- Tahun 4 -->
+                                        <option value="4 Azkiya">Tahun 4 Azkiya</option>
+                                        <option value="4 Najihin">Tahun 4 Najihin</option>
+                                        <!-- Tahun 5 -->
+                                        <option value="5 Azkiya">Tahun 5 Azkiya</option>
+                                        <option value="5 Najihin">Tahun 5 Najihin</option>
+                                        <!-- Tahun 6 -->
+                                        <option value="6 Azkiya">Tahun 6 Azkiya</option>
+                                        <option value="6 Najihin">Tahun 6 Najihin</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Status:</label>
+                                    <select id="filterStatusSelect" onchange="filterStudents()" class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl p-2 outline-none focus:ring-2 focus:ring-emerald-500">
+                                        <option value="ALL">Semua Status</option>
+                                        <option value="TAKEN">Telah Ambil Makanan</option>
+                                        <option value="PENDING">Belum Ambil</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Student Table -->
+                            <div class="overflow-x-auto max-h-96 custom-scrollbar border border-slate-100 rounded-xl">
+                                <table class="w-full text-left border-collapse">
+                                    <thead class="bg-slate-50 text-[11px] font-bold text-slate-500 uppercase sticky top-0 border-b border-slate-200">
+                                        <tr>
+                                            <th class="p-3">Murid</th>
+                                            <th class="p-3">Kelas</th>
+                                            <th class="p-3">Status RMT</th>
+                                            <th class="p-3 text-right admin-only hidden">Tindakan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="studentTableBody" class="text-xs divide-y divide-slate-100">
+                                        <!-- Rendered dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: MENU RMT MINGGUAN -->
+            <section id="tab-menu" class="tab-panel hidden space-y-6">
+                <!-- Status Header for Canteen -->
+                <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl">
+                            <i class="fa-solid fa-kitchen-set"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800">Status Penyediaan Kantin Hari Ini</h3>
+                            <p class="text-xs text-slate-500">Pengusaha Kantin: <span class="font-semibold text-slate-700">Kantin Cemerlang Enterprise</span></p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span id="canteenStatusBadge" class="bg-emerald-100 text-emerald-800 font-bold text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-check"></i> Disahkan Sedia (06:45 AM)
+                        </span>
+                        <button onclick="toggleCanteenStatus()" class="admin-only hidden text-xs bg-slate-800 hover:bg-slate-900 text-white font-medium px-4 py-2 rounded-xl transition">
+                            Tukar Status Kesediaan
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Weekly Menu Planner Grid -->
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-slate-800 text-lg">Jadual Menu RMT Mingguan</h3>
+                        <span class="text-xs text-slate-500 bg-white border border-slate-200 px-3 py-1 rounded-lg">Panduan Pemakanan KPM</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4" id="weeklyMenuContainer">
+                        <!-- Populated dynamically via JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: PENGURUSAN DATA MURID (ADMIN ONLY) -->
+            <section id="tab-pengurusan-murid" class="tab-panel hidden space-y-6">
+                <!-- Header Actions -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Pentadbir Sahaja</span>
+                            <h3 class="font-bold text-slate-800 text-base">Pengurusan Data Murid Layak RMT (Supabase)</h3>
+                        </div>
+                        <p class="text-xs text-slate-500">Kemas kini senarai murid, muat naik fail CSV (APDM), cetak Kad QR, atau tambah murid baru.</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="generatePrintableQRCards()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs px-3.5 py-2.5 rounded-xl transition flex items-center gap-2 shadow">
+                            <i class="fa-solid fa-print"></i> Cetak Kad QR Murid
+                        </button>
+                        <button onclick="downloadCSVTemplate()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-3.5 py-2.5 rounded-xl transition flex items-center gap-2">
+                            <i class="fa-solid fa-download text-emerald-600"></i> Templat CSV
+                        </button>
+                        <label class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-2.5 rounded-xl transition flex items-center gap-2 cursor-pointer shadow">
+                            <i class="fa-solid fa-file-csv"></i> Import CSV
+                            <input type="file" id="csvFileInput" accept=".csv" onchange="handleCSVUpload(event)" class="hidden">
+                        </label>
+                        <button onclick="openAddStudentModal()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-3.5 py-2.5 rounded-xl transition flex items-center gap-2 shadow">
+                            <i class="fa-solid fa-user-plus"></i> Tambah Murid
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Main Data Table Container -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm space-y-4">
+                    <!-- Table Search Bar -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div class="relative lg:col-span-2">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
+                            <input type="text" id="adminSearchStudent" onkeyup="filterAdminStudents()" placeholder="Cari nama murid atau MyKid..." class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl pl-9 pr-3 py-2.5 outline-none focus:ring-2 focus:ring-emerald-500">
+                        </div>
+                        <select id="adminFilterClass" onchange="filterAdminStudents()" class="bg-slate-50 border border-slate-200 text-xs rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500">
+   			 <option value="ALL">Semua Kelas</option>
+  			  <!-- Tahun 1 -->
+  			  <option value="1 Azkiya">Tahun 1 Azkiya</option>
+  			  <option value="1 Najihin">Tahun 1 Najihin</option>
+ 			   <!-- Tahun 2 -->
+ 			   <option value="2 Azkiya">Tahun 2 Azkiya</option>
+ 			   <option value="2 Najihin">Tahun 2 Najihin</option>
+ 			   <!-- Tahun 3 -->
+ 			   <option value="3 Azkiya">Tahun 3 Azkiya</option>
+  			  <option value="3 Najihin">Tahun 3 Najihin</option>
+   			 <!-- Tahun 4 -->
+   			 <option value="4 Azkiya">Tahun 4 Azkiya</option>
+    			<option value="4 Najihin">Tahun 4 Najihin</option>
+   			 <!-- Tahun 5 -->
+   			 <option value="5 Azkiya">Tahun 5 Azkiya</option>
+   			 <option value="5 Najihin">Tahun 5 Najihin</option>
+   			 <!-- Tahun 6 -->
+   			 <option value="6 Azkiya">Tahun 6 Azkiya</option>
+   			 <option value="6 Najihin">Tahun 6 Najihin</option>
+			</select>
+                        <div class="text-right flex items-center justify-end">
+                            <span class="text-xs text-slate-500">Jumlah Murid Supabase: <strong id="adminStudentCount" class="text-emerald-600 font-bold">0</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Admin Student List Table -->
+                    <div class="overflow-x-auto max-h-[450px] custom-scrollbar border border-slate-100 rounded-xl">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead class="bg-slate-100 text-slate-600 font-bold uppercase sticky top-0 border-b border-slate-200">
+                                <tr>
+                                    <th class="p-3">ID (Supabase)</th>
+                                    <th class="p-3">Nama Penuh Murid</th>
+                                    <th class="p-3">Kelas</th>
+                                    <th class="p-3">MyKid / ID</th>
+                                    <th class="p-3 text-center">Tindakan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminStudentTableBody" class="divide-y divide-slate-100">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 5: LAPORAN & EKSPORT (KHAS GURU RMT / PK HEM / ADMIN) -->
+            <section id="tab-laporan" class="tab-panel hidden space-y-6">
+                <!-- Restricted Access Warning if viewed directly -->
+                <div id="laporanRestrictedNotice" class="hidden bg-rose-50 border border-rose-200 rounded-2xl p-8 text-center max-w-md mx-auto my-12">
+                    <div class="w-14 h-14 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto text-2xl mb-3">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-lg">Akses Terhad Pentadbir</h3>
+                    <p class="text-xs text-slate-600 mt-2">Modul laporan tuntutan kewangan dan PPD ini hanya boleh diakses oleh Guru RMT dan PK HEM Sekolah.</p>
+                    <button onclick="openLoginModal()" class="mt-4 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow transition">
+                        Log Masuk Sekarang
+                    </button>
+                </div>
+
+                <!-- Admin Report Content -->
+                <div id="laporanAdminContent" class="space-y-6">
+                    <!-- Export Action Bar -->
+                    <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="bg-purple-100 text-purple-800 text-[10px] font-bold px-2 py-0.5 rounded">Akses Terhad Admin</span>
+                                <h3 class="font-bold text-slate-800">Penjana Laporan Bulanan RMT</h3>
+                            </div>
+                            <p class="text-xs text-slate-500">Format penyediaan untuk Pejabat Pendidikan Daerah (PPD) / KPM</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="exportCSVReport()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
+                                <i class="fa-solid fa-file-excel"></i> Eksport Excel/CSV
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Report Summary Preview Table -->
+                    <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                            <h4 class="font-bold text-slate-800 text-sm">Ringkasan Tuntutan Kewangan RMT - September 2026</h4>
+                            <span class="text-xs text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full font-medium">Status: Terhubung Supabase</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-slate-50 p-4 rounded-xl text-xs">
+                            <div>
+                                <span class="text-slate-400 block mb-0.5">Hari Persekolahan:</span>
+                                <span class="font-bold text-slate-800 text-sm">20 Hari</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 block mb-0.5">Jumlah Layak RMT:</span>
+                                <span class="font-bold text-slate-800 text-sm" id="reportTotalStudents">0 Murid</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 block mb-0.5">Kadar Tuntutan Harian:</span>
+                                <span class="font-bold text-emerald-600 text-sm">RM 3.50 / murid</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 block mb-0.5">Anggaran Tuntutan Bulanan:</span>
+                                <span class="font-bold text-slate-800 text-sm" id="reportTotalClaim">RM 0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+   <!-- PRINTABLE SECTION FOR QR CARDS -->
+    <div id="printableCardSection" class="hidden p-6 bg-white">
+        <div class="flex justify-between items-center mb-6 no-print">
+            <h2 class="text-2xl font-bold text-slate-800">Kad QR Pas Murid RMT (Sedia Dicetak)</h2>
+            <div class="flex items-center gap-2">
+                <button onclick="closePrintableQRCards()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2.5 rounded-xl font-bold text-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i> Kembali ke Sistem
+                </button>
+                <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow transition flex items-center gap-2">
+                    <i class="fa-solid fa-print"></i> Cetak / Simpan PDF
+                </button>
+            </div>
+        </div>
+        <div id="qrCardsGrid" class="grid grid-cols-2 gap-4">
+            <!-- QR Cards rendered dynamically -->
+        </div>
+    </div>
+
+    <!-- MODAL 1: REAL CAMERA QR SCANNER -->
+    <div id="cameraScannerModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 no-print">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative text-center">
+            <button onclick="closeCameraScannerModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+
+            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto text-xl mb-2">
+                <i class="fa-solid fa-camera"></i>
+            </div>
+            <h3 class="font-bold text-slate-800 text-lg mb-1">Pengimbas Kamera Pas Murid</h3>
+            <p class="text-xs text-slate-500 mb-4">Halakan kamera telefon / webcam ke arah Kod QR Kad Murid RMT.</p>
+
+            <div id="cameraReader" class="overflow-hidden rounded-xl bg-black border-2 border-emerald-500 min-h-[250px]"></div>
+            <div id="cameraScanMsg" class="mt-4 p-3 rounded-xl text-xs hidden font-bold"></div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: CUSTOM NEON CIRCLE LOGIN PENTADBIR / GURU RMT -->
+    <div id="loginModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4 no-print">
+        <div class="circle-login-card relative">
+            <button onclick="closeLoginModal()" class="absolute top-8 right-8 text-slate-400 hover:text-white transition">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+
+            <h2>Log Masuk Admin</h2>
+            <p class="subtitle">Sila log masuk untuk modul pengurusan RMT</p>
+
+            <form onsubmit="handleLoginSubmit(event)">
+                <div class="input-box">
+                    <i class="fa-regular fa-user"></i>
+                    <input type="text" id="loginUsername" placeholder="ID Pengguna (admin)" required>
+                </div>
+
+                <div class="input-box">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="loginPassword" placeholder="Kata Laluan" required>
+                </div>
+
+                <div class="options">
+                    <label class="cursor-pointer flex items-center gap-1.5"><input type="checkbox" class="accent-purple-500"> Ingat saya</label>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    Log Masuk &rarr;
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 3: TAMBAH MURID MANUAL -->
+    <div id="addStudentModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 no-print">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="closeAddStudentModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="text-center mb-5">
+                <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto text-xl mb-2">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+                <h3 class="font-bold text-slate-800 text-lg">Tambah Murid RMT Baru</h3>
+                <p class="text-xs text-slate-500">Isi maklumat murid untuk didaftarkan terus ke Supabase</p>
+            </div>
+
+            <form onsubmit="handleAddStudentSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Penuh Murid *</label>
+                    <input type="text" id="newStudentName" placeholder="Contoh: Muhammad Ali Bin Hassan" required class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl p-3 outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Kelas *</label>
+                    <select id="newStudentClass" required class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl p-3 outline-none focus:ring-2 focus:ring-emerald-500">
+   		 <!-- Tahun 1 -->
+    		<option value="1 Azkiya">Tahun 1 Azkiya</option>
+   		 <option value="1 Najihin">Tahun 1 Najihin</option>
+   		 <!-- Tahun 2 -->
+   		 <option value="2 Azkiya">Tahun 2 Azkiya</option>
+   		 <option value="2 Najihin">Tahun 2 Najihin</option>
+  		  <!-- Tahun 3 -->
+  		  <option value="3 Azkiya">Tahun 3 Azkiya</option>
+   		 <option value="3 Najihin">Tahun 3 Najihin</option>
+    		<!-- Tahun 4 -->
+   		 <option value="4 Azkiya">Tahun 4 Azkiya</option>
+   		 <option value="4 Najihin">Tahun 4 Najihin</option>
+   		 <!-- Tahun 5 -->
+   		 <option value="5 Azkiya">Tahun 5 Azkiya</option>
+   		 <option value="5 Najihin">Tahun 5 Najihin</option>
+   		 <!-- Tahun 6 -->
+    		<option value="6 Azkiya">Tahun 6 Azkiya</option>
+   		 <option value="6 Najihin">Tahun 6 Najihin</option>
+		</select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">ID MyKid / No Kad Pengenalan</label>
+                    <input type="text" id="newStudentMyKid" placeholder="Contoh: 150102035544" class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl p-3 outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+
+                <div class="flex gap-2 pt-3">
+                    <button type="button" onclick="closeAddStudentModal()" class="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-2.5 rounded-xl transition">
+                        Batal
+                    </button>
+                    <button type="submit" class="w-1/2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-2.5 rounded-xl shadow transition">
+                        Simpan ke Supabase
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Notification Message Container -->
+    <div id="actionModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 no-print">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl">
+            <div id="modalIcon" class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center text-xl mb-3">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h3 id="modalTitle" class="font-bold text-slate-800 text-lg">Berjaya!</h3>
+            <p id="modalMessage" class="text-xs text-slate-500 mt-2">Tindakan anda telah direkodkan dalam sistem.</p>
+            <button onclick="closeModal()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs py-2.5 rounded-xl mt-5 transition">
+                Tutup
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- SUPABASE CONFIGURATION ---
+        const SUPABASE_URL = "https://jdgyjdbogoatntplpzdc.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkZ3lqZGJvZ29hdG50cGxwemRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5MjAyNzcsImV4cCI6MjEwNDQ5NjI3N30.EBOZ5KjpNO8FIpF5plTGF1Z7-D5WMFhbTAtOw_Cb0gI";
+
+        // Initialize Supabase Client
+        const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // --- APPLICATION STATE ---
+        let isAdminLoggedIn = false;
+        let studentsData = [];
+        let attendanceDataToday = [];
+        let html5QrcodeScanner = null;
+
+        let menuData = [
+            { day: "Isnin", meal: "Nasi Goreng Cina + Telur Mata + Pisang", calories: "390 kcal", protein: "14g", prepared: true },
+            { day: "Selasa", meal: "Mee Hoon Sup Ayam + Buah Epal", calories: "350 kcal", protein: "16g", prepared: true },
+            { day: "Rabu", meal: "Nasi Ayam Kukus + Sup Sayur + Tembikai", calories: "420 kcal", protein: "18g", prepared: true },
+            { day: "Khamis", meal: "Nasi Lemak Sihat RMT + Susu Segar", calories: "410 kcal", protein: "15g", prepared: false },
+            { day: "Jumaat", meal: "Mee Goreng Mamak Sihat + Betik", calories: "380 kcal", protein: "13g", prepared: false }
+        ];
+
+  window.onload = async function() {
+            updateRoleUI();
+            renderWeeklyMenu();
+            initCharts();
+            
+            // Set tarikh laluan (default) kepada hari ini
+            const todayStr = new Date().toISOString().split('T')[0];
+            const datePicker = document.getElementById('attendanceDatePicker');
+            if (datePicker) datePicker.value = todayStr;
+
+            await loadDataFromSupabase();
+
+            document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+                document.getElementById('navMenu').classList.toggle('hidden');
+            });
+        };
+
+     // --- SUPABASE DATA FETCHING ---
+        async function loadDataFromSupabase() {
+            const badge = document.getElementById('supabaseConnectionBadge');
+            const dbText = document.getElementById('dbStatusText');
+            
+            try {
+                dbText.innerText = "Memuat data...";
+
+                // Fetch Murid list
+                const { data: muridList, error: errMurid } = await db
+                    .from('murid')
+                    .select('*')
+                    .order('id', { ascending: true });
+
+                if (errMurid) throw errMurid;
+
+                studentsData = muridList || [];
+
+                // Fetch Attendance berdasarkan tarikh pada Date Picker
+                const dateInput = document.getElementById('attendanceDatePicker');
+                const selectedDate = (dateInput && dateInput.value) ? dateInput.value : new Date().toISOString().split('T')[0];
+
+                const { data: attList, error: errAtt } = await db
+                    .from('kehadiran_rmt')
+                    .select('*')
+                    .eq('tarikh', selectedDate);
+
+                if (errAtt) throw errAtt;
+
+                attendanceDataToday = attList || [];
+
+                // Update UI Connection Status
+                dbText.innerText = "Supabase Live";
+                badge.className = "bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs px-3 py-1.5 rounded-full font-medium flex items-center gap-2";
+
+                refreshAllViews();
+
+            } catch (err) {
+                console.error("Supabase error:", err);
+                dbText.innerText = "Supabase Ralat / Offline";
+                badge.className = "bg-rose-50 text-rose-700 border border-rose-200 text-xs px-3 py-1.5 rounded-full font-medium flex items-center gap-2";
+            }
+        }
+
+        // --- MUAT KEHADIRAN MENGIKUT TARIKH DIPILIH ---
+        async function loadAttendanceForSelectedDate() {
+            const dateInput = document.getElementById('attendanceDatePicker');
+            const selectedDate = (dateInput && dateInput.value) ? dateInput.value : new Date().toISOString().split('T')[0];
+
+            try {
+                const { data: attList, error } = await db
+                    .from('kehadiran_rmt')
+                    .select('*')
+                    .eq('tarikh', selectedDate);
+
+                if (error) throw error;
+
+                attendanceDataToday = attList || [];
+                refreshAllViews();
+
+            } catch (err) {
+                console.error("Ralat memuat data kehadiran:", err);
+            }
+        }
+
+        // --- CAMERA QR SCANNER LOGIC ---
+        function openCameraScannerModal() {
+            document.getElementById('cameraScannerModal').classList.remove('hidden');
+            document.getElementById('cameraScannerModal').classList.add('flex');
+
+            html5QrcodeScanner = new Html5Qrcode("cameraReader");
+            html5QrcodeScanner.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 200, height: 200 } },
+                onCameraScanSuccess
+            ).catch(err => {
+                console.error("Gagal membuka kamera:", err);
+            });
+        }
+
+        function closeCameraScannerModal() {
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.stop().then(() => {
+                    html5QrcodeScanner.clear();
+                    document.getElementById('cameraScannerModal').classList.add('hidden');
+                    document.getElementById('cameraScannerModal').classList.remove('flex');
+                }).catch(() => {
+                    document.getElementById('cameraScannerModal').classList.add('hidden');
+                    document.getElementById('cameraScannerModal').classList.remove('flex');
+                });
+            } else {
+                document.getElementById('cameraScannerModal').classList.add('hidden');
+                document.getElementById('cameraScannerModal').classList.remove('flex');
+            }
+        }
+
+        async function onCameraScanSuccess(decodedText) {
+            const scannedCode = decodedText.trim();
+            
+            // 1. Cari murid dalam memori mengikut MyKid atau ID
+            let student = studentsData.find(s => 
+                (s.mykid && s.mykid.trim() === scannedCode) || 
+                String(s.id) === scannedCode
+            );
+
+            const msgBox = document.getElementById('cameraScanMsg');
+            msgBox.classList.remove('hidden');
+
+            // 2. Jika murid tiada dalam memori, muat turun data terkini terus dari Supabase
+            if (!student) {
+                await loadDataFromSupabase();
+                student = studentsData.find(s => 
+                    (s.mykid && s.mykid.trim() === scannedCode) || 
+                    String(s.id) === scannedCode
+                );
+            }
+
+            // 3. Jika murid dijumpai, tanda kehadiran ke Supabase
+            if (student) {
+                await markStudentAttendance(student.id);
+                msgBox.className = "mt-4 p-3 rounded-xl text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300";
+                msgBox.innerHTML = `<i class="fa-solid fa-circle-check"></i> Imbasan Berjaya!<br>${student.nama} (${student.kelas})`;
+            } else {
+                msgBox.className = "mt-4 p-3 rounded-xl text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300";
+                msgBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Kod QR Tidak Dikenali! (${scannedCode})`;
+            }
+
+            setTimeout(() => { msgBox.classList.add('hidden'); }, 3000);
+        }
+
+      // --- PRINTABLE QR CARDS GENERATOR ---
+        function generatePrintableQRCards() {
+            const grid = document.getElementById('qrCardsGrid');
+            grid.innerHTML = "";
+
+            if (studentsData.length === 0) {
+                alert("Tiada data murid untuk dicetak.");
+                return;
+            }
+
+            studentsData.forEach(s => {
+                const card = document.createElement('div');
+                card.className = "border-2 border-emerald-600 rounded-2xl p-4 flex items-center justify-between bg-white shadow-sm";
+                const qrId = `qr-${s.id}`;
+                card.innerHTML = `
+                    <div>
+                        <span class="bg-emerald-700 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">PAS RMT SEKOLAH</span>
+                        <h4 class="font-bold text-slate-800 text-sm mt-2">${s.nama}</h4>
+                        <p class="text-xs text-slate-600 mt-0.5">Kelas: ${s.kelas}</p>
+                        <p class="text-[10px] text-slate-400 font-mono mt-1">ID / MyKid: ${s.mykid || '-'}</p>
+                    </div>
+                    <div id="${qrId}" class="p-1 bg-slate-50 rounded-xl border border-slate-200"></div>
+                `;
+                grid.appendChild(card);
+
+                setTimeout(() => {
+                    new QRCode(document.getElementById(qrId), {
+                        text: s.mykid || String(s.id),
+                        width: 75,
+                        height: 75
+                    });
+                }, 100);
+            });
+
+            document.getElementById('printableCardSection').classList.remove('hidden');
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+
+        // TAMBAH FUNGSI BAHARU INI DI SINI:
+        function closePrintableQRCards() {
+            document.getElementById('printableCardSection').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateRoleUI() {
+            const adminElements = document.querySelectorAll('.admin-only');
+            const publicElements = document.querySelectorAll('.public-only');
+            const roleText = document.getElementById('roleBadgeText');
+            const roleIcon = document.getElementById('roleBadgeIcon');
+            const loginSideBtn = document.getElementById('loginSideBtn');
+            const logoutSideBtn = document.getElementById('logoutSideBtn');
+            const topLoginBtn = document.getElementById('topLoginBtn');
+            const tableContainer = document.getElementById('attendanceTableContainer');
+
+            if (isAdminLoggedIn) {
+                adminElements.forEach(el => el.classList.remove('hidden'));
+                publicElements.forEach(el => el.classList.add('hidden'));
+
+                if (roleText) {
+                    roleText.innerText = "Guru RMT / PK HEM";
+                    roleText.className = "font-bold text-emerald-400";
+                }
+                if (roleIcon) roleIcon.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
+
+                if (loginSideBtn) loginSideBtn.classList.add('hidden');
+                if (logoutSideBtn) logoutSideBtn.classList.remove('hidden');
+                if (topLoginBtn) topLoginBtn.classList.add('hidden');
+
+                const restrictedNotice = document.getElementById('laporanRestrictedNotice');
+                const adminContent = document.getElementById('laporanAdminContent');
+                if (restrictedNotice) restrictedNotice.classList.add('hidden');
+                if (adminContent) adminContent.classList.remove('hidden');
+
+                // Dalam Admin Mode, jadual mengambil 2 kolum (sebab modul scanner muncul di sebelah)
+                if (tableContainer) {
+                    tableContainer.classList.remove('lg:col-span-3');
+                    tableContainer.classList.add('lg:col-span-2');
+                }
+            } else {
+                adminElements.forEach(el => el.classList.add('hidden'));
+                publicElements.forEach(el => el.classList.remove('hidden'));
+
+                if (roleText) {
+                    roleText.innerText = "Akses Awam / Ibu Bapa";
+                    roleText.className = "font-semibold text-slate-200";
+                }
+                if (roleIcon) roleIcon.className = "w-2.5 h-2.5 rounded-full bg-blue-400";
+
+                if (loginSideBtn) loginSideBtn.classList.remove('hidden');
+                if (logoutSideBtn) logoutSideBtn.classList.add('hidden');
+                if (topLoginBtn) topLoginBtn.classList.remove('hidden');
+
+                const restrictedNotice = document.getElementById('laporanRestrictedNotice');
+                const adminContent = document.getElementById('laporanAdminContent');
+                if (restrictedNotice) restrictedNotice.classList.remove('hidden');
+                if (adminContent) adminContent.classList.add('hidden');
+
+                // Dalam Public Mode, jadual melebarkan diri memenuhi 3 kolum
+                if (tableContainer) {
+                    tableContainer.classList.remove('lg:col-span-2');
+                    tableContainer.classList.add('lg:col-span-3');
+                }
+            }
+        }
+
+        function openLoginModal() {
+            document.getElementById('loginModal').classList.remove('hidden');
+            document.getElementById('loginModal').classList.add('flex');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.add('hidden');
+            document.getElementById('loginModal').classList.remove('flex');
+        }
+
+        function handleLoginSubmit(e) {
+            e.preventDefault();
+            
+            const usernameInput = document.getElementById('loginUsername').value.trim();
+            const passwordInput = document.getElementById('loginPassword').value.trim();
+
+            const VALID_USERNAMES = ['admin', 'guru.rmt@moe.edu.my', 'pkhem'];
+            const VALID_PASSWORD = 'rmt2026';
+
+            if (VALID_USERNAMES.includes(usernameInput.toLowerCase()) && passwordInput === VALID_PASSWORD) {
+                isAdminLoggedIn = true;
+                updateRoleUI();
+                closeLoginModal();
+                
+                document.getElementById('loginUsername').value = '';
+                document.getElementById('loginPassword').value = '';
+
+                showModal(
+                    "Log Masuk Berjaya!", 
+                    "Anda kini berada dalam Mod Pentadbir (Guru RMT / PK HEM)."
+                );
+            } else {
+                alert("Ralat Log Masuk!\nID Pengguna atau Kata Laluan yang anda masukkan adalah salah.Sila cuba lagi.");
+            }
+        }
+
+        function logoutAdmin() {
+            isAdminLoggedIn = false;
+            updateRoleUI();
+            switchTab('dashboard');
+            showModal("Log Keluar", "Anda telah kembali ke Mod Akses Awam / Ibu Bapa.");
+        }
+
+        function handleAdminTabClick(tabId) {
+            switchTab(tabId);
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(nav => {
+                nav.classList.remove('bg-emerald-600', 'text-white', 'shadow-md', 'shadow-emerald-900/30');
+                nav.classList.add('text-slate-300', 'hover:bg-slate-800');
+            });
+
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            const activeNav = document.getElementById('nav-' + tabId);
+            if (activeNav) {
+                activeNav.classList.add('bg-emerald-600', 'text-white', 'shadow-md', 'shadow-emerald-900/30');
+                activeNav.classList.remove('text-slate-300', 'hover:bg-slate-800');
+            }
+
+            const titleMap = {
+                'dashboard': ['Dashboard Utama', 'Ringkasan status harian & maklumat nutrisi murid RMT'],
+                'kehadiran': ['Semakan Kehadiran Murid', 'Rekod pengambilan makanan harian murid RMT (Supabase)'],
+                'menu': ['Jadual Menu RMT Mingguan', 'Perancangan menu sihat mengikut standard KPM'],
+                'pengurusan-murid': ['Pengurusan Data Murid', 'Muat naik CSV/APDM, tambah murid baharu, dan cetak Kad QR'],
+                'laporan': ['Laporan & Tuntutan Kewangan', 'Jana rekod tuntutan bulanan untuk PPD / KPM (Admin)']
+            };
+
+            if (titleMap[tabId]) {
+                document.getElementById('pageTitle').innerText = titleMap[tabId][0];
+                document.getElementById('pageSubtitle').innerText = titleMap[tabId][1];
+            }
+        }
+
+        function refreshAllViews() {
+            renderStudentTable(studentsData);
+            renderAdminStudentTable(studentsData);
+            populateScanDropdown();
+            updateTopStats();
+        }
+
+        function renderAdminStudentTable(data) {
+            const tbody = document.getElementById('adminStudentTableBody');
+            tbody.innerHTML = '';
+            document.getElementById('adminStudentCount').innerText = data.length;
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-medium">Tiada rekod murid dalam pangkalan data Supabase. Sila tambah murid atau muat naik fail CSV.</td></tr>`;
+                return;
+            }
+
+            data.forEach((student) => {
+                let tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
+                tr.innerHTML = `
+                    <td class="p-3 font-mono text-slate-500 font-medium">${student.id}</td>
+                    <td class="p-3 font-bold text-slate-800">${student.nama}</td>
+                    <td class="p-3 font-medium text-slate-600">${student.kelas}</td>
+                    <td class="p-3 font-mono text-slate-500">${student.mykid || '-'}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="deleteStudentSupabase(${student.id}, '${student.nama}')" title="Padam Murid" class="text-rose-500 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 p-2 rounded-lg transition">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterAdminStudents() {
+            const searchVal = document.getElementById('adminSearchStudent').value.toLowerCase();
+            const classVal = document.getElementById('adminFilterClass').value;
+
+            const filtered = studentsData.filter(s => {
+                const matchesSearch = s.nama.toLowerCase().includes(searchVal) || (s.mykid && s.mykid.toLowerCase().includes(searchVal));
+                const matchesClass = classVal === 'ALL' || s.kelas === classVal;
+                return matchesSearch && matchesClass;
+            });
+
+            renderAdminStudentTable(filtered);
+        }
+
+        function openAddStudentModal() {
+            document.getElementById('addStudentModal').classList.remove('hidden');
+        }
+
+        function closeAddStudentModal() {
+            document.getElementById('addStudentModal').classList.add('hidden');
+        }
+
+        async function handleAddStudentSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('newStudentName').value.trim();
+            const studentClass = document.getElementById('newStudentClass').value;
+            const mykid = document.getElementById('newStudentMyKid').value.trim();
+
+            try {
+                const { data, error } = await db
+                    .from('murid')
+                    .insert([{ nama: name, kelas: studentClass, mykid: mykid }])
+                    .select();
+
+                if (error) throw error;
+
+                closeAddStudentModal();
+                document.getElementById('newStudentName').value = '';
+                document.getElementById('newStudentMyKid').value = '';
+
+                showModal("Berjaya Disimpan!", `Murid ${name} (${studentClass}) telah dimasukkan ke pangkalan data Supabase.`);
+                await loadDataFromSupabase();
+
+            } catch (err) {
+                alert("Ralat semasa menyimpan ke Supabase: " + err.message);
+            }
+        }
+
+        async function deleteStudentSupabase(studentId, name) {
+            if (!confirm(`Adakah anda pasti mahu memadam murid ${name} daripada Supabase?`)) return;
+
+            try {
+                const { error } = await db
+                    .from('murid')
+                    .delete()
+                    .eq('id', studentId);
+
+                if (error) throw error;
+
+                showModal("Rekod Dipadam", `Data murid ${name} telah dipadam daripada Supabase.`);
+                await loadDataFromSupabase();
+
+            } catch (err) {
+                alert("Ralat semasa memadam: " + err.message);
+            }
+        }
+
+        function downloadCSVTemplate() {
+            const csvContent = "data:text/csv;charset=utf-8,Nama,Kelas,MyKid\nAhmad Daniel Bin Rosli,3 Bijak,150312034433\nSiti Nur Aishah Binti Azman,1 Cerdas,170410031122\nMuhammad Adam Rayyan,2 Pintar,160520038899";
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "Templat_Data_Murid_RMT.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        async function handleCSVUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function(evt) {
+                const text = evt.target.result;
+                const lines = text.split('\n');
+                let newRecords = [];
+
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+                    const parts = line.split(',');
+                    if (parts.length >= 2) {
+                        const nama = parts[0].trim();
+                        const kelas = parts[1].trim();
+                        const mykid = parts[2] ? parts[2].trim() : null;
+
+                        if (nama) {
+                            newRecords.push({ nama, kelas: kelas || '1 Cerdas', mykid });
+                        }
+                    }
+                }
+
+                if (newRecords.length > 0) {
+                    try {
+                        const { error } = await db
+                            .from('murid')
+                            .insert(newRecords);
+
+                        if (error) throw error;
+
+                        showModal("Import CSV Berjaya!", `${newRecords.length} murid baharu telah berjaya diimport ke Supabase.`);
+                        await loadDataFromSupabase();
+                    } catch (err) {
+                        alert("Ralat semasa memuat naik CSV ke Supabase: " + err.message);
+                    }
+                }
+                e.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        function isStudentAttended(studentId) {
+            return attendanceDataToday.some(a => a.murid_id === studentId);
+        }
+
+        function renderStudentTable(data) {
+            const tbody = document.getElementById('studentTableBody');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400 font-medium">Tiada murid RMT dalam pangkalan data. Sila tambah murid di modul Pengurusan Murid.</td></tr>`;
+                return;
+            }
+
+            data.forEach(student => {
+                const attended = isStudentAttended(student.id);
+
+                let badgeClass = attended ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
+                let statusText = attended ? '<i class="fa-solid fa-circle-check mr-1"></i> Telah Ambil' : '<i class="fa-solid fa-clock mr-1"></i> Belum Ambil';
+
+                let actionButton = '';
+                if (isAdminLoggedIn) {
+                    actionButton = !attended 
+                        ? `<button onclick="markStudentAttendance(${student.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg shadow transition">Tanda Ambil</button>`
+                        : `<span class="text-emerald-600 text-[11px] font-semibold"><i class="fa-solid fa-check mr-1"></i>Selesai</span>`;
+                }
+
+                let tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
+                tr.innerHTML = `
+                    <td class="p-3">
+                        <div class="font-bold text-slate-800">${student.nama}</div>
+                        <div class="text-[10px] text-slate-400">MyKid: ${student.mykid || '-'}</div>
+                    </td>
+                    <td class="p-3 font-medium text-slate-600">${student.kelas}</td>
+                    <td class="p-3">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${badgeClass}">
+                            ${statusText}
+                        </span>
+                    </td>
+                    <td class="p-3 text-right admin-only ${isAdminLoggedIn ? '' : 'hidden'}">
+                        ${actionButton}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- FUNGSI CETAK SENARAI KEHADIRAN (TAMPAL DI SINI) ---
+        function printAttendanceReport() {
+            const selectedDate = document.getElementById('attendanceDatePicker').value || new Date().toISOString().split('T')[0];
+            const selectedClass = document.getElementById('filterClassSelect').value;
+            const classText = selectedClass === 'ALL' ? 'Semua Kelas (Tahun 1 - 6)' : selectedClass;
+
+            let rowsHtml = '';
+            const filteredList = typeof getFilteredStudents === 'function' ? getFilteredStudents() : studentsData;
+
+            if (filteredList.length === 0) {
+                rowsHtml = `<tr><td colspan="4" style="text-align:center; padding: 12px; color: #888;">Tiada rekod murid ditemui.</td></tr>`;
+            } else {
+                filteredList.forEach((s, index) => {
+                    const attended = isStudentAttended(s.id);
+                    const statusStr = attended ? 'TELAH AMBIL' : 'BELUM AMBIL';
+                    const statusColor = attended ? '#047857' : '#b45309';
+
+                    rowsHtml += `
+                        <tr>
+                            <td style="text-align: center;">${index + 1}</td>
+                            <td>
+                                <strong>${s.nama}</strong><br>
+                                <span style="font-size: 9px; color: #666;">MyKid: ${s.mykid || '-'}</span>
+                            </td>
+                            <td>${s.kelas}</td>
+                            <td style="font-weight: bold; color: ${statusColor};">${statusStr}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Laporan Kehadiran RMT - SK Felda Chemomoi</title>
+                    <style>
+                        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 20px; color: #1e293b; }
+                        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #059669; padding-bottom: 10px; }
+                        .header h2 { margin: 0; color: #065f46; font-size: 18px; text-transform: uppercase; }
+                        .header p { margin: 4px 0 0; font-size: 11px; color: #64748b; }
+                        .info-bar { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 11px; font-weight: bold; background: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                        th, td { border: 1px solid #cbd5e1; padding: 8px; text-align: left; font-size: 11px; }
+                        th { background-color: #f1f5f9; text-transform: uppercase; color: #475569; font-size: 10px; }
+                        .footer { margin-top: 30px; font-size: 9px; text-align: right; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 8px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h2>SK FELDA CHEMOMOI</h2>
+                        <p>REKOD KEHADIRAN & PENGAMBILAN MAKANAN RMT</p>
+                    </div>
+                    <div class="info-bar">
+                        <span>TARIKH: ${selectedDate}</span>
+                        <span>TAPISAN KELAS: ${classText}</span>
+                        <span>JUMLAH REKOD: ${filteredList.length} Murid</span>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%; text-align: center;">No</th>
+                                <th style="width: 50%;">Nama Murid</th>
+                                <th style="width: 25%;">Kelas</th>
+                                <th style="width: 20%;">Status RMT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml}
+                        </tbody>
+                    </table>
+                    <div class="footer">
+                        Dicetak pada: ${new Date().toLocaleString('ms-MY')} | e-RMT SK Felda Chemomoi
+                    </div>
+                </body>
+                </html>
+            `);
+
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 500);
+        }
+
+        function populateScanDropdown() {
+            const select = document.getElementById('scanStudentSelect');
+            select.innerHTML = '';
+            
+            const unAttendedList = studentsData.filter(s => !isStudentAttended(s.id));
+
+            unAttendedList.forEach(s => {
+                select.innerHTML += `<option value="${s.id}">${s.nama} (${s.kelas})</option>`;
+            });
+
+            if (unAttendedList.length === 0) {
+                select.innerHTML = `<option value="">Semua murid telah mengambil makanan hari ini</option>`;
+            }
+        }
+
+        async function triggerQRScan() {
+            const studentId = document.getElementById('scanStudentSelect').value;
+            if (!studentId) return;
+
+            await markStudentAttendance(Number(studentId));
+        }
+
+       async function markStudentAttendance(studentId) {
+            const dateInput = document.getElementById('attendanceDatePicker');
+            const selectedDate = (dateInput && dateInput.value) ? dateInput.value : new Date().toISOString().split('T')[0];
+
+            try {
+                const { error } = await db
+                    .from('kehadiran_rmt')
+                    .insert([{ murid_id: studentId, tarikh: selectedDate, status: 'Hadir' }]);
+
+                if (error) throw error;
+
+                const student = studentsData.find(s => s.id === studentId);
+                showModal("Kehadiran Direkod!", `Sajian RMT disahkan untuk ${student ? student.nama : 'Murid'} bagi tarikh (${selectedDate}). Rekod disimpan ke Supabase.`);
+                await loadAttendanceForSelectedDate();
+
+            } catch (err) {
+                alert("Ralat semasa mencatat kehadiran: " + err.message);
+            }
+        }
+
+      // --- Kemaskini Fungsi Attendance Pukal (Dengan Pengesahan) ---
+        async function markAllPresent() {
+            const dateInput = document.getElementById('attendanceDatePicker');
+            const selectedDate = (dateInput && dateInput.value) ? dateInput.value : new Date().toISOString().split('T')[0];
+            const unAttendedList = studentsData.filter(s => !isStudentAttended(s.id));
+
+            if (unAttendedList.length === 0) {
+                showModal("Maklumat", "Semua murid telah ditandakan mengambil makanan bagi tarikh ini.");
+                return;
+            }
+
+            // Pop-up pengesahan keselamatan
+            const confirmAction = confirm(`Adakah anda pasti untuk menanda HADIR secara pukal bagi ${unAttendedList.length} murid pada tarikh (${selectedDate})?`);
+            if (!confirmAction) return;
+
+            const records = unAttendedList.map(s => ({ murid_id: s.id, tarikh: selectedDate, status: 'Hadir' }));
+
+            try {
+                const { error } = await db
+                    .from('kehadiran_rmt')
+                    .insert(records);
+
+                if (error) throw error;
+
+                showModal("Kehadiran Pukal!", `Semua ${records.length} murid telah ditandakan mengambil makanan bagi tarikh (${selectedDate}).`);
+                await loadAttendanceForSelectedDate();
+            } catch (err) {
+                alert("Ralat semasa menanda semua hadir: " + err.message);
+            }
+        }
+
+        // --- Fungsi Reset / Undo Kehadiran Bagi Tarikh Dipilih ---
+        async function resetAttendanceForSelectedDate() {
+            const dateInput = document.getElementById('attendanceDatePicker');
+            const selectedDate = (dateInput && dateInput.value) ? dateInput.value : new Date().toISOString().split('T')[0];
+
+            if (attendanceDataToday.length === 0) {
+                alert("Tiada rekod kehadiran untuk dipadam pada tarikh ini.");
+                return;
+            }
+
+            const confirmReset = confirm(`AMARAN: Adakah anda pasti untuk MEMADAM / RESET semula semua rekod kehadiran pada tarikh (${selectedDate})?`);
+            if (!confirmReset) return;
+
+            try {
+                const { error } = await db
+                    .from('kehadiran_rmt')
+                    .delete()
+                    .eq('tarikh', selectedDate);
+
+                if (error) throw error;
+
+                showModal("Rekod Dipadam", `Semua rekod kehadiran bagi tarikh (${selectedDate}) telah dibatalkan/direset.`);
+                await loadAttendanceForSelectedDate();
+
+            } catch (err) {
+                alert("Ralat semasa memadam rekod: " + err.message);
+            }
+        }
+
+        function filterStudents() {
+            const searchVal = document.getElementById('searchStudentInput').value.toLowerCase();
+            const classVal = document.getElementById('filterClassSelect').value;
+            const statusVal = document.getElementById('filterStatusSelect').value;
+
+            const filtered = studentsData.filter(s => {
+                const matchesSearch = s.nama.toLowerCase().includes(searchVal) || (s.mykid && s.mykid.toLowerCase().includes(searchVal));
+                const matchesClass = classVal === 'ALL' || s.kelas === classVal;
+                
+                const attended = isStudentAttended(s.id);
+                const matchesStatus = statusVal === 'ALL' || (statusVal === 'TAKEN' && attended) || (statusVal === 'PENDING' && !attended);
+                
+                return matchesSearch && matchesClass && matchesStatus;
+            });
+
+            renderStudentTable(filtered);
+        }
+
+        function updateTopStats() {
+            const total = studentsData.length;
+            const takenCount = studentsData.filter(s => isStudentAttended(s.id)).length;
+
+            document.getElementById('statTotalStudents').innerText = total;
+            document.getElementById('statAttended').innerText = `${takenCount} / ${total}`;
+            document.getElementById('reportTotalStudents').innerText = `${total} Murid`;
+
+            const dailyCost = (total * 3.50).toFixed(2);
+            document.getElementById('statDailyBudget').innerText = `RM ${dailyCost}`;
+
+            const monthlyClaim = (total * 3.50 * 20).toFixed(2);
+            document.getElementById('reportTotalClaim').innerText = `RM ${monthlyClaim}`;
+
+            const percentage = total > 0 ? Math.round((takenCount / total) * 100) : 0;
+            document.getElementById('attendanceProgressBar').style.width = percentage + '%';
+        }
+
+        function renderWeeklyMenu() {
+            const container = document.getElementById('weeklyMenuContainer');
+            container.innerHTML = '';
+
+            menuData.forEach((m) => {
+                const isToday = m.day === 'Rabu';
+                container.innerHTML += `
+                    <div class="bg-white rounded-2xl p-4 border ${isToday ? 'border-emerald-500 ring-2 ring-emerald-500/20' : 'border-slate-100'} shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold ${isToday ? 'text-emerald-600' : 'text-slate-500'} uppercase tracking-wide">${m.day} ${isToday ? '(Hari Ini)' : ''}</span>
+                                <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded">${m.calories}</span>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-sm mb-2">${m.meal}</h4>
+                            <p class="text-[11px] text-slate-500 mb-3"><i class="fa-solid fa-dumbbell mr-1 text-emerald-500"></i> Protein: ${m.protein}</p>
+                        </div>
+                        <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span class="text-[10px] font-semibold ${m.prepared ? 'text-emerald-600 bg-emerald-50' : 'text-amber-600 bg-amber-50'} px-2 py-1 rounded-md">
+                                ${m.prepared ? 'Sedia Dihidang' : 'Dalam Perancangan'}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function toggleCanteenStatus() {
+            const badge = document.getElementById('canteenStatusBadge');
+            if (badge.classList.contains('bg-emerald-100')) {
+                badge.className = "bg-amber-100 text-amber-800 font-bold text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5";
+                badge.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i> Penyediaan Makanan Sedang Berjalan`;
+            } else {
+                badge.className = "bg-emerald-100 text-emerald-800 font-bold text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5";
+                badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> Disahkan Sedia (06:45 AM)`;
+            }
+        }
+
+        function exportCSVReport() {
+            let csv = "ID_Supabase,Nama_Murid,Kelas,MyKid,Status_Kehadiran_Hari_Ini\n";
+            studentsData.forEach(s => {
+                const status = isStudentAttended(s.id) ? "Telah Ambil" : "Belum Ambil";
+                csv += `"${s.id}","${s.nama}","${s.kelas}","${s.mykid || ''}","${status}"\n`;
+            });
+
+            const encodedUri = encodeURI("data:text/csv;charset=utf-8," + csv);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Laporan_RMT_Sekolah_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function showModal(title, msg) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMessage').innerText = msg;
+            document.getElementById('actionModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('actionModal').classList.add('hidden');
+        }
+
+        function initCharts() {
+            const ctxAtt = document.getElementById('attendanceChart').getContext('2d');
+            new Chart(ctxAtt, {
+                type: 'bar',
+                data: {
+                    labels: ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat'],
+                    datasets: [
+                        {
+                            label: 'Jumlah Murid Ambil Makanan',
+                            data: [8, 7, 8, 8, 7],
+                            backgroundColor: '#10b981',
+                            borderRadius: 8
+                        },
+                        {
+                            label: 'Jumlah Murid Layak (Total)',
+                            data: [8, 8, 8, 8, 8],
+                            backgroundColor: '#e2e8f0',
+                            borderRadius: 8
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, max: 10, grid: { color: '#f1f5f9' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            const ctxNut = document.getElementById('nutritionChart').getContext('2d');
+            new Chart(ctxNut, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Karbohidrat', 'Protein', 'Serat/Buah', 'Lemak Sihat'],
+                    datasets: [{
+                        data: [50, 25, 15, 10],
+                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+    </script>
+</body>
+</html>
