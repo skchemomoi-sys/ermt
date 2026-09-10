@@ -558,7 +558,7 @@
                 </div>
             </section>
 
-            <!-- TAB 3: MENU RMT MINGGUAN -->
+           <!-- TAB 3: MENU RMT MINGGUAN -->
             <section id="tab-menu" class="tab-panel hidden space-y-6">
                 <!-- Status Header for Canteen -->
                 <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -568,32 +568,75 @@
                         </div>
                         <div>
                             <h3 class="font-bold text-slate-800">Status Penyediaan Kantin Hari Ini</h3>
-                            <p class="text-xs text-slate-500">Pengusaha Kantin: <span class="font-semibold text-slate-700">Kantin Cemerlang Enterprise</span></p>
+                            <p class="text-xs text-slate-500">
+                                Pengusaha Kantin: <span id="canteenNameDisplay" class="font-semibold text-slate-700">Kantin Cemerlang Enterprise</span>
+                            </p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2">
                         <span id="canteenStatusBadge" class="bg-emerald-100 text-emerald-800 font-bold text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5">
-                            <i class="fa-solid fa-circle-check"></i> Disahkan Sedia (06:45 AM)
-                        </span>
-                        <button onclick="toggleCanteenStatus()" class="admin-only hidden text-xs bg-slate-800 hover:bg-slate-900 text-white font-medium px-4 py-2 rounded-xl transition">
-                            Tukar Status Kesediaan
+    <i class="fa-solid fa-circle-check"></i> Disahkan Sedia (07:00 AM)
+</span>
+                        <button onclick="editCanteenName()" class="admin-only hidden text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-1.5 rounded-xl border border-slate-200 transition">
+                            <i class="fa-solid fa-pen-to-square mr-1"></i> Edit Kantin
+                        </button>
+                        <button onclick="toggleCanteenStatus()" class="admin-only hidden text-xs bg-slate-800 hover:bg-slate-900 text-white font-medium px-3 py-1.5 rounded-xl transition">
+                            Tukar Status
                         </button>
                     </div>
                 </div>
 
-                <!-- Weekly Menu Planner Grid -->
+                <!-- Borang Kemaskini Menu (HANYA MUNCUL DALAM MOD ADMIN/GURU RMT) -->
+                <div class="admin-only hidden bg-white rounded-2xl p-6 border border-emerald-100 shadow-sm bg-emerald-50/20">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fa-solid fa-pen-to-square text-emerald-600"></i>
+                        <h3 class="font-bold text-slate-800 text-sm">Kemaskini Menu RMT Mingguan</h3>
+                    </div>
+                    <form id="editMenuForm" onsubmit="saveMenuRMT(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Hari:</label>
+                            <select id="menuDaySelect" onchange="populateMenuForm()" class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl p-2.5 font-bold outline-none focus:ring-2 focus:ring-emerald-500">
+                                <option value="Isnin">Isnin</option>
+                                <option value="Selasa">Selasa</option>
+                                <option value="Rabu">Rabu</option>
+                                <option value="Khamis">Khamis</option>
+                                <option value="Jumaat">Jumaat</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Hidangan / Makanan:</label>
+                            <input type="text" id="menuFoodInput" required placeholder="Contoh: Nasi Ayam Kukus + Tembikai" class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Kalori (kcal):</label>
+                            <input type="text" id="menuCaloriesInput" placeholder="420 kcal" class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500">
+                        </div>
+                        <div class="flex items-end gap-2">
+                            <div class="flex-1">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Protein:</label>
+                                <input type="text" id="menuProteinInput" placeholder="18g" class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                            <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition">
+                                Simpan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+               <!-- Weekly Menu Planner Grid -->
                 <div>
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="font-bold text-slate-800 text-lg">Jadual Menu RMT Mingguan</h3>
-                        <span class="text-xs text-slate-500 bg-white border border-slate-200 px-3 py-1 rounded-lg">Panduan Pemakanan KPM</span>
+                        <a href="https://www.moe.gov.my" target="_blank" class="text-xs font-semibold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 cursor-pointer">
+                            <i class="fa-solid fa-file-pdf"></i> Panduan Pemakanan KPM
+                        </a>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4" id="weeklyMenuContainer">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4" id="weeklyMenuContainer">
                         <!-- Populated dynamically via JavaScript -->
                     </div>
                 </div>
+               
             </section>
-
             <!-- TAB 4: PENGURUSAN DATA MURID (ADMIN ONLY) -->
             <section id="tab-pengurusan-murid" class="tab-panel hidden space-y-6">
                 <!-- Header Actions -->
@@ -1685,15 +1728,15 @@
         }
 
         function toggleCanteenStatus() {
-            const badge = document.getElementById('canteenStatusBadge');
-            if (badge.classList.contains('bg-emerald-100')) {
-                badge.className = "bg-amber-100 text-amber-800 font-bold text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5";
-                badge.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i> Penyediaan Makanan Sedang Berjalan`;
-            } else {
-                badge.className = "bg-emerald-100 text-emerald-800 font-bold text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5";
-                badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> Disahkan Sedia (06:45 AM)`;
-            }
-        }
+    const badge = document.getElementById('canteenStatusBadge');
+    if (badge.classList.contains('bg-emerald-100')) {
+        badge.className = "bg-amber-100 text-amber-800 font-bold text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5";
+        badge.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i> Penyediaan Makanan Sedang Berjalan`;
+    } else {
+        badge.className = "bg-emerald-100 text-emerald-800 font-bold text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5";
+        badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> Disahkan Sedia (07:00 AM)`;
+    }
+}
 
         function exportCSVReport() {
             let csv = "ID_Supabase,Nama_Murid,Kelas,MyKid,Status_Kehadiran_Hari_Ini\n";
@@ -1717,7 +1760,7 @@
             document.getElementById('actionModal').classList.remove('hidden');
         }
 
-        function closeModal() {
+       function closeModal() {
             document.getElementById('actionModal').classList.add('hidden');
         }
 
@@ -1774,7 +1817,201 @@
                     cutout: '70%'
                 }
             });
+        } // <-- PENUTUP FUNGSI initCharts() YANG TERMALING TADI
+
+        // ==========================================
+        // PENGURUSAN MENU RMT MINGGUAN
+        // ==========================================
+        let currentMenuData = [];
+
+        // 1. Muat turun Menu dari Supabase
+        async function loadWeeklyMenu() {
+            try {
+                const { data, error } = await db.from('menu_rmt').select('*');
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    currentMenuData = data;
+                } else {
+                    currentMenuData = [
+                        { hari: 'Isnin', makanan: 'Nasi Goreng Cina + Telur Mata + Pisang', kalori: '390 kcal', protein: '14g' },
+                        { hari: 'Selasa', makanan: 'Mee Hoon Sup Ayam + Buah Epal', kalori: '350 kcal', protein: '16g' },
+                        { hari: 'Rabu', makanan: 'Nasi Ayam Kukus + Sup Sayur + Tembikai', kalori: '420 kcal', protein: '18g' },
+                        { hari: 'Khamis', makanan: 'Nasi Lemak Sihat RMT + Susu Segar', kalori: '410 kcal', protein: '15g' },
+                        { hari: 'Jumaat', makanan: 'Mee Goreng Mamak Sihat + Betik', kalori: '380 kcal', protein: '13g' }
+                    ];
+                }
+
+                renderWeeklyMenuCards();
+                updateTodayDashboardMenu();
+                populateMenuForm();
+            } catch (err) {
+                console.error("Ralat memuatkan menu:", err.message);
+            }
         }
+
+       // 2. Melukis Kad Menu Mingguan (KEMASKINI BAHARU)
+        function renderWeeklyMenuCards() {
+            const container = document.getElementById('weeklyMenuContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const daysOrder = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat'];
+            
+            // Dapatkan indeks hari semasa (0 = Ahad, 1 = Isnin, 2 = Selasa, 3 = Rabu, 4 = Khamis, 5 = Jumaat, 6 = Sabtu)
+            const rawDayIndex = new Date().getDay(); 
+            
+            // Tetapkan indeks perbandingan
+            let currentDayIndex = rawDayIndex;
+            if (rawDayIndex === 0) currentDayIndex = 0; // Ahad
+            if (rawDayIndex === 6) currentDayIndex = 5; // Sabtu
+
+            daysOrder.forEach((day, index) => {
+                const menu = currentMenuData.find(m => m.hari.toLowerCase() === day.toLowerCase()) || {
+                    hari: day, makanan: 'Tiada Menu Setted', kalori: '-', protein: '-'
+                };
+
+                const dayNum = index + 1; // 1 = Isnin, 2 = Selasa, 3 = Rabu, 4 = Khamis, 5 = Jumaat
+                const isToday = dayNum === currentDayIndex;
+                
+                // Hari ini dan hari-hari yang telah lepas minggu ini mendapat status 'Sedia Dihidang'
+                const isPassedOrToday = dayNum <= currentDayIndex;
+
+                const cardStyle = isToday 
+                    ? 'border-2 border-emerald-500 bg-emerald-50/30 shadow-md ring-2 ring-emerald-200' 
+                    : 'border border-slate-100 bg-white shadow-sm';
+
+                const statusText = isPassedOrToday ? 'Sedia Dihidang' : 'Dalam Perancangan';
+                const statusColor = isPassedOrToday ? 'text-emerald-600 font-bold' : 'text-amber-600 font-medium';
+
+                container.innerHTML += `
+                    <div class="rounded-2xl p-4 ${cardStyle} flex flex-col justify-between transition">
+                        <div>
+                            <div class="flex items-center justify-between text-[10px] font-bold uppercase mb-2">
+                                <span class="${isToday ? 'text-emerald-700 font-extrabold' : 'text-slate-500'}">${day} ${isToday ? '(HARI INI)' : ''}</span>
+                                <span class="text-slate-400">${menu.kalori}</span>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-xs mb-2 leading-relaxed">${menu.makanan}</h4>
+                            <p class="text-[10px] font-semibold text-emerald-600"><i class="fa-solid fa-dna mr-1"></i>Protein: ${menu.protein}</p>
+                        </div>
+                        <div class="mt-4 pt-2 border-t border-slate-100">
+                            <span class="text-[10px] ${statusColor}">
+                                ${statusText}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // 3. Kemaskini Menu Hari Ini Secara Automatik di Dashboard Utama
+        function updateTodayDashboardMenu() {
+            const daysOrder = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
+            const todayIndex = new Date().getDay();
+            let todayName = daysOrder[todayIndex];
+
+            if (todayIndex === 0 || todayIndex === 6) todayName = 'Isnin';
+
+            const todayMenu = currentMenuData.find(m => m.hari.toLowerCase() === todayName.toLowerCase());
+
+            if (todayMenu) {
+                const dashboardMenuTitle = document.getElementById('dashboardTodayMenuTitle');
+                const dashboardMenuName = document.getElementById('dashboardTodayMenuName');
+                const dashboardMenuCal = document.getElementById('dashboardTodayMenuCal');
+                const dashboardMenuProt = document.getElementById('dashboardTodayMenuProt');
+
+                if (dashboardMenuTitle) dashboardMenuTitle.innerText = `MENU HARI INI (${todayName.toUpperCase()})`;
+                if (dashboardMenuName) dashboardMenuName.innerText = todayMenu.makanan;
+                if (dashboardMenuCal) dashboardMenuCal.innerText = `Jumlah Kalori: ${todayMenu.kalori}`;
+                if (dashboardMenuProt) dashboardMenuProt.innerText = `Protein: ${todayMenu.protein}`;
+            }
+        }
+
+        // 4. Isi Borang Admin Mengikut Hari yang Dipilih
+        function populateMenuForm() {
+            const daySelect = document.getElementById('menuDaySelect');
+            if (!daySelect) return;
+            const selectedDay = daySelect.value;
+            const menu = currentMenuData.find(m => m.hari.toLowerCase() === selectedDay.toLowerCase());
+
+            if (menu) {
+                document.getElementById('menuFoodInput').value = menu.makanan;
+                document.getElementById('menuCaloriesInput').value = menu.kalori;
+                document.getElementById('menuProteinInput').value = menu.protein;
+            }
+        }
+
+       // 5. Simpan Perubahan Menu ke Supabase
+        async function saveMenuRMT(e) {
+            e.preventDefault();
+            const hari = document.getElementById('menuDaySelect').value;
+            const makanan = document.getElementById('menuFoodInput').value;
+            const kalori = document.getElementById('menuCaloriesInput').value || '400 kcal';
+            const protein = document.getElementById('menuProteinInput').value || '15g';
+
+            try {
+                const { error } = await db
+                    .from('menu_rmt')
+                    .upsert({ hari, makanan, kalori, protein });
+
+                if (error) throw error;
+
+                showModal("Menu Dikemaskini", `Menu bagi hari ${hari} telah berjaya disimpan.`);
+                await loadWeeklyMenu();
+            } catch (err) {
+                alert("Ralat semasa menyimpan menu: " + err.message);
+            }
+        }
+
+        // ==========================================
+        // PENGURUSAN NAMA PENGUSAHA KANTIN
+        // ==========================================
+        async function loadCanteenInfo() {
+            try {
+                const { data, error } = await db.from('tetapan_sekolah').select('nama_kantin').eq('id', 1).single();
+                if (error && error.code !== 'PGRST116') throw error;
+
+                if (data && data.nama_kantin) {
+                    updateCanteenUI(data.nama_kantin);
+                }
+            } catch (err) {
+                console.warn("Menggunakan maklumat kantin lalai:", err.message);
+            }
+        }
+
+        function updateCanteenUI(namaKantin) {
+            const displays = ['canteenNameDisplay', 'dashboardCanteenNameDisplay'];
+            displays.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerText = namaKantin;
+            });
+        }
+
+        async function editCanteenName() {
+            const currentName = document.getElementById('canteenNameDisplay')?.innerText || 'Kantin Cemerlang Enterprise';
+            const newName = prompt("Masukkan Nama Pengusaha Kantin / Syarikat Baharu:", currentName);
+
+            if (newName && newName.trim() !== "" && newName !== currentName) {
+                try {
+                    const { error } = await db
+                        .from('tetapan_sekolah')
+                        .upsert({ id: 1, nama_kantin: newName.trim() });
+
+                    if (error) throw error;
+
+                    updateCanteenUI(newName.trim());
+                    showModal("Berjaya", "Nama pengusaha kantin telah dikemaskini.");
+                } catch (err) {
+                    alert("Ralat semasa menyimpan nama kantin: " + err.message);
+                }
+            }
+        }
+
+        // Inisialisasi Panggilan Sistem
+        document.addEventListener('DOMContentLoaded', () => {
+            loadWeeklyMenu();
+            loadCanteenInfo();
+        });
     </script>
 </body>
 </html>
