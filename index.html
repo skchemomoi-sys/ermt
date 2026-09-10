@@ -282,151 +282,189 @@
         <!-- Main Content Dynamic Panels -->
         <div class="p-4 sm:p-6 lg:p-8 space-y-6 flex-1">
 
-            <!-- TAB 1: DASHBOARD UTAMA -->
-            <section id="tab-dashboard" class="tab-panel space-y-6">
-                <!-- Top Stat Cards Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <!-- Total RMT Students (Akses Awam) -->
-                    <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Jumlah Murid Layak RMT</p>
-                                <h3 class="text-2xl font-bold text-slate-800 mt-1" id="statTotalStudents">0</h3>
-                                <p class="text-xs text-emerald-600 mt-2 flex items-center font-medium">
-                                    <i class="fa-solid fa-database text-[10px] mr-1"></i> Data dari Supabase
-                                </p>
-                            </div>
-                            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
-                                <i class="fa-solid fa-users"></i>
-                            </div>
-                        </div>
-                    </div>
+          <!-- TAB 1: DASHBOARD UTAMA -->
+<section id="tab-dashboard" class="tab-panel space-y-6">
+    <!-- Top Stat Cards Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+        <!-- Total RMT Students (Akses Awam) -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Jumlah Murid Layak RMT</p>
+                    <h3 class="text-2xl font-bold text-slate-800 mt-1" id="statTotalStudents">0</h3>
+                    <p class="text-xs text-emerald-600 mt-2 flex items-center font-medium">
+                        <i class="fa-solid fa-database text-[10px] mr-1"></i> Data dari Supabase
+                    </p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+            </div>
+        </div>
 
-                    <!-- Attendance Today (Akses Awam) -->
-                    <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Ambil Makanan Hari Ini</p>
-                                <h3 class="text-2xl font-bold text-slate-800 mt-1" id="statAttended">0 / 0</h3>
-                                <div class="w-full bg-slate-100 h-2 rounded-full mt-3 overflow-hidden">
-                                    <div id="attendanceProgressBar" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
-                                </div>
-                            </div>
-                            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
-                                <i class="fa-solid fa-user-check"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Food Waste Percentage (RESTRICTED: HANYA ADMIN/GURU RMT) -->
-                    <div id="cardWasteStat" class="admin-only hidden bg-white rounded-2xl p-5 border border-amber-100 shadow-sm hover:shadow-md transition relative overflow-hidden">
-                        <div class="absolute top-0 right-0 bg-amber-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl">Sulit Admin</div>
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Anggaran Pembaziran</p>
-                                <h3 class="text-2xl font-bold text-slate-800 mt-1" id="statWaste">2.4 <span class="text-sm font-normal text-slate-500">kg</span></h3>
-                                <p class="text-xs text-emerald-600 mt-2 flex items-center font-medium">
-                                    <i class="fa-solid fa-arrow-down text-[10px] mr-1"></i> -15% minggu ini
-                                </p>
-                            </div>
-                            <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
-                                <i class="fa-solid fa-dumpster"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Status Bajet / Peruntukan (RESTRICTED: HANYA ADMIN/GURU RMT) -->
-                    <div id="cardBudgetStat" class="admin-only hidden bg-white rounded-2xl p-5 border border-purple-100 shadow-sm hover:shadow-md transition relative overflow-hidden">
-                        <div class="absolute top-0 right-0 bg-purple-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl">Kewangan Admin</div>
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Peruntukan RMT Hari Ini</p>
-                                <h3 class="text-2xl font-bold text-slate-800 mt-1" id="statDailyBudget">RM 0.00</h3>
-                                <p class="text-xs text-slate-500 mt-2 font-medium">
-                                    Kadar: <span class="text-purple-700 font-semibold">RM3.50 / murid</span>
-                                </p>
-                            </div>
-                            <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl">
-                                <i class="fa-solid fa-wallet"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Public Notice Card -->
-                    <div id="cardPublicNotice" class="public-only bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-5 text-white shadow-sm flex flex-col justify-between">
-                        <div>
-                            <span class="text-[10px] bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded">e-RMT Info</span>
-                            <h4 class="font-bold text-sm mt-2">Program Pemakanan KPM</h4>
-                            <p class="text-xs text-slate-300 mt-1 leading-relaxed">Menyediakan sajian sihat, seimbang dan berkualiti untuk membendung kemiskinan nutrisi.</p>
-                        </div>
-                        <div class="mt-3 pt-2 border-t border-slate-700 text-[11px] text-slate-400">
-                            Dipantau oleh Pentadbir Sekolah
-                        </div>
+        <!-- Attendance Today (Akses Awam) -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Ambil Makanan Hari Ini</p>
+                    <h3 class="text-2xl font-bold text-slate-800 mt-1" id="statAttended">0 / 0</h3>
+                    <div class="w-full bg-slate-100 h-2 rounded-full mt-3 overflow-hidden">
+                        <div id="attendanceProgressBar" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
                     </div>
                 </div>
-
-                <!-- Graphs Section -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Kehadiran Mingguan Chart -->
-                    <div class="lg:col-span-2 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
-                        <div class="flex items-center justify-between mb-4">
-                            <div>
-                                <h3 class="font-bold text-slate-800">Analisis Kehadiran RMT (Minggu Ini)</h3>
-                                <p class="text-xs text-slate-500">Perbandingan murid mengambil makanan berbanding murid hadir</p>
-                            </div>
-                            <span class="text-xs bg-slate-100 text-slate-600 font-medium px-2.5 py-1 rounded-md">Minggu Semasa</span>
-                        </div>
-                        <div class="h-64">
-                            <canvas id="attendanceChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Nutritional Breakdown Chart -->
-                    <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <h3 class="font-bold text-slate-800">Imbangan Nutrisi Menu Hari Ini</h3>
-                                <span class="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-medium">Standard KPM</span>
-                            </div>
-                            <p class="text-xs text-slate-500 mb-4">Nasi Ayam Kukus + Sup Sayur + Tembikai</p>
-                            <div class="h-48 flex justify-center">
-                                <canvas id="nutritionChart"></canvas>
-                            </div>
-                        </div>
-                        <div class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500 flex justify-between">
-                            <span>Jumlah Kalori: <strong class="text-slate-800">420 kcal</strong></span>
-                            <span>Protein: <strong class="text-slate-800">18g</strong></span>
-                        </div>
-                    </div>
+                <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-user-check"></i>
                 </div>
+            </div>
+        </div>
 
-                <!-- Today's Menu Highlight Banner -->
-                <div class="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
-                    <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                        <div>
-                            <div class="flex items-center space-x-2">
-                                <span class="bg-emerald-800/60 backdrop-blur text-emerald-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
-                                    Menu Hari Ini (Rabu)
-                                </span>
-                                <span class="bg-white/20 text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1">
-                                    <i class="fa-solid fa-circle text-[8px] text-emerald-300"></i> Terpelihara Halal
-                                </span>
-                            </div>
-                            <h3 class="text-2xl font-bold mt-3">Nasi Ayam Kukus + Sup Sayur + Tembikai</h3>
-                            <p class="text-emerald-100 text-sm mt-1">Disediakan oleh: <span class="font-semibold text-white">Kantin Cemerlang Enterprise</span></p>
-                        </div>
-                        <div class="flex flex-wrap items-center gap-3">
-                            <button onclick="switchTab('kehadiran')" class="bg-white text-emerald-800 hover:bg-emerald-50 px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow">
-                                <i class="fa-solid fa-search"></i> Semak Senarai Murid
-                            </button>
-                            <button onclick="switchTab('menu')" class="bg-emerald-800/50 hover:bg-emerald-800 text-white px-4 py-2.5 rounded-xl text-xs font-medium transition">
-                                Jadual Mingguan
-                            </button>
-                        </div>
-                    </div>
-                    <i class="fa-solid fa-bowl-rice text-9xl absolute -bottom-6 -right-6 text-white/10 pointer-events-none"></i>
+       <!-- Food Waste Percentage (RESTRICTED: HANYA ADMIN/GURU RMT) -->
+<div id="cardWasteStat" class="admin-only hidden bg-white rounded-2xl p-5 border border-amber-100 shadow-sm hover:shadow-md transition relative overflow-hidden">
+    <div class="absolute top-0 right-0 bg-amber-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl">Sulit Admin</div>
+    <div class="flex justify-between items-start">
+        <div>
+            <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Anggaran Pembaziran</p>
+            <h3 class="text-2xl font-bold text-slate-800 mt-1" id="statWaste">0.0 <span class="text-sm font-normal text-slate-500">kg</span></h3>
+            
+            <!-- Ditambah id="statWasteSubtext" untuk fungsi dinamik JavaScript -->
+            <p id="statWasteSubtext" class="text-xs text-emerald-600 mt-2 flex items-center font-medium">
+                <i class="fa-solid fa-check text-[10px] mr-1"></i> Tiada Pembaziran
+            </p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
+            <i class="fa-solid fa-dumpster"></i>
+        </div>
+    </div>
+</div>
+
+        <!-- Kad 1: Tuntutan Sebenar Hari Ini (Murid Hadir) -->
+        <div id="cardActualClaimStat" class="admin-only hidden bg-white rounded-2xl p-5 border border-emerald-100 shadow-sm hover:shadow-md transition relative overflow-hidden">
+            <div class="absolute top-0 right-0 bg-emerald-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl">Kewangan Sah</div>
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Tuntutan Sebenar Hari Ini</p>
+                    <h3 class="text-2xl font-bold text-slate-800 mt-1" id="statActualClaimToday">RM 0.00</h3>
+                    <p class="text-xs text-slate-500 mt-2 font-medium">
+                        Berdasarkan: <span class="text-emerald-700 font-semibold">Kehadiran Murid</span>
+                    </p>
                 </div>
-            </section>
+                <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-receipt"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kad 2: Anggaran Maksimum Harian (Keseluruhan Murid Layak) -->
+        <div id="cardMaxBudgetStat" class="admin-only hidden bg-white rounded-2xl p-5 border border-purple-100 shadow-sm hover:shadow-md transition relative overflow-hidden">
+            <div class="absolute top-0 right-0 bg-purple-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl">Siling Peruntukan</div>
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Anggaran Maksimum Harian</p>
+                    <h3 class="text-2xl font-bold text-slate-800 mt-1" id="statMaxDailyBudget">RM 0.00</h3>
+                    <p class="text-xs text-slate-500 mt-2 font-medium">
+                        Kadar: <span class="text-purple-700 font-semibold">RM3.50 × Murid Layak</span>
+                    </p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Public Notice Card -->
+        <div id="cardPublicNotice" class="public-only bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-5 text-white shadow-sm flex flex-col justify-between">
+            <div>
+                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded">e-RMT Info</span>
+                <h4 class="font-bold text-sm mt-2">Program Pemakanan KPM</h4>
+                <p class="text-xs text-slate-300 mt-1 leading-relaxed">Menyediakan sajian sihat, seimbang dan berkualiti untuk membendung kemiskinan nutrisi.</p>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-700 text-[11px] text-slate-400">
+                Dipantau oleh Pentadbir Sekolah
+            </div>
+        </div>
+    </div>
+               <!-- Graphs Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Kehadiran Mingguan Chart -->
+    <div class="lg:col-span-2 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h3 class="font-bold text-slate-800">Analisis Kehadiran RMT (Minggu Ini)</h3>
+                <p class="text-xs text-slate-500">Perbandingan murid mengambil makanan berbanding murid hadir</p>
+            </div>
+            <span class="text-xs bg-slate-100 text-slate-600 font-medium px-2.5 py-1 rounded-md">Minggu Semasa</span>
+        </div>
+        <div class="h-64">
+            <canvas id="attendanceChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Nutritional Breakdown Chart (Versi Kemas) -->
+    <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex flex-col justify-between">
+        <div>
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-800">Imbangan Nutrisi Menu</h3>
+                <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full uppercase">Standard KPM</span>
+            </div>
+            
+            <!-- Format Nama Menu Berbentuk Lencana Kemas -->
+            <div class="bg-slate-50 rounded-xl p-2.5 border border-slate-100 my-2 text-center">
+                <p class="text-xs font-semibold text-slate-700 flex items-center justify-center gap-2 flex-wrap">
+                    <span>Nasi Ayam Kukus</span>
+                    <span class="text-emerald-500 font-bold">•</span>
+                    <span>Sup Sayur</span>
+                    <span class="text-emerald-500 font-bold">•</span>
+                    <span>Tembikai</span>
+                </p>
+            </div>
+
+            <div class="h-44 flex justify-center items-center my-1">
+                <canvas id="nutritionChart"></canvas>
+            </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 text-xs text-slate-500 flex justify-between items-center bg-slate-50/50 -mx-5 -mb-5 p-4 rounded-b-2xl">
+            <span>Jumlah Kalori: <strong class="text-slate-800 font-bold">420 kcal</strong></span>
+            <span>Protein: <strong class="text-slate-800 font-bold">18g</strong></span>
+        </div>
+    </div>
+</div>
+
+<!-- Today's Menu Highlight Banner (Versi Kemas) -->
+<div class="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+    <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+            <div class="flex items-center space-x-2">
+                <span class="bg-emerald-800/60 backdrop-blur text-emerald-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
+                    Menu Hari Ini (Rabu)
+                </span>
+                <span class="bg-white/20 text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1">
+                    <i class="fa-solid fa-circle text-[8px] text-emerald-300"></i> Terpelihara Halal
+                </span>
+            </div>
+            
+            <!-- Tajuk Menu Banner Berasingan Kemas -->
+            <h3 class="text-2xl font-bold mt-3 flex items-center gap-2 flex-wrap">
+                <span>Nasi Ayam Kukus</span>
+                <span class="text-emerald-300 font-normal text-lg">•</span>
+                <span>Sup Sayur</span>
+                <span class="text-emerald-300 font-normal text-lg">•</span>
+                <span>Tembikai</span>
+            </h3>
+            <p class="text-emerald-100 text-sm mt-1">Disediakan oleh: <span class="font-semibold text-white">Kantin Cemerlang Enterprise</span></p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+            <button onclick="switchTab('kehadiran')" class="bg-white text-emerald-800 hover:bg-emerald-50 px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow">
+                <i class="fa-solid fa-search"></i> Semak Senarai Murid
+            </button>
+            <button onclick="switchTab('menu')" class="bg-emerald-800/50 hover:bg-emerald-800 text-white px-4 py-2.5 rounded-xl text-xs font-medium transition">
+                Jadual Mingguan
+            </button>
+        </div>
+    </div>
+    <i class="fa-solid fa-bowl-rice text-9xl absolute -bottom-6 -right-6 text-white/10 pointer-events-none"></i>
+</div>
+</section>
 
      <!-- TAB 2: SEMAKAN KEHADIRAN MURID -->
             <section id="tab-kehadiran" class="tab-panel hidden space-y-6">
@@ -1726,50 +1764,82 @@
             renderStudentTable(filtered);
         }
 
-        function updateTopStats() {
-            const total = studentsData ? studentsData.length : 0;
-            const takenCount = studentsData ? studentsData.filter(s => isStudentAttended(s.id)).length : 0;
+      function updateTopStats() {
+    const total = studentsData ? studentsData.length : 0;
+    const takenCount = studentsData ? studentsData.filter(s => isStudentAttended(s.id)).length : 0;
 
-            const elTotalStudents = document.getElementById('statTotalStudents');
-            const elAttended = document.getElementById('statAttended');
-            const elDailyBudget = document.getElementById('statDailyBudget');
-            const elProgressBar = document.getElementById('attendanceProgressBar');
+    const elTotalStudents = document.getElementById('statTotalStudents');
+    const elAttended = document.getElementById('statAttended');
+    const elProgressBar = document.getElementById('attendanceProgressBar');
+    
+    // Elemen Kewangan Dua Kad
+    const elActualClaim = document.getElementById('statActualClaimToday');
+    const elMaxBudget = document.getElementById('statMaxDailyBudget');
+    
+    // Elemen Anggaran Pembaziran
+    const elWaste = document.getElementById('statWaste');
 
-            if (elTotalStudents) elTotalStudents.innerText = total;
-            if (elAttended) elAttended.innerText = `${takenCount} / ${total}`;
+    if (elTotalStudents) elTotalStudents.innerText = total;
+    if (elAttended) elAttended.innerText = `${takenCount} / ${total}`;
 
-            const dailyCost = (total * 3.50).toFixed(2);
-            if (elDailyBudget) elDailyBudget.innerText = `RM ${dailyCost}`;
+    // 1. Kirakan Tuntutan Sebenar Hari Ini (Murid Hadir × RM 3.50)
+    const actualCost = (takenCount * 3.50).toFixed(2);
+    if (elActualClaim) elActualClaim.innerText = `RM ${actualCost}`;
 
-            const percentage = total > 0 ? Math.round((takenCount / total) * 100) : 0;
-            if (elProgressBar) elProgressBar.style.width = percentage + '%';
+    // 2. Kirakan Peruntukan Maksimum Harian (Jumlah Murid Layak × RM 3.50)
+    const maxCost = (total * 3.50).toFixed(2);
+    if (elMaxBudget) elMaxBudget.innerText = `RM ${maxCost}`;
+
+    // 3. Kirakan Anggaran Pembaziran Makanan (0.3 kg se porsi bagi murid tidak hadir/ambil)
+    const absentCount = total - takenCount;
+    const wasteInKg = (absentCount * 0.3).toFixed(1);
+    if (elWaste) {
+        elWaste.innerHTML = `${wasteInKg} <span class="text-sm font-normal text-slate-500">kg</span>`;
+    }
+
+    // Kemaskini teks indikator di bawah berat pembaziran
+    const elWasteSubtext = document.getElementById('statWasteSubtext');
+    if (elWasteSubtext) {
+        if (absentCount === 0) {
+            elWasteSubtext.innerHTML = `<i class="fa-solid fa-check text-[10px] mr-1"></i> Tiada Pembaziran`;
+            elWasteSubtext.className = "text-xs text-emerald-600 mt-2 flex items-center font-medium";
+        } else {
+            elWasteSubtext.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-[10px] mr-1"></i> ${absentCount} murid tidak ambil`;
+            elWasteSubtext.className = "text-xs text-amber-600 mt-2 flex items-center font-medium";
         }
+    }
 
-        function renderWeeklyMenu() {
-            const container = document.getElementById('weeklyMenuContainer');
-            container.innerHTML = '';
+    const percentage = total > 0 ? Math.round((takenCount / total) * 100) : 0;
+    if (elProgressBar) elProgressBar.style.width = percentage + '%';
+}
 
-            menuData.forEach((m) => {
-                const isToday = m.day === 'Rabu';
-                container.innerHTML += `
-                    <div class="bg-white rounded-2xl p-4 border ${isToday ? 'border-emerald-500 ring-2 ring-emerald-500/20' : 'border-slate-100'} shadow-sm flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-xs font-bold ${isToday ? 'text-emerald-600' : 'text-slate-500'} uppercase tracking-wide">${m.day} ${isToday ? '(Hari Ini)' : ''}</span>
-                                <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded">${m.calories}</span>
-                            </div>
-                            <h4 class="font-bold text-slate-800 text-sm mb-2">${m.meal}</h4>
-                            <p class="text-[11px] text-slate-500 mb-3"><i class="fa-solid fa-dumbbell mr-1 text-emerald-500"></i> Protein: ${m.protein}</p>
-                        </div>
-                        <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                            <span class="text-[10px] font-semibold ${m.prepared ? 'text-emerald-600 bg-emerald-50' : 'text-amber-600 bg-amber-50'} px-2 py-1 rounded-md">
-                                ${m.prepared ? 'Sedia Dihidang' : 'Dalam Perancangan'}
-                            </span>
-                        </div>
+function renderWeeklyMenu() {
+    const container = document.getElementById('weeklyMenuContainer');
+    if (!container) return;
+    
+    container.innerHTML = '';
+
+    menuData.forEach((m) => {
+        const isToday = m.day === 'Rabu';
+        container.innerHTML += `
+            <div class="bg-white rounded-2xl p-4 border ${isToday ? 'border-emerald-500 ring-2 ring-emerald-500/20' : 'border-slate-100'} shadow-sm flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold ${isToday ? 'text-emerald-600' : 'text-slate-500'} uppercase tracking-wide">${m.day} ${isToday ? '(Hari Ini)' : ''}</span>
+                        <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded">${m.calories}</span>
                     </div>
-                `;
-            });
-        }
+                    <h4 class="font-bold text-slate-800 text-sm mb-2">${m.meal}</h4>
+                    <p class="text-[11px] text-slate-500 mb-3"><i class="fa-solid fa-dumbbell mr-1 text-emerald-500"></i> Protein: ${m.protein}</p>
+                </div>
+                <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <span class="text-[10px] font-semibold ${m.prepared ? 'text-emerald-600 bg-emerald-50' : 'text-amber-600 bg-amber-50'} px-2 py-1 rounded-md">
+                        ${m.prepared ? 'Sedia Dihidang' : 'Dalam Perancangan'}
+                    </span>
+                </div>
+            </div>
+        `;
+    });
+}
 
         function toggleCanteenStatus() {
     const badge = document.getElementById('canteenStatusBadge');
