@@ -719,67 +719,86 @@
                 </div>
             </section>
 
-            <!-- TAB 5: LAPORAN & EKSPORT (KHAS GURU RMT / PK HEM / ADMIN) -->
+          <!-- TAB 5: LAPORAN & TUNTUTAN KEWANGAN -->
             <section id="tab-laporan" class="tab-panel hidden space-y-6">
-                <!-- Restricted Access Warning if viewed directly -->
-                <div id="laporanRestrictedNotice" class="hidden bg-rose-50 border border-rose-200 rounded-2xl p-8 text-center max-w-md mx-auto my-12">
-                    <div class="w-14 h-14 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto text-2xl mb-3">
-                        <i class="fa-solid fa-lock"></i>
-                    </div>
-                    <h3 class="font-bold text-slate-800 text-lg">Akses Terhad Pentadbir</h3>
-                    <p class="text-xs text-slate-600 mt-2">Modul laporan tuntutan kewangan dan PPD ini hanya boleh diakses oleh Guru RMT dan PK HEM Sekolah.</p>
-                    <button onclick="openLoginModal()" class="mt-4 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow transition">
-                        Log Masuk Sekarang
-                    </button>
-                </div>
 
-                <!-- Admin Report Content -->
-                <div id="laporanAdminContent" class="space-y-6">
-                    <!-- Export Action Bar -->
-                    <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                        <div>
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="bg-purple-100 text-purple-800 text-[10px] font-bold px-2 py-0.5 rounded">Akses Terhad Admin</span>
-                                <h3 class="font-bold text-slate-800">Penjana Laporan Bulanan RMT</h3>
-                            </div>
-                            <p class="text-xs text-slate-500">Format penyediaan untuk Pejabat Pendidikan Daerah (PPD) / KPM</p>
+                <!-- 1. Kad Penjana Laporan & Pemilih Bulan -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div>
+                        <span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full uppercase tracking-wider">Akses Terhad Admin</span>
+                        <h3 class="font-bold text-slate-800 text-lg mt-1">Penjana Laporan Bulanan RMT</h3>
+                        <p class="text-xs text-slate-500">Format penyediaan untuk Pejabat Pendidikan Daerah (PPD) / KPM</p>
+                    </div>
+
+                    <!-- BORANG PEMILIH BULAN & TAHUN + BUTANG EKSPORT -->
+                    <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+                        <div class="text-left">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Bulan:</label>
+                            <select id="reportMonthSelect" onchange="triggerFinancialReport()" class="bg-slate-50 border border-slate-200 text-xs rounded-xl px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-emerald-500">
+                                <option value="1">Januari</option>
+                                <option value="2">Februari</option>
+                                <option value="3">Mac</option>
+                                <option value="4">April</option>
+                                <option value="5">Mei</option>
+                                <option value="6">Jun</option>
+                                <option value="7">Julai</option>
+                                <option value="8">Ogos</option>
+                                <option value="9">September</option>
+                                <option value="10">Oktober</option>
+                                <option value="11">November</option>
+                                <option value="12">Disember</option>
+                            </select>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <button onclick="exportCSVReport()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
+                        <div class="text-left">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Tahun:</label>
+                            <select id="reportYearSelect" onchange="triggerFinancialReport()" class="bg-slate-50 border border-slate-200 text-xs rounded-xl px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-emerald-500">
+                                <option value="2026">2026</option>
+                                <option value="2025">2025</option>
+                            </select>
+                        </div>
+                        <div class="self-end">
+                            <button onclick="exportReportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
                                 <i class="fa-solid fa-file-excel"></i> Eksport Excel/CSV
                             </button>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Report Summary Preview Table -->
-                    <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm space-y-4">
-                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                            <h4 class="font-bold text-slate-800 text-sm">Ringkasan Tuntutan Kewangan RMT - September 2026</h4>
-                            <span class="text-xs text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full font-medium">Status: Terhubung Supabase</span>
+                <!-- 2. KAD RINGKASAN TUNTUTAN KEWANGAN DINAMIK -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <h3 id="reportTitleMonth" class="font-bold text-slate-800 text-sm">Ringkasan Tuntutan Kewangan RMT</h3>
+                        <span class="text-xs bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-lg font-medium border border-emerald-100">
+                            <i class="fa-solid fa-circle-check mr-1"></i> Status: Terhubung Supabase
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                        <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase">Hari Persekolahan</p>
+                            <p id="reportSchoolDays" class="text-lg font-extrabold text-slate-800">0 Hari</p>
                         </div>
-
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-slate-50 p-4 rounded-xl text-xs">
-                            <div>
-                                <span class="text-slate-400 block mb-0.5">Hari Persekolahan:</span>
-                                <span class="font-bold text-slate-800 text-sm">20 Hari</span>
-                            </div>
-                            <div>
-                                <span class="text-slate-400 block mb-0.5">Jumlah Layak RMT:</span>
-                                <span class="font-bold text-slate-800 text-sm" id="reportTotalStudents">0 Murid</span>
-                            </div>
-                            <div>
-                                <span class="text-slate-400 block mb-0.5">Kadar Tuntutan Harian:</span>
-                                <span class="font-bold text-emerald-600 text-sm">RM 3.50 / murid</span>
-                            </div>
-                            <div>
-                                <span class="text-slate-400 block mb-0.5">Anggaran Tuntutan Bulanan:</span>
-                                <span class="font-bold text-slate-800 text-sm" id="reportTotalClaim">RM 0.00</span>
-                            </div>
+                        <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase">Jumlah Layak RMT</p>
+                            <p id="reportEligibleStudents" class="text-lg font-extrabold text-slate-800">0 Murid</p>
+                        </div>
+                        <!-- KAD KETIBAAN/KEHADIRAN: KEMASKINI ISTILAH UNTUK KEJELASAN -->
+                        <div class="bg-amber-50/60 rounded-xl p-3 border border-amber-100">
+                            <p class="text-[10px] font-bold text-amber-600 uppercase">Jumlah Kehadiran (Murid/Hari)</p>
+                            <p id="reportTotalMeals" class="text-lg font-extrabold text-amber-700">0 Kehadiran</p>
+                        </div>
+                        <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase">Kadar Tuntutan Harian</p>
+                            <p id="reportDailyRate" class="text-lg font-extrabold text-emerald-600">RM 3.50 / murid</p>
+                        </div>
+                        <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase">Anggaran Tuntutan Bulanan</p>
+                            <p id="reportTotalClaim" class="text-lg font-extrabold text-slate-800">RM 0.00</p>
                         </div>
                     </div>
                 </div>
-            </section>
 
+            </section>
         </div>
     </main>
 
@@ -1219,6 +1238,10 @@
 
             if (VALID_USERNAMES.includes(usernameInput.toLowerCase()) && passwordInput === VALID_PASSWORD) {
                 isAdminLoggedIn = true;
+                
+                // Simpan status sesi Admin ke localStorage
+                localStorage.setItem('isAdminLoggedIn', 'true');
+                
                 updateRoleUI();
                 closeLoginModal();
                 
@@ -1236,23 +1259,32 @@
 
         function logoutAdmin() {
             isAdminLoggedIn = false;
+            
+            // Padamkan rekod sesi Admin dan tab tersimpan dari localStorage
+            localStorage.removeItem('isAdminLoggedIn');
+            localStorage.removeItem('activeRmtTab');
+            
             updateRoleUI();
             switchTab('dashboard');
             showModal("Log Keluar", "Anda telah kembali ke Mod Akses Awam / Ibu Bapa.");
         }
-
         function handleAdminTabClick(tabId) {
             switchTab(tabId);
         }
 
         function switchTab(tabId) {
+            // Simpan tab terkini supaya kekal selepas refresh
+            localStorage.setItem('activeRmtTab', tabId);
+
             document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.add('hidden'));
             document.querySelectorAll('.nav-item').forEach(nav => {
                 nav.classList.remove('bg-emerald-600', 'text-white', 'shadow-md', 'shadow-emerald-900/30');
                 nav.classList.add('text-slate-300', 'hover:bg-slate-800');
             });
 
-            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            const targetPanel = document.getElementById('tab-' + tabId);
+            if (targetPanel) targetPanel.classList.remove('hidden');
+
             const activeNav = document.getElementById('nav-' + tabId);
             if (activeNav) {
                 activeNav.classList.add('bg-emerald-600', 'text-white', 'shadow-md', 'shadow-emerald-900/30');
@@ -1268,8 +1300,10 @@
             };
 
             if (titleMap[tabId]) {
-                document.getElementById('pageTitle').innerText = titleMap[tabId][0];
-                document.getElementById('pageSubtitle').innerText = titleMap[tabId][1];
+                const titleEl = document.getElementById('pageTitle');
+                const subTitleEl = document.getElementById('pageSubtitle');
+                if (titleEl) titleEl.innerText = titleMap[tabId][0];
+                if (subTitleEl) subTitleEl.innerText = titleMap[tabId][1];
             }
         }
 
@@ -1282,10 +1316,15 @@
 
         function renderAdminStudentTable(data) {
             const tbody = document.getElementById('adminStudentTableBody');
-            tbody.innerHTML = '';
-            document.getElementById('adminStudentCount').innerText = data.length;
+            if (!tbody) return; // Selamat jika elemen tiada
 
-            if (data.length === 0) {
+            tbody.innerHTML = '';
+            
+            // Menggunakan ?.innerText supaya tiada ralat jika adminStudentCount tiada
+            const countEl = document.getElementById('adminStudentCount');
+            if (countEl) countEl.innerText = data ? data.length : 0;
+
+            if (!data || data.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-medium">Tiada rekod murid dalam pangkalan data Supabase. Sila tambah murid atau muat naik fail CSV.</td></tr>`;
                 return;
             }
@@ -1295,11 +1334,11 @@
                 tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
                 tr.innerHTML = `
                     <td class="p-3 font-mono text-slate-500 font-medium">${student.id}</td>
-                    <td class="p-3 font-bold text-slate-800">${student.nama}</td>
-                    <td class="p-3 font-medium text-slate-600">${student.kelas}</td>
-                    <td class="p-3 font-mono text-slate-500">${student.mykid || '-'}</td>
+                    <td class="p-3 font-bold text-slate-800">${student.nama_murid || student.nama || 'Murid'}</td>
+                    <td class="p-3 font-medium text-slate-600">${student.kelas || '-'}</td>
+                    <td class="p-3 font-mono text-slate-500">${student.mykid || student.nokp || '-'}</td>
                     <td class="p-3 text-center">
-                        <button onclick="deleteStudentSupabase(${student.id}, '${student.nama}')" title="Padam Murid" class="text-rose-500 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 p-2 rounded-lg transition">
+                        <button onclick="deleteStudentSupabase(${student.id}, '${student.nama_murid || student.nama}')" title="Padam Murid" class="text-rose-500 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 p-2 rounded-lg transition">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </td>
@@ -1307,20 +1346,24 @@
                 tbody.appendChild(tr);
             });
         }
-
         function filterAdminStudents() {
-            const searchVal = document.getElementById('adminSearchStudent').value.toLowerCase();
-            const classVal = document.getElementById('adminFilterClass').value;
+            const searchInput = document.getElementById('adminSearchStudent');
+            const classSelect = document.getElementById('adminFilterClass');
 
-            const filtered = studentsData.filter(s => {
-                const matchesSearch = s.nama.toLowerCase().includes(searchVal) || (s.mykid && s.mykid.toLowerCase().includes(searchVal));
+            const searchVal = searchInput ? searchInput.value.toLowerCase() : '';
+            const classVal = classSelect ? classSelect.value : 'ALL';
+
+            const filtered = (studentsData || []).filter(s => {
+                const nama = s.nama_murid || s.nama || '';
+                const mykid = s.mykid || s.nokp || '';
+
+                const matchesSearch = nama.toLowerCase().includes(searchVal) || mykid.toLowerCase().includes(searchVal);
                 const matchesClass = classVal === 'ALL' || s.kelas === classVal;
                 return matchesSearch && matchesClass;
             });
 
             renderAdminStudentTable(filtered);
         }
-
         function openAddStudentModal() {
             document.getElementById('addStudentModal').classList.remove('hidden');
         }
@@ -1684,21 +1727,22 @@
         }
 
         function updateTopStats() {
-            const total = studentsData.length;
-            const takenCount = studentsData.filter(s => isStudentAttended(s.id)).length;
+            const total = studentsData ? studentsData.length : 0;
+            const takenCount = studentsData ? studentsData.filter(s => isStudentAttended(s.id)).length : 0;
 
-            document.getElementById('statTotalStudents').innerText = total;
-            document.getElementById('statAttended').innerText = `${takenCount} / ${total}`;
-            document.getElementById('reportTotalStudents').innerText = `${total} Murid`;
+            const elTotalStudents = document.getElementById('statTotalStudents');
+            const elAttended = document.getElementById('statAttended');
+            const elDailyBudget = document.getElementById('statDailyBudget');
+            const elProgressBar = document.getElementById('attendanceProgressBar');
+
+            if (elTotalStudents) elTotalStudents.innerText = total;
+            if (elAttended) elAttended.innerText = `${takenCount} / ${total}`;
 
             const dailyCost = (total * 3.50).toFixed(2);
-            document.getElementById('statDailyBudget').innerText = `RM ${dailyCost}`;
-
-            const monthlyClaim = (total * 3.50 * 20).toFixed(2);
-            document.getElementById('reportTotalClaim').innerText = `RM ${monthlyClaim}`;
+            if (elDailyBudget) elDailyBudget.innerText = `RM ${dailyCost}`;
 
             const percentage = total > 0 ? Math.round((takenCount / total) * 100) : 0;
-            document.getElementById('attendanceProgressBar').style.width = percentage + '%';
+            if (elProgressBar) elProgressBar.style.width = percentage + '%';
         }
 
         function renderWeeklyMenu() {
@@ -1991,7 +2035,7 @@
             const currentName = document.getElementById('canteenNameDisplay')?.innerText || 'Kantin Cemerlang Enterprise';
             const newName = prompt("Masukkan Nama Pengusaha Kantin / Syarikat Baharu:", currentName);
 
-            if (newName && newName.trim() !== "" && newName !== currentName) {
+           if (newName && newName.trim() !== "" && newName !== currentName) {
                 try {
                     const { error } = await db
                         .from('tetapan_sekolah')
@@ -2007,10 +2051,249 @@
             }
         }
 
-        // Inisialisasi Panggilan Sistem
+  // ==========================================
+        // LAPORAN & TUNTUTAN KEWANGAN DINAMIK
+        // ==========================================
+        async function loadFinancialReport(month = null, year = null) {
+            const now = new Date();
+            const selectedMonth = month !== null ? parseInt(month) : now.getMonth() + 1;
+            const selectedYear = year !== null ? parseInt(year) : now.getFullYear();
+
+            try {
+                const startDate = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-01`;
+                const lastDay = new Date(selectedYear, selectedMonth, 0).getDate();
+                const endDate = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+
+                // 1. Ambil data kehadiran dari Supabase
+                const { data: attendanceData, error: attError } = await db
+                    .from('kehadiran_rmt')
+                    .select('tarikh, murid_id, status')
+                    .gte('tarikh', startDate)
+                    .lte('tarikh', endDate);
+
+                if (attError) throw attError;
+
+                // Tapis rekod hadir sahaja (fleksibel untuk pelbagai format status)
+                const rawAttended = (attendanceData || []).filter(item => {
+                    if (item.status === undefined || item.status === null) return true;
+                    const st = String(item.status).toLowerCase().trim();
+                    return st === 'hadir' || st === 'true' || st === '1' || st === 'h';
+                });
+
+                // Buang rekod bertindih (Unique key: tarikh + murid_id)
+                const uniqueAttendance = [];
+                const seenKeys = new Set();
+
+                rawAttended.forEach(item => {
+                    const key = `${item.tarikh}_${item.murid_id}`;
+                    if (!seenKeys.has(key)) {
+                        seenKeys.add(key);
+                        uniqueAttendance.push(item);
+                    }
+                });
+
+                // Kira Jumlah Hari Persekolahan (Tarikh Unik)
+                const uniqueDates = [...new Set(uniqueAttendance.map(item => item.tarikh))];
+                const totalSchoolDays = uniqueDates.length;
+
+                // 2. Ambil Jumlah Murid Layak RMT dari jadual 'murid'
+                const { data: studentsData, error: studError } = await db
+                    .from('murid')
+                    .select('id');
+
+                if (studError) throw studError;
+
+                const totalEligibleStudents = studentsData ? studentsData.length : 0;
+                
+                // Kira jumlah sajian dan nilai tuntutan berdasarkan rekod sah
+                const totalMeals = uniqueAttendance.length;
+                const ratePerMeal = 3.50;
+                const totalClaimAmount = totalMeals * ratePerMeal;
+
+                // Kemaskini Paparan UI 5 Kad
+                updateFinancialUI({
+                    monthName: getMonthNameMY(selectedMonth),
+                    year: selectedYear,
+                    daysCount: totalSchoolDays,
+                    studentsCount: totalEligibleStudents,
+                    totalMeals: totalMeals,
+                    claimAmount: totalClaimAmount.toFixed(2)
+                });
+
+                setSupabaseBadgeStatus(true);
+
+            } catch (err) {
+                console.error("Ralat memuatkan laporan kewangan:", err.message);
+                setSupabaseBadgeStatus(false);
+            }
+        }
+
+        function getMonthNameMY(monthNumber) {
+            const months = [
+                "Januari", "Februari", "Mac", "April", "Mei", "Jun",
+                "Julai", "Ogos", "September", "Oktober", "November", "Disember"
+            ];
+            return months[monthNumber - 1] || "";
+        }
+
+        function updateFinancialUI(data) {
+            const elDays = document.getElementById('reportSchoolDays');
+            const elStudents = document.getElementById('reportEligibleStudents');
+            const elMeals = document.getElementById('reportTotalMeals');
+            const elRate = document.getElementById('reportDailyRate');
+            const elTotal = document.getElementById('reportTotalClaim');
+            const elTitle = document.getElementById('reportTitleMonth');
+
+            if (elTitle) elTitle.innerText = `Ringkasan Tuntutan Kewangan RMT - ${data.monthName} ${data.year}`;
+            if (elDays) elDays.innerText = `${data.daysCount} Hari`;
+            if (elStudents) elStudents.innerText = `${data.studentsCount} Murid`;
+            if (elMeals) elMeals.innerText = `${data.totalMeals} Kehadiran`; // Menampilkan unit "Kehadiran"
+            if (elRate) elRate.innerText = `RM 3.50 / murid`;
+            if (elTotal) elTotal.innerText = `RM ${data.claimAmount}`;
+        }
+
+        function triggerFinancialReport() {
+            const m = document.getElementById('reportMonthSelect')?.value;
+            const y = document.getElementById('reportYearSelect')?.value;
+            loadFinancialReport(m, y);
+        }
+
+    function setSupabaseBadgeStatus(isLive) {
+            // 1. Kemaskini Lencana Header Atas
+            const mainBadgeContainer = document.getElementById('supabaseConnectionBadge');
+
+            if (mainBadgeContainer) {
+                if (isLive) {
+                    mainBadgeContainer.className = "bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs px-3 py-1.5 rounded-full font-medium flex items-center gap-2";
+                    mainBadgeContainer.innerHTML = `
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span id="dbStatusText">Supabase Live</span>
+                    `;
+                } else {
+                    mainBadgeContainer.className = "bg-rose-50 text-rose-700 border border-rose-200 text-xs px-3 py-1.5 rounded-full font-medium flex items-center gap-2";
+                    mainBadgeContainer.innerHTML = `
+                        <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                        <span id="dbStatusText">Supabase Ralat / Offline</span>
+                    `;
+                }
+            }
+
+            // 2. Kemaskini Lencana Dalam Kad Laporan Kewangan
+            const reportBadge = document.getElementById('reportSupabaseStatus');
+            if (reportBadge) {
+                if (isLive) {
+                    reportBadge.className = "text-xs bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-lg font-medium border border-emerald-100";
+                    reportBadge.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> Status: Terhubung Supabase`;
+                } else {
+                    reportBadge.className = "text-xs bg-rose-50 text-rose-700 px-2.5 py-1 rounded-lg font-medium border border-rose-100";
+                    reportBadge.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1"></i> Status: Ralat Supabase`;
+                }
+            }
+        }
+        async function exportReportToCSV() {
+            const monthSelect = document.getElementById('reportMonthSelect');
+            const yearSelect = document.getElementById('reportYearSelect');
+
+            const selectedMonth = monthSelect ? monthSelect.value : (new Date().getMonth() + 1);
+            const selectedYear = yearSelect ? yearSelect.value : new Date().getFullYear();
+            const monthName = getMonthNameMY(parseInt(selectedMonth));
+
+            try {
+                const startDate = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-01`;
+                const lastDay = new Date(selectedYear, selectedMonth, 0).getDate();
+                const endDate = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+
+                const { data: attendanceData, error } = await db
+                    .from('kehadiran_rmt')
+                    .select('tarikh, murid_id, status')
+                    .gte('tarikh', startDate)
+                    .lte('tarikh', endDate);
+
+                if (error) throw error;
+
+                const rawAttended = (attendanceData || []).filter(item => {
+                    if (item.status === undefined || item.status === null) return true;
+                    const st = String(item.status).toLowerCase().trim();
+                    return st === 'hadir' || st === 'true' || st === '1' || st === 'h';
+                });
+
+                const uniqueAttendance = [];
+                const seenKeys = new Set();
+                rawAttended.forEach(item => {
+                    const key = `${item.tarikh}_${item.murid_id}`;
+                    if (!seenKeys.has(key)) {
+                        seenKeys.add(key);
+                        uniqueAttendance.push(item);
+                    }
+                });
+
+                const { data: studentsData, error: studError } = await db
+                    .from('murid')
+                    .select('*');
+
+                if (studError) throw studError;
+
+                let csvContent = "data:text/csv;charset=utf-8,";
+                csvContent += `LAPORAN TUNTUTAN KEWANGAN RMT - SK FELDA CHEMEMOI\n`;
+                csvContent += `Bulan: ${monthName} ${selectedYear}\n\n`;
+                csvContent += `Bil,Nama Murid,Kelas,Jumlah Hari Hadir,Kadar Harian (RM),Jumlah Tuntutan (RM)\n`;
+
+                let totalOverallClaim = 0;
+
+                (studentsData || []).forEach((student, index) => {
+                    const studentAttendCount = uniqueAttendance.filter(att => att.murid_id === student.id).length;
+                    const studentClaim = studentAttendCount * 3.50;
+                    totalOverallClaim += studentClaim;
+
+                    const namaMurid = student.nama_murid || student.nama || "Murid";
+                    csvContent += `${index + 1},"${namaMurid}","${student.kelas || '-'}",${studentAttendCount},3.50,${studentClaim.toFixed(2)}\n`;
+                });
+
+                csvContent += `\n,,JUMLAH BESAR TUNTUTAN,,,RM ${totalOverallClaim.toFixed(2)}\n`;
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", `Laporan_RMT_${monthName}_${selectedYear}.csv`);
+                document.body.appendChild(link);
+
+                link.click();
+                document.body.removeChild(link);
+
+            } catch (err) {
+                alert("Ralat semasa mengeksport laporan: " + err.message);
+            }
+        }
+
+        // ==========================================
+        // INISIALISASI PANGGILAN SISTEM
+        // ==========================================
         document.addEventListener('DOMContentLoaded', () => {
-            loadWeeklyMenu();
-            loadCanteenInfo();
+            if (typeof loadWeeklyMenu === 'function') loadWeeklyMenu();
+            if (typeof loadCanteenInfo === 'function') loadCanteenInfo();
+
+            const currentMonth = new Date().getMonth() + 1;
+            const currentYear = new Date().getFullYear();
+
+            if (document.getElementById('reportMonthSelect')) document.getElementById('reportMonthSelect').value = currentMonth;
+            if (document.getElementById('reportYearSelect')) document.getElementById('reportYearSelect').value = currentYear;
+
+            loadFinancialReport(currentMonth, currentYear);
+
+            // 1. SEMAK & PULIHKAN SESI ADMIN DARI LOCALSTORAGE
+            const savedAdminState = localStorage.getItem('isAdminLoggedIn') === 'true';
+            if (savedAdminState) {
+                isAdminLoggedIn = true;
+                if (typeof updateRoleUI === 'function') updateRoleUI();
+            }
+
+            // 2. SEMAK & PENGEKALAN TAB TERAKHIR SELEPAS REFRESH
+            const savedTab = localStorage.getItem('activeRmtTab');
+            if (savedTab && document.getElementById('tab-' + savedTab)) {
+                switchTab(savedTab);
+            } else {
+                switchTab('dashboard');
+            }
         });
     </script>
 </body>
