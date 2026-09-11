@@ -1743,32 +1743,54 @@ function handleAdminTabClick(tabId) {
             }
         }
 
-        async function triggerQRScan() {
-            const studentId = document.getElementById('scanStudentSelect').value;
-            if (!studentId) return;
+      async function triggerQRScan() {
+    const studentId = document.getElementById('scanStudentSelect').value;
+    if (!studentId) return;
 
-            await markStudentAttendance(Number(studentId));
+    await markStudentAttendance(Number(studentId));
+}
+
+async function markStudentAttendance(studentId) {
+    const dateInput = document.getElementById('attendanceDatePicker');
+    const selectedDate = (dateInput && dateInput.value) ? dateInput.value : new Date().toISOString().split('T')[0];
+
+    try {
+        // 1. Semak samada murid ini SUDAH ADA rekod bagi tarikh yang dipilih
+        const { data: existingRecords, error: checkError } = await db
+            .from('kehadiran_rmt')
+            .select('id, status')
+            .eq('murid_id', studentId)
+            .eq('tarikh', selectedDate);
+
+        if (checkError) throw checkError;
+
+        // 2. Jika rekod sudah wujud untuk tarikh tersebut, halang rekod berganda
+        if (existingRecords && existingRecords.length > 0) {
+            const student = studentsData.find(s => s.id === Number(studentId));
+            const studentName = student ? student.nama : 'Murid';
+            
+            showModal("Sudah Direkod!", `${studentName} telah pun mengambil RMT bagi tarikh (${selectedDate}). Rekod tidak bertindih.`);
+            return false;
         }
 
-       async function markStudentAttendance(studentId) {
-            const dateInput = document.getElementById('attendanceDatePicker');
-            const selectedDate = (dateInput && dateInput.value) ? dateInput.value : new Date().toISOString().split('T')[0];
+        // 3. Jika BELUM ADA, masukkan rekod baharu ke Supabase
+        const { error } = await db
+            .from('kehadiran_rmt')
+            .insert([{ murid_id: Number(studentId), tarikh: selectedDate, status: 'Hadir' }]);
 
-            try {
-                const { error } = await db
-                    .from('kehadiran_rmt')
-                    .insert([{ murid_id: studentId, tarikh: selectedDate, status: 'Hadir' }]);
+        if (error) throw error;
 
-                if (error) throw error;
+        const student = studentsData.find(s => s.id === Number(studentId));
+        showModal("Kehadiran Direkod!", `Sajian RMT disahkan untuk ${student ? student.nama : 'Murid'} bagi tarikh (${selectedDate}). Rekod disimpan ke Supabase.`);
+        
+        await loadAttendanceForSelectedDate();
+        return true;
 
-                const student = studentsData.find(s => s.id === studentId);
-                showModal("Kehadiran Direkod!", `Sajian RMT disahkan untuk ${student ? student.nama : 'Murid'} bagi tarikh (${selectedDate}). Rekod disimpan ke Supabase.`);
-                await loadAttendanceForSelectedDate();
-
-            } catch (err) {
-                alert("Ralat semasa mencatat kehadiran: " + err.message);
-            }
-        }
+    } catch (err) {
+        alert("Ralat semasa mencatat kehadiran: " + err.message);
+        return false;
+    }
+}
 
       // --- Kemaskini Fungsi Attendance Pukal (Dengan Pengesahan) ---
         async function markAllPresent() {
