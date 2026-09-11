@@ -1162,39 +1162,56 @@
     }
 }
 
-        async function onCameraScanSuccess(decodedText) {
-            const scannedCode = decodedText.trim();
-            
-            // 1. Cari murid dalam memori mengikut MyKid atau ID
-            let student = studentsData.find(s => 
-                (s.mykid && s.mykid.trim() === scannedCode) || 
-                String(s.id) === scannedCode
-            );
+       // Variable kunci keselamatan (lock) diletakkan di luar fungsi
+let isProcessingScan = false;
 
-            const msgBox = document.getElementById('cameraScanMsg');
-            msgBox.classList.remove('hidden');
+async function onCameraScanSuccess(decodedText) {
+    // 0. Jika imbasan terdahulu sedang diproses, abaikan imbasan kamera susulan
+    if (isProcessingScan) return;
+    isProcessingScan = true;
 
-            // 2. Jika murid tiada dalam memori, muat turun data terkini terus dari Supabase
-            if (!student) {
-                await loadDataFromSupabase();
-                student = studentsData.find(s => 
-                    (s.mykid && s.mykid.trim() === scannedCode) || 
-                    String(s.id) === scannedCode
-                );
-            }
+    const scannedCode = decodedText.trim();
+    
+    // 1. Cari murid dalam memori mengikut MyKid atau ID
+    let student = studentsData.find(s => 
+        (s.mykid && s.mykid.trim() === scannedCode) || 
+        String(s.id) === scannedCode
+    );
 
-            // 3. Jika murid dijumpai, tanda kehadiran ke Supabase
-            if (student) {
-                await markStudentAttendance(student.id);
-                msgBox.className = "mt-4 p-3 rounded-xl text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300";
-                msgBox.innerHTML = `<i class="fa-solid fa-circle-check"></i> Imbasan Berjaya!<br>${student.nama} (${student.kelas})`;
-            } else {
-                msgBox.className = "mt-4 p-3 rounded-xl text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300";
-                msgBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Kod QR Tidak Dikenali! (${scannedCode})`;
-            }
+    const msgBox = document.getElementById('cameraScanMsg');
+    if (msgBox) msgBox.classList.remove('hidden');
 
-            setTimeout(() => { msgBox.classList.add('hidden'); }, 3000);
+    // 2. Jika murid tiada dalam memori, muat turun data terkini terus dari Supabase
+    if (!student && typeof loadDataFromSupabase === 'function') {
+        await loadDataFromSupabase();
+        student = studentsData.find(s => 
+            (s.mykid && s.mykid.trim() === scannedCode) || 
+            String(s.id) === scannedCode
+        );
+    }
+
+    // 3. Jika murid dijumpai, tanda kehadiran ke Supabase
+    if (student) {
+        if (typeof markStudentAttendance === 'function') {
+            await markStudentAttendance(student.id);
         }
+        if (msgBox) {
+            msgBox.className = "mt-4 p-3 rounded-xl text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300";
+            msgBox.innerHTML = `<i class="fa-solid fa-circle-check"></i> Imbasan Berjaya!<br>${student.nama} (${student.kelas})`;
+        }
+    } else {
+        if (msgBox) {
+            msgBox.className = "mt-4 p-3 rounded-xl text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300";
+            msgBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Kod QR Tidak Dikenali! (${scannedCode})`;
+        }
+    }
+
+    // Tunggu 3 saat sebelum membenarkan imbasan kamera seterusnya
+    setTimeout(() => { 
+        if (msgBox) msgBox.classList.add('hidden');
+        isProcessingScan = false; // Buka semula kunci imbasan
+    }, 3000);
+}
 
       // --- PRINTABLE QR CARDS GENERATOR ---
         function generatePrintableQRCards() {
