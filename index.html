@@ -757,7 +757,7 @@
                 </div>
             </section>
 
-       <!-- TAB 5: LAPORAN & TUNTUTAN KEWANGAN -->
+      <!-- TAB 5: LAPORAN & TUNTUTAN KEWANGAN -->
 <section id="tab-laporan" class="tab-panel hidden space-y-6">
 
     <!-- 1. Kad Penjana Laporan & Pemilih Bulan -->
@@ -768,7 +768,7 @@
             <p class="text-xs text-slate-500">Format penyediaan untuk Pejabat Pendidikan Daerah (PPD) / KPM</p>
         </div>
 
-        <!-- BORANG PEMILIH BULAN & TAHUN + BUTANG EKSPORT & BORANG C6/C8 -->
+        <!-- BORANG PEMILIH BULAN & TAHUN + BUTANG EKSPORT & BORANG C5/C6/C8 -->
         <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
             <div class="text-left">
                 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Bulan:</label>
@@ -795,11 +795,17 @@
                 </select>
             </div>
             
-		<div class="self-end flex items-center gap-2 flex-wrap">
-    <!-- BUTANG CETAK BORANG C6 (PDF) -->
-    <button onclick="downloadBorangC6()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
-        <i class="fa-solid fa-print"></i> Cetak Borang C6
-    </button>
+            <div class="self-end flex items-center gap-2 flex-wrap">
+                <!-- BUTANG CETAK BORANG C5 (MENU RMT) -->
+                <button onclick="downloadBorangC5()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
+                    <i class="fa-solid fa-utensils"></i> Cetak Borang C5
+                </button>
+
+                <!-- BUTANG CETAK BORANG C6 (PDF) -->
+                <button onclick="downloadBorangC6()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
+                    <i class="fa-solid fa-print"></i> Cetak Borang C6
+                </button>
+
                 <!-- BUTANG BORANG C8 (KHAS UNTUK ADMIN MODE) -->
                 <button onclick="printBorangC8()" class="admin-only hidden bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
                     <i class="fa-solid fa-print"></i> Cetak Borang C8
@@ -2508,6 +2514,114 @@ function getJantinaMurid(murid) {
 
     return "-";
 }
+
+
+// ==========================================
+// FUNGSI JANA & CETAK BORANG C5 (SUPABASE)
+// ==========================================
+
+async function downloadBorangC5() {
+    try {
+        // 1. Tarik data dari jadual 'menu_rmt'
+        const { data: dbMenuData, error: menuErr } = await db
+            .from('menu_rmt')
+            .select('hari, makanan');
+
+        if (menuErr) {
+            console.error("Ralat membaca menu_rmt:", menuErr);
+            alert("Ralat semasa mengambil data menu dari Supabase.");
+            return;
+        }
+
+        // 2. Susunan hari mengikut urutan persekolahan (Isnin - Jumaat)
+        const daysOrder = ["Isnin", "Selasa", "Rabu", "Khamis", "Jumaat"];
+
+        // 3. Tarikh keputusan jawatankuasa
+        const tarikhKeputusan = document.getElementById('tarikhMenuJawatankuasa')?.value 
+            || new Date().toLocaleDateString('ms-MY', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+        // 4. Bina kotak Menu 1 hingga Menu 5 mengikut urutan hari
+        let menuBoxesHtml = '';
+        daysOrder.forEach((dayName, index) => {
+            const menuNo = index + 1;
+            
+            // Cari rekod hidangan mengikut hari
+            const menuItem = (dbMenuData || []).find(m => 
+                m.hari && m.hari.trim().toLowerCase() === dayName.toLowerCase()
+            );
+
+            const makananText = menuItem ? menuItem.makanan : 'Tiada Tetapan Menu';
+
+            menuBoxesHtml += `
+                <div style="margin-bottom: 12px;">
+                    <div style="font-weight: bold; font-size: 11pt; margin-bottom: 4px;">MENU ${menuNo} (${dayName.toUpperCase()})</div>
+                    <div style="border: 1.5px solid #000; min-height: 45px; padding: 8px 12px; font-size: 10pt; line-height: 1.4; background-color: #fff;">
+                        ${makananText}
+                    </div>
+                </div>
+            `;
+        });
+
+        // 5. Buka tetingkap cetakan
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) {
+            alert("Sila benarkan 'Pop-up' pada browser untuk mencetak Borang C5.");
+            return;
+        }
+
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>BORANG C5 - MENU RMT</title>
+                <style>
+                    @page { size: A4 portrait; margin: 15mm; }
+                    body { font-family: Arial, sans-serif; padding: 10px; color: #000; }
+                    .doc-no { text-align: right; font-weight: bold; font-size: 10pt; margin-bottom: 10px; }
+                    .title { font-weight: bold; font-size: 14pt; margin-bottom: 20px; text-transform: uppercase; }
+                    .date-section { margin-top: 25px; border: 1.5px solid #000; padding: 8px 12px; font-weight: bold; font-size: 10pt; width: max-content; }
+                    .footer-sign { margin-top: 40px; display: flex; justify-content: space-between; font-size: 10pt; }
+                </style>
+            </head>
+            <body>
+                <div class="doc-no">BORANG C5</div>
+                <div class="title">MENU RMT</div>
+
+                ${menuBoxesHtml}
+
+                <div class="date-section">
+                    TARIKH MENU DIPUTUSKAN OLEH JAWATANKUASA BANTUAN : ${tarikhKeputusan}
+                </div>
+
+                <div class="footer-sign">
+                    <div style="width: 45%;">
+                        <p>Disediakan oleh:</p>
+                        <br><br><br>
+                        <p>___________________________<br>(Penyelaras RMT / Guru RMT)</p>
+                    </div>
+                    <div style="width: 45%;">
+                        <p>Disahkan oleh:</p>
+                        <br><br><br>
+                        <p>___________________________<br>(Guru Besar / PK HEM)</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `);
+
+        printWindow.document.close();
+        printWindow.focus();
+        setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+        }, 500);
+
+    } catch (err) {
+        console.error("Gagal menjana Borang C5:", err);
+        alert("Ralat semasa menjana Borang C5.");
+    }
+}
+
 
 // Fungsi Cetak Borang C6 (Diperbaiki: Elak Ralat Pop-up & Menyokong Backdated)
 async function downloadBorangC6() {
