@@ -466,38 +466,38 @@
 </div>
 </section>
 
-     <!-- TAB 2: SEMAKAN KEHADIRAN MURID -->
-            <section id="tab-kehadiran" class="tab-panel hidden space-y-6">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    
-                    <!-- Modul Imbasan Pas / Kad Murid (ADMIN ONLY) -->
-                    <div class="admin-only hidden bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col items-center text-center">
-                        <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mb-3">
-                            <i class="fa-solid fa-qrcode"></i>
-                        </div>
-                        <h3 class="font-bold text-slate-800">Modul Imbasan Pas / Kad Murid</h3>
-                        <p class="text-xs text-slate-500 mt-1 max-w-xs">Gunakan Kamera Sebenar atau Simulasi Pilihan Nama Murid untuk merekod kehadiran ke Supabase.</p>
-                        
-                        <!-- Camera Scanner Button -->
-                        <button onclick="openCameraScannerModal()" class="w-full my-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3 px-4 rounded-xl shadow transition flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-camera text-base"></i> Buka Kamera Pengimbas QR
-                        </button>
+    <!-- TAB 2: SEMAKAN KEHADIRAN MURID -->
+<section id="tab-kehadiran" class="tab-panel hidden space-y-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        
+        <!-- Modul Imbasan Pas / Kad Murid (ADMIN ONLY) -->
+        <div class="admin-only hidden bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col items-center text-center w-full min-w-0 box-border">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mb-3 shrink-0">
+                <i class="fa-solid fa-qrcode"></i>
+            </div>
+            <h3 class="font-bold text-slate-800">Modul Imbasan Pas / Kad Murid</h3>
+            <p class="text-xs text-slate-500 mt-1 max-w-xs">Gunakan Kamera Sebenar atau Simulasi Pilihan Nama Murid untuk merekod kehadiran ke Supabase.</p>
+            
+            <!-- Camera Scanner Button -->
+            <button onclick="openCameraScannerModal()" class="w-full my-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3 px-4 rounded-xl shadow transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-camera text-base"></i> Buka Kamera Pengimbas QR
+            </button>
 
-                        <div class="w-full border-t border-slate-100 my-2"></div>
+            <div class="w-full border-t border-slate-100 my-2"></div>
 
-                        <!-- Manual/Simulation Fallback -->
-                        <div class="w-full space-y-2">
-                            <label class="text-xs font-semibold text-slate-600 block text-left">Simulasi Imbasan Pilihan Nama:</label>
-                            <div class="flex gap-2">
-                                <select id="scanStudentSelect" class="flex-1 bg-slate-50 border border-slate-200 text-xs rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500">
-                                    <!-- Populated dynamically -->
-                                </select>
-                                <button onclick="triggerQRScan()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition">
-                                    Imbas
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Manual/Simulation Fallback -->
+            <div class="w-full space-y-2 min-w-0">
+                <label class="text-xs font-semibold text-slate-600 block text-left">Simulasi Imbasan Pilihan Nama:</label>
+                <div class="flex flex-col sm:flex-row gap-2 w-full min-w-0">
+                    <select id="scanStudentSelect" class="w-full sm:flex-1 bg-slate-50 border border-slate-200 text-xs rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500 truncate min-w-0">
+                        <!-- Populated dynamically -->
+                    </select>
+                    <button onclick="triggerQRScan()" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition shrink-0">
+                        Imbas
+                    </button>
+                </div>
+            </div>
+        </div>
 
                     <!-- Student List Controls & Filter (Akan Melebar dalam Mod Awam) -->
                     <div id="attendanceTableContainer" class="lg:col-span-3 bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between transition-all duration-300">
@@ -1122,7 +1122,7 @@
             }
         }
 
-        // --- CAMERA QR SCANNER LOGIC ---
+      // --- CAMERA QR SCANNER LOGIC ---
         function openCameraScannerModal() {
             document.getElementById('cameraScannerModal').classList.remove('hidden');
             document.getElementById('cameraScannerModal').classList.add('flex');
@@ -1137,21 +1137,30 @@
             });
         }
 
-        function closeCameraScannerModal() {
-            if (html5QrcodeScanner) {
-                html5QrcodeScanner.stop().then(() => {
-                    html5QrcodeScanner.clear();
-                    document.getElementById('cameraScannerModal').classList.add('hidden');
-                    document.getElementById('cameraScannerModal').classList.remove('flex');
-                }).catch(() => {
-                    document.getElementById('cameraScannerModal').classList.add('hidden');
-                    document.getElementById('cameraScannerModal').classList.remove('flex');
-                });
-            } else {
-                document.getElementById('cameraScannerModal').classList.add('hidden');
-                document.getElementById('cameraScannerModal').classList.remove('flex');
-            }
+       function closeCameraScannerModal() {
+    // 1. Sembunyikan modal serta-merta supaya UI terus tutup tanpa tunggu kamera
+    const modal = document.getElementById('cameraScannerModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    // 2. Hentikan pemutar kamera secara senyap di latar belakang
+    if (typeof html5QrcodeScanner !== 'undefined' && html5QrcodeScanner) {
+        try {
+            html5QrcodeScanner.stop().then(function() {
+                html5QrcodeScanner.clear();
+                html5QrcodeScanner = null;
+            }).catch(function(err) {
+                console.warn("Kamera dihentikan:", err);
+                html5QrcodeScanner = null;
+            });
+        } catch (e) {
+            console.warn("Ralat penutupan kamera diabaikan:", e);
+            html5QrcodeScanner = null;
         }
+    }
+}
 
         async function onCameraScanSuccess(decodedText) {
             const scannedCode = decodedText.trim();
@@ -1314,8 +1323,8 @@
             if (VALID_USERNAMES.includes(usernameInput.toLowerCase()) && passwordInput === VALID_PASSWORD) {
                 isAdminLoggedIn = true;
                 
-                // Simpan status sesi Admin ke localStorage
-                localStorage.setItem('isAdminLoggedIn', 'true');
+                // Simpan status sesi Admin ke sessionStorage
+		sessionStorage.setItem('isAdminLoggedIn', 'true');
                 
                 updateRoleUI();
                 closeLoginModal();
@@ -1333,23 +1342,24 @@
         }
 
         function logoutAdmin() {
-            isAdminLoggedIn = false;
-            
-            // Padamkan rekod sesi Admin dan tab tersimpan dari localStorage
-            localStorage.removeItem('isAdminLoggedIn');
-            localStorage.removeItem('activeRmtTab');
-            
-            updateRoleUI();
-            switchTab('dashboard');
-            showModal("Log Keluar", "Anda telah kembali ke Mod Akses Awam / Ibu Bapa.");
-        }
-        function handleAdminTabClick(tabId) {
-            switchTab(tabId);
-        }
+    isAdminLoggedIn = false;
+    
+    // Padamkan rekod sesi Admin dan tab tersimpan dari sessionStorage
+    sessionStorage.removeItem('isAdminLoggedIn');
+    sessionStorage.removeItem('activeRmtTab');
+    
+    updateRoleUI();
+    switchTab('dashboard');
+    showModal("Log Keluar", "Anda telah kembali ke Mod Akses Awam / Ibu Bapa.");
+}
+
+function handleAdminTabClick(tabId) {
+    switchTab(tabId);
+}
 
         function switchTab(tabId) {
             // Simpan tab terkini supaya kekal selepas refresh
-            localStorage.setItem('activeRmtTab', tabId);
+		sessionStorage.setItem('activeRmtTab', tabId);
 
             document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.add('hidden'));
             document.querySelectorAll('.nav-item').forEach(nav => {
@@ -3022,15 +3032,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (typeof loadFinancialReport === 'function') loadFinancialReport(currentMonth, currentYear);
 
-    // 1. SEMAK & PULIHKAN SESI ADMIN DARI LOCALSTORAGE
-    const savedAdminState = localStorage.getItem('isAdminLoggedIn') === 'true';
+    // 1. SEMAK & PULIHKAN SESI ADMIN DARI SESSIONSTORAGE
+    const savedAdminState = sessionStorage.getItem('isAdminLoggedIn') === 'true';
     if (savedAdminState) {
         isAdminLoggedIn = true;
         if (typeof updateRoleUI === 'function') updateRoleUI();
     }
 
     // 2. SEMAK & PENGEKALAN TAB TERAKHIR SELEPAS REFRESH
-    const savedTab = localStorage.getItem('activeRmtTab');
+    const savedTab = sessionStorage.getItem('activeRmtTab');
     if (savedTab && document.getElementById('tab-' + savedTab)) {
         switchTab(savedTab);
     } else {
