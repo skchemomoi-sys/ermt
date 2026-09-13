@@ -200,40 +200,46 @@
             </div>
         </div>
 
-        <!-- Menu Navigation Links -->
-        <nav id="navMenu" class="hidden md:block flex-1 px-3 py-3 space-y-1 overflow-y-auto custom-scrollbar">
-            <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 text-white shadow-md shadow-emerald-900/30">
-                <i class="fa-solid fa-chart-pie w-5 text-center"></i>
-                <span>Dashboard Utama</span>
-            </a>
-            <a href="#" onclick="switchTab('kehadiran')" id="nav-kehadiran" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
-                <i class="fa-solid fa-qrcode w-5 text-center"></i>
-                <span>Semakan Kehadiran</span>
-            </a>
-            <a href="#" onclick="switchTab('menu')" id="nav-menu" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
-                <i class="fa-solid fa-utensils w-5 text-center"></i>
-                <span>Menu RMT Mingguan</span>
-            </a>
-            
-            <!-- Tab Pengurusan Data Murid (Khusus Admin) -->
-            <a href="#" onclick="handleAdminTabClick('pengurusan-murid')" id="nav-pengurusan-murid" class="nav-item admin-only hidden flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
-                <div class="flex items-center space-x-3">
-                    <i class="fa-solid fa-users-gear w-5 text-center text-emerald-400"></i>
-                    <span>Pengurusan Data Murid</span>
-                </div>
-                <span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded uppercase font-bold">Admin</span>
-            </a>
+       <!-- Menu Navigation Links -->
+<nav id="navMenu" class="hidden md:block flex-1 px-3 py-3 space-y-1 overflow-y-auto custom-scrollbar">
+    <!-- Tab Awam -->
+    <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 text-white shadow-md shadow-emerald-900/30">
+        <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+        <span>Dashboard Utama</span>
+    </a>
+    <a href="#" onclick="switchTab('kehadiran')" id="nav-kehadiran" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
+        <i class="fa-solid fa-qrcode w-5 text-center"></i>
+        <span>Semakan Kehadiran</span>
+    </a>
+    <a href="#" onclick="switchTab('menu')" id="nav-menu" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
+        <i class="fa-solid fa-utensils w-5 text-center"></i>
+        <span>Menu RMT Mingguan</span>
+    </a>
+    
+    <!-- 🟢 DITAMBAH: Tab Awam Senarai Murid RMT 🟢 -->
+    <a href="#" onclick="switchTab('senarai-murid-awam'); loadSenaraiMuridAwam();" id="nav-senarai-murid-awam" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
+        <i class="fa-solid fa-user-graduate w-5 text-center"></i>
+        <span>Senarai Murid Penerima RMT</span>
+    </a>
+    
+    <!-- Tab Pengurusan Data Murid (Khusus Admin) -->
+    <a href="#" onclick="handleAdminTabClick('pengurusan-murid')" id="nav-pengurusan-murid" class="nav-item admin-only hidden flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
+        <div class="flex items-center space-x-3">
+            <i class="fa-solid fa-users-gear w-5 text-center text-emerald-400"></i>
+            <span>Pengurusan Data Murid</span>
+        </div>
+        <span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded uppercase font-bold">Admin</span>
+    </a>
 
-            <!-- Tab Laporan khusus Admin/PK HEM -->
-            <a href="#" onclick="handleAdminTabClick('laporan')" id="nav-laporan" class="nav-item admin-only hidden flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
-                <div class="flex items-center space-x-3">
-                    <i class="fa-solid fa-file-invoice w-5 text-center text-emerald-400"></i>
-                    <span>Laporan & Tuntutan</span>
-                </div>
-                <span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded uppercase font-bold">Admin</span>
-            </a>
-        </nav>
-
+    <!-- Tab Laporan khusus Admin/PK HEM -->
+    <a href="#" onclick="handleAdminTabClick('laporan')" id="nav-laporan" class="nav-item admin-only hidden flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
+        <div class="flex items-center space-x-3">
+            <i class="fa-solid fa-file-invoice w-5 text-center text-emerald-400"></i>
+            <span>Laporan & Tuntutan</span>
+        </div>
+        <span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded uppercase font-bold">Admin</span>
+    </a>
+</nav>
         <!-- School Info Footer & Login Button -->
         <div class="p-4 border-t border-slate-800 bg-slate-950/50 space-y-3">
             <div id="authButtonSection">
@@ -675,6 +681,50 @@
                 </div>
                
             </section>
+	<!-- TAB PAPARAN AWAM: SENARAI MURID PENERIMA RMT (FORMAL BERKOTAK) -->
+<section id="tab-senarai-murid-awam" class="tab-panel hidden space-y-6">
+    
+    <div class="bg-white rounded-2xl p-6 md:p-8 border border-slate-300 shadow-sm space-y-6">
+        
+        <!-- Header Dokumen Rasmi -->
+        <div class="border-b-2 border-slate-800 pb-5 text-center relative">
+            <span id="badgeTotalMuridAwam" class="absolute right-0 top-0 bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold text-xs px-3 py-1.5 rounded-lg shadow-sm hidden md:inline-flex items-center gap-1.5">
+                <i class="fa-solid fa-users"></i> Memuatkan...
+            </span>
+            
+            <h2 class="text-base md:text-lg font-bold text-slate-900 uppercase tracking-wide">SK FELDA CHEMOMOI</h2>
+            <h3 class="text-sm md:text-base font-bold text-slate-700 uppercase tracking-wide mt-0.5">SENARAI MURID PENERIMA BANTUAN RANCANGAN MAKANAN TAMBAHAN (RMT)</h3>
+            <p class="text-xs text-slate-500 font-medium mt-1">Susunan Rasmi Mengikut Tahun & Kelas</p>
+        </div>
+
+        <!-- Jadual Berkotak Rasmi Gaya Borang C4 -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse border border-slate-400 text-xs md:text-sm">
+                <thead>
+                    <tr class="bg-slate-200 text-slate-800 font-bold uppercase border-b border-slate-400">
+                        <th class="p-3 text-center border-r border-slate-400 w-16">BIL</th>
+                        <th class="p-3 border-r border-slate-400">NAMA MURID</th>
+                        <th class="p-3 text-center w-44">KELAS</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyMuridAwam" class="divide-y divide-slate-300 text-slate-800">
+                    <tr>
+                        <td colspan="3" class="py-8 text-center text-slate-400 border border-slate-300">
+                            <i class="fa-solid fa-circle-notch fa-spin text-emerald-500 text-xl mr-2"></i> Memuatkan senarai murid...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Nota Kakian Dokumen -->
+        <div class="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-100">
+            <span>Sistem e-RMT SK Felda Chemomoi</span>
+            <span>Status: Aktif</span>
+        </div>
+    </div>
+</section>
+
             <!-- TAB 4: PENGURUSAN DATA MURID (ADMIN ONLY) -->
             <section id="tab-pengurusan-murid" class="tab-panel hidden space-y-6">
                 <!-- Header Actions -->
@@ -768,56 +818,60 @@
             <p class="text-xs text-slate-500">Format penyediaan untuk Pejabat Pendidikan Daerah (PPD) / KPM</p>
         </div>
 
-        <!-- BORANG PEMILIH BULAN & TAHUN + BUTANG EKSPORT & BORANG C5/C6/C8 -->
-        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
-            <div class="text-left">
-                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Bulan:</label>
-                <select id="reportMonthSelect" onchange="triggerFinancialReport()" class="bg-slate-50 border border-slate-200 text-xs rounded-xl px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-emerald-500">
-                    <option value="1">Januari</option>
-                    <option value="2">Februari</option>
-                    <option value="3">Mac</option>
-                    <option value="4">April</option>
-                    <option value="5">Mei</option>
-                    <option value="6">Jun</option>
-                    <option value="7">Julai</option>
-                    <option value="8">Ogos</option>
-                    <option value="9">September</option>
-                    <option value="10">Oktober</option>
-                    <option value="11">November</option>
-                    <option value="12">Disember</option>
-                </select>
-            </div>
-            <div class="text-left">
-                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Tahun:</label>
-                <select id="reportYearSelect" onchange="triggerFinancialReport()" class="bg-slate-50 border border-slate-200 text-xs rounded-xl px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-emerald-500">
-                    <option value="2026">2026</option>
-                    <option value="2025">2025</option>
-                </select>
-            </div>
-            
-            <div class="self-end flex items-center gap-2 flex-wrap">
-                <!-- BUTANG CETAK BORANG C5 (MENU RMT) -->
-                <button onclick="downloadBorangC5()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
-                    <i class="fa-solid fa-utensils"></i> Cetak Borang C5
-                </button>
-
-                <!-- BUTANG CETAK BORANG C6 (PDF) -->
-                <button onclick="downloadBorangC6()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
-                    <i class="fa-solid fa-print"></i> Cetak Borang C6
-                </button>
-
-                <!-- BUTANG BORANG C8 (KHAS UNTUK ADMIN MODE) -->
-                <button onclick="printBorangC8()" class="admin-only hidden bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
-                    <i class="fa-solid fa-print"></i> Cetak Borang C8
-                </button>
-
-                <button onclick="exportReportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
-                    <i class="fa-solid fa-file-csv"></i> Eksport Excel/CSV
-                </button>
-            </div>
-        </div>
+       <!-- BORANG PEMILIH BULAN & TAHUN + BUTANG EKSPORT & BORANG C4/C5/C6/C8 -->
+<div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+    <div class="text-left">
+        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Bulan:</label>
+        <select id="reportMonthSelect" onchange="triggerFinancialReport()" class="bg-slate-50 border border-slate-200 text-xs rounded-xl px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-emerald-500">
+            <option value="1">Januari</option>
+            <option value="2">Februari</option>
+            <option value="3">Mac</option>
+            <option value="4">April</option>
+            <option value="5">Mei</option>
+            <option value="6">Jun</option>
+            <option value="7">Julai</option>
+            <option value="8">Ogos</option>
+            <option value="9">September</option>
+            <option value="10">Oktober</option>
+            <option value="11">November</option>
+            <option value="12">Disember</option>
+        </select>
     </div>
+    <div class="text-left">
+        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Tahun:</label>
+        <select id="reportYearSelect" onchange="triggerFinancialReport()" class="bg-slate-50 border border-slate-200 text-xs rounded-xl px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-emerald-500">
+            <option value="2026">2026</option>
+            <option value="2025">2025</option>
+        </select>
+    </div>
+    
+    <div class="self-end flex items-center gap-2 flex-wrap">
+        <!-- BUTANG CETAK BORANG C4 (SENARAI MURID - ADMIN) -->
+        <button onclick="downloadBorangC4()" class="admin-only hidden bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
+            <i class="fa-solid fa-list-check"></i> Cetak Borang C4
+        </button>
 
+        <!-- BUTANG CETAK BORANG C5 (MENU RMT) -->
+        <button onclick="downloadBorangC5()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
+            <i class="fa-solid fa-utensils"></i> Cetak Borang C5
+        </button>
+
+        <!-- BUTANG CETAK BORANG C6 (PDF) -->
+        <button onclick="downloadBorangC6()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
+            <i class="fa-solid fa-print"></i> Cetak Borang C6
+        </button>
+
+        <!-- BUTANG BORANG C8 (KHAS UNTUK ADMIN MODE) -->
+        <button onclick="printBorangC8()" class="admin-only hidden bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
+            <i class="fa-solid fa-print"></i> Cetak Borang C8
+        </button>
+
+        <button onclick="exportReportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
+            <i class="fa-solid fa-file-csv"></i> Eksport Excel/CSV
+        </button>
+    </div>
+</div>
+</div>
                 <!-- 2. KAD RINGKASAN TUNTUTAN KEWANGAN DINAMIK -->
                 <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm space-y-4">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -1380,80 +1434,100 @@ function handleAdminTabClick(tabId) {
     switchTab(tabId);
 }
 
-        function switchTab(tabId) {
-            // Simpan tab terkini supaya kekal selepas refresh
-		sessionStorage.setItem('activeRmtTab', tabId);
+function switchTab(tabId) {
+    // 1. Simpan tab terkini supaya kekal selepas refresh
+    sessionStorage.setItem('activeRmtTab', tabId);
 
-            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.add('hidden'));
-            document.querySelectorAll('.nav-item').forEach(nav => {
-                nav.classList.remove('bg-emerald-600', 'text-white', 'shadow-md', 'shadow-emerald-900/30');
-                nav.classList.add('text-slate-300', 'hover:bg-slate-800');
-            });
+    // 2. Sembunyikan semua seksyen tab
+    document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.add('hidden'));
 
-            const targetPanel = document.getElementById('tab-' + tabId);
-            if (targetPanel) targetPanel.classList.remove('hidden');
+    // 3. Reset warna navigasi
+    document.querySelectorAll('.nav-item').forEach(nav => {
+        nav.classList.remove('bg-emerald-600', 'text-white', 'shadow-md', 'shadow-emerald-900/30');
+        nav.classList.add('text-slate-300', 'hover:bg-slate-800');
+    });
 
-            const activeNav = document.getElementById('nav-' + tabId);
-            if (activeNav) {
-                activeNav.classList.add('bg-emerald-600', 'text-white', 'shadow-md', 'shadow-emerald-900/30');
-                activeNav.classList.remove('text-slate-300', 'hover:bg-slate-800');
-            }
+    // 4. Paparkan seksyen tab yang dipanggil
+    const targetPanel = document.getElementById('tab-' + tabId);
+    if (targetPanel) {
+        targetPanel.classList.remove('hidden');
+    }
 
-            const titleMap = {
-                'dashboard': ['Dashboard Utama', 'Ringkasan status harian & maklumat nutrisi murid RMT'],
-                'kehadiran': ['Semakan Kehadiran Murid', 'Rekod pengambilan makanan harian murid RMT (Supabase)'],
-                'menu': ['Jadual Menu RMT Mingguan', 'Perancangan menu sihat mengikut standard KPM'],
-                'pengurusan-murid': ['Pengurusan Data Murid', 'Muat naik CSV/APDM, tambah murid baharu, dan cetak Kad QR'],
-                'laporan': ['Laporan & Tuntutan Kewangan', 'Jana rekod tuntutan bulanan untuk PPD / KPM (Admin)']
-            };
+    // 5. Aktifkan butang menu navigasi
+    const activeNav = document.getElementById('nav-' + tabId);
+    if (activeNav) {
+        activeNav.classList.add('bg-emerald-600', 'text-white', 'shadow-md', 'shadow-emerald-900/30');
+        activeNav.classList.remove('text-slate-300', 'hover:bg-slate-800');
+    }
 
-            if (titleMap[tabId]) {
-                const titleEl = document.getElementById('pageTitle');
-                const subTitleEl = document.getElementById('pageSubtitle');
-                if (titleEl) titleEl.innerText = titleMap[tabId][0];
-                if (subTitleEl) subTitleEl.innerText = titleMap[tabId][1];
-            }
+    // 6. Pemetaan Tajuk Utama & Subtajuk Halaman
+    const titleMap = {
+        'dashboard': ['Dashboard Utama', 'Ringkasan status harian & maklumat nutrisi murid RMT'],
+        'kehadiran': ['Semakan Kehadiran Murid', 'Rekod pengambilan makanan harian murid RMT (Supabase)'],
+        'menu': ['Jadual Menu RMT Mingguan', 'Perancangan menu sihat mengikut standard KPM'],
+        'senarai-murid-awam': ['Senarai Murid Penerima RMT', 'Maklumat murid SK Felda Chemomoi yang layak menerima bantuan RMT'],
+        'pengurusan-murid': ['Pengurusan Data Murid', 'Muat naik CSV/APDM, tambah murid baharu, dan cetak Kad QR'],
+        'laporan': ['Laporan & Tuntutan Kewangan', 'Jana rekod tuntutan bulanan untuk PPD / KPM (Admin)']
+    };
+
+    if (titleMap[tabId]) {
+        const titleEl = document.getElementById('pageTitle');
+        const subTitleEl = document.getElementById('pageSubtitle');
+        if (titleEl) titleEl.innerText = titleMap[tabId][0];
+        if (subTitleEl) subTitleEl.innerText = titleMap[tabId][1];
+    }
+
+    // 7. Muat turun data murid dari Supabase jika tab senarai murid awam dipilih
+    if (tabId === 'senarai-murid-awam') {
+        if (typeof loadSenaraiMuridAwam === 'function') {
+            loadSenaraiMuridAwam();
         }
+    }
+}
+function refreshAllViews() {
+    renderStudentTable(studentsData);
+    renderAdminStudentTable(studentsData);
+    populateScanDropdown();
+    updateTopStats();
+    
+    // Pastikan senarai murid awam turut dikemaskini jika berada dalam paparan awam
+    if (typeof loadSenaraiMuridAwam === 'function') {
+        loadSenaraiMuridAwam();
+    }
+}
 
-        function refreshAllViews() {
-            renderStudentTable(studentsData);
-            renderAdminStudentTable(studentsData);
-            populateScanDropdown();
-            updateTopStats();
-        }
+function renderAdminStudentTable(data) {
+    const tbody = document.getElementById('adminStudentTableBody');
+    if (!tbody) return; // Selamat jika elemen tiada
 
-        function renderAdminStudentTable(data) {
-            const tbody = document.getElementById('adminStudentTableBody');
-            if (!tbody) return; // Selamat jika elemen tiada
+    tbody.innerHTML = '';
+    
+    // Menggunakan ?.innerText supaya tiada ralat jika adminStudentCount tiada
+    const countEl = document.getElementById('adminStudentCount');
+    if (countEl) countEl.innerText = data ? data.length : 0;
 
-            tbody.innerHTML = '';
-            
-            // Menggunakan ?.innerText supaya tiada ralat jika adminStudentCount tiada
-            const countEl = document.getElementById('adminStudentCount');
-            if (countEl) countEl.innerText = data ? data.length : 0;
+    if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-medium">Tiada rekod murid dalam pangkalan data Supabase. Sila tambah murid atau muat naik fail CSV.</td></tr>`;
+        return;
+    }
 
-            if (!data || data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-medium">Tiada rekod murid dalam pangkalan data Supabase. Sila tambah murid atau muat naik fail CSV.</td></tr>`;
-                return;
-            }
-
-            data.forEach((student) => {
-                let tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
-                tr.innerHTML = `
-                    <td class="p-3 font-mono text-slate-500 font-medium">${student.id}</td>
-                    <td class="p-3 font-bold text-slate-800">${student.nama_murid || student.nama || 'Murid'}</td>
-                    <td class="p-3 font-medium text-slate-600">${student.kelas || '-'}</td>
-                    <td class="p-3 font-mono text-slate-500">${student.mykid || student.nokp || '-'}</td>
-                    <td class="p-3 text-center">
-                        <button onclick="deleteStudentSupabase(${student.id}, '${student.nama_murid || student.nama}')" title="Padam Murid" class="text-rose-500 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 p-2 rounded-lg transition">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
+    data.forEach((student) => {
+        let tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
+        tr.innerHTML = `
+            <td class="p-3 font-mono text-slate-500 font-medium">${student.id}</td>
+            <td class="p-3 font-bold text-slate-800">${student.nama_murid || student.nama || 'Murid'}</td>
+            <td class="p-3 font-medium text-slate-600">${student.kelas || '-'}</td>
+            <td class="p-3 font-mono text-slate-500">${student.mykid || student.nokp || '-'}</td>
+            <td class="p-3 text-center">
+                <button onclick="deleteStudentSupabase(${student.id}, '${student.nama_murid || student.nama}')" title="Padam Murid" class="text-rose-500 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 p-2 rounded-lg transition">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
         function filterAdminStudents() {
             const searchInput = document.getElementById('adminSearchStudent');
             const classSelect = document.getElementById('adminFilterClass');
@@ -2024,61 +2098,148 @@ function renderWeeklyMenu() {
             document.getElementById('actionModal').classList.add('hidden');
         }
 
-        function initCharts() {
-            const ctxAtt = document.getElementById('attendanceChart').getContext('2d');
-            new Chart(ctxAtt, {
+   // Pembolehubah global supaya carta kehadiran boleh dikemaskini semula tanpa pertindihan
+let attendanceChartInstance = null;
+
+async function initCharts() {
+    // ==========================================
+    // 1. CARTA ANALISIS KEHADIRAN (DINAMIK SUPABASE)
+    // ==========================================
+    const ctxAtt = document.getElementById('attendanceChart');
+    if (ctxAtt) {
+        try {
+            // A. Dapatkan jumlah murid layak sebenar daripada jadual 'murid' Supabase
+            const { count: totalLayak, error: errMurid } = await db
+                .from('murid')
+                .select('*', { count: 'exact', head: true });
+
+            const totalMuridCount = (errMurid || !totalLayak) ? 25 : totalLayak;
+
+            // B. Dapatkan tarikh bagi minggu persekolahan aktif (Isnin - Jumaat)
+            const curr = new Date();
+            const currentDay = curr.getDay(); // 0 = Ahad, 1 = Isnin, ..., 6 = Sabtu
+
+            // Jika Sabtu (6) atau Ahad (0), undur semula ke Isnin minggu lepas (kekalkan paparan minggu lalu)
+            let distanceToMonday = 1 - currentDay;
+            if (currentDay === 6) distanceToMonday = -5; // Sabtu -> undur 5 hari ke Isnin
+            if (currentDay === 0) distanceToMonday = -6; // Ahad -> undur 6 hari ke Isnin
+
+            const monday = new Date(curr);
+            monday.setDate(curr.getDate() + distanceToMonday);
+
+            // Bina senarai 5 tarikh persekolahan (Isnin hingga Jumaat) format YYYY-MM-DD
+            const weekDates = [];
+            for (let i = 0; i < 5; i++) {
+                const nextDay = new Date(monday);
+                nextDay.setDate(monday.getDate() + i);
+                
+                const yyyy = nextDay.getFullYear();
+                const mm = String(nextDay.getMonth() + 1).padStart(2, '0');
+                const dd = String(nextDay.getDate()).padStart(2, '0');
+                
+                weekDates.push(`${yyyy}-${mm}-${dd}`);
+            }
+
+            // C. Tarik data kehadiran dari Supabase mengikut nama lajur 'status' dan 'tarikh'
+            const { data: attendanceData, error: errAtt } = await db
+                .from('kehadiran_rmt')
+                .select('tarikh, status')
+                .in('tarikh', weekDates);
+
+            if (errAtt) {
+                console.error("Ralat membaca kehadiran_rmt:", errAtt);
+            }
+
+            // D. Kira jumlah murid yang statusnya 'Hadir' (atau 'TAKEN'/'HADIR') mengikut hari
+            const dailyCounts = weekDates.map(dateStr => {
+                if (!attendanceData) return 0;
+                return attendanceData.filter(item => {
+                    const itemDate = String(item.tarikh).split('T')[0].trim();
+                    const statusVal = String(item.status || '').trim().toLowerCase();
+                    
+                    // Semak padanan tarikh dan status 'hadir' atau 'taken'
+                    return itemDate === dateStr && (statusVal === 'hadir' || statusVal === 'taken');
+                }).length;
+            });
+
+            // E. Musnahkan instance carta lama jika wujud
+            if (attendanceChartInstance) {
+                attendanceChartInstance.destroy();
+            }
+
+            // F. Bina Carta Kehadiran Baharu
+            attendanceChartInstance = new Chart(ctxAtt.getContext('2d'), {
                 type: 'bar',
                 data: {
                     labels: ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat'],
                     datasets: [
                         {
                             label: 'Jumlah Murid Ambil Makanan',
-                            data: [8, 7, 8, 8, 7],
+                            data: dailyCounts, // Membaca bilangan 'Hadir' sebenar dari Supabase
                             backgroundColor: '#10b981',
-                            borderRadius: 8
+                            borderRadius: 6
                         },
                         {
                             label: 'Jumlah Murid Layak (Total)',
-                            data: [8, 8, 8, 8, 8],
+                            data: Array(5).fill(totalMuridCount), // Data murid layak (cth: 25)
                             backgroundColor: '#e2e8f0',
-                            borderRadius: 8
+                            borderRadius: 6
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    grouped: true, // Memastikan kedua-dua bar dipaparkan bersebelahan
                     plugins: {
-                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
                     },
                     scales: {
-                        y: { beginAtZero: true, max: 10, grid: { color: '#f1f5f9' } },
+                        y: { 
+                            beginAtZero: true, 
+                            max: Math.ceil((totalMuridCount + 5) / 5) * 5, // Pembulatan skala paksi-Y automatik (cth: 30)
+                            ticks: { stepSize: 5 },
+                            grid: { color: '#f1f5f9' } 
+                        },
                         x: { grid: { display: false } }
                     }
                 }
             });
 
-            const ctxNut = document.getElementById('nutritionChart').getContext('2d');
-            new Chart(ctxNut, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Karbohidrat', 'Protein', 'Serat/Buah', 'Lemak Sihat'],
-                    datasets: [{
-                        data: [50, 25, 15, 10],
-                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } }
-                    },
-                    cutout: '70%'
-                }
-            });
-        } // <-- PENUTUP FUNGSI initCharts() YANG TERMALING TADI
+        } catch (err) {
+            console.error("Gagal menjana carta kehadiran:", err);
+        }
+    }
 
+    // ==========================================
+    // 2. CARTA IMBANGAN NUTRISI MENU (ASAL)
+    // ==========================================
+    const ctxNut = document.getElementById('nutritionChart');
+    if (ctxNut) {
+        new Chart(ctxNut.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Karbohidrat', 'Protein', 'Serat/Buah', 'Lemak Sihat'],
+                datasets: [{
+                    data: [50, 25, 15, 10],
+                    backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } }
+                },
+                cutout: '70%'
+            }
+        });
+    }
+}
         // ==========================================
         // PENGURUSAN MENU RMT MINGGUAN
         // ==========================================
@@ -2515,6 +2676,173 @@ function getJantinaMurid(murid) {
     return "-";
 }
 
+// ==========================================
+// FUNGSI JANA & CETAK BORANG C4 (SUPABASE)
+// ==========================================
+
+async function downloadBorangC4() {
+    try {
+        // 1. Dapatkan data murid daripada jadual 'murid' Supabase
+        const { data: senaraiMurid, error: errMurid } = await db
+            .from('murid')
+            .select('nama, kelas, status_rmt');
+
+        if (errMurid) {
+            console.error("Ralat membaca data murid:", errMurid);
+            alert("Gagal mengambil data murid dari Supabase.");
+            return;
+        }
+
+        // Tapis hanya murid berstatus 'Aktif' (jika ada)
+        let muridAktif = (senaraiMurid || []).filter(m => 
+            !m.status_rmt || String(m.status_rmt).toLowerCase() === 'aktif'
+        );
+
+        // 🟢 SUSUNAN KEUTAMAAN KELAS (1 Azkiya -> 6 Najihin)
+        const orderKelas = [
+            '1 AZKIYA', '1 NAJIHIN', '1 CERDAS',
+            '2 AZKIYA', '2 NAJIHIN',
+            '3 AZKIYA', '3 NAJIHIN',
+            '4 AZKIYA', '4 NAJIHIN',
+            '5 AZKIYA', '5 NAJIHIN',
+            '6 AZKIYA', '6 NAJIHIN'
+        ];
+
+        // LOGIK SUSUNAN: Mengikut Keutamaan Kelas, Kemudian Nama Murid
+        muridAktif.sort((a, b) => {
+            const kelasA = (a.kelas || '').toUpperCase().trim();
+            const kelasB = (b.kelas || '').toUpperCase().trim();
+
+            let indexA = orderKelas.indexOf(kelasA);
+            let indexB = orderKelas.indexOf(kelasB);
+
+            if (indexA === -1) indexA = 99;
+            if (indexB === -1) indexB = 99;
+
+            if (indexA !== indexB) {
+                return indexA - indexB;
+            }
+
+            const namaA = (a.nama || '').toUpperCase();
+            const namaB = (b.nama || '').toUpperCase();
+            return namaA.localeCompare(namaB);
+        });
+
+        const tahunSemasa = new Date().getFullYear();
+
+        // 2. Bina baris jadual murid
+        let rowsHtml = '';
+        muridAktif.forEach((murid, index) => {
+            rowsHtml += `
+                <tr>
+                    <td style="text-align: center;">${index + 1}</td>
+                    <td style="text-align: left; padding-left: 10px; text-transform: uppercase;">${murid.nama || ''}</td>
+                    <td style="text-align: center; text-transform: uppercase;">${murid.kelas || ''}</td>
+                </tr>
+            `;
+        });
+
+        // Pastikan sekurang-kurangnya 20 baris wujud mengikut templat asal
+        for (let i = muridAktif.length; i < 20; i++) {
+            rowsHtml += `
+                <tr>
+                    <td style="text-align: center;">${i + 1}</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            `;
+        }
+
+        // 3. Buka tetingkap cetakan
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) {
+            alert("Sila benarkan 'Pop-up' pada browser untuk mencetak Borang C4.");
+            return;
+        }
+
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>BORANG C4 - SENARAI PENERIMA MURID RMT</title>
+                <style>
+                    @page { size: A4 portrait; margin: 15mm; }
+                    body { font-family: Arial, sans-serif; padding: 10px; color: #000; }
+                    
+                    .doc-no-container { text-align: right; margin-bottom: 15px; }
+                    .doc-no-box { 
+                        display: inline-block; 
+                        border: 1.5px solid #000; 
+                        padding: 3px 12px; 
+                        font-weight: bold; 
+                        font-size: 10pt; 
+                    }
+                    
+                    .title { 
+                        font-weight: bold; 
+                        font-size: 11pt; 
+                        margin-bottom: 5px; 
+                        text-transform: uppercase; 
+                    }
+                    .school-name { 
+                        font-weight: bold; 
+                        font-size: 11pt; 
+                        margin-bottom: 15px; 
+                        text-transform: uppercase; 
+                    }
+                    
+                    table { 
+                        width: 100%; 
+                        border-collapse: collapse; 
+                        margin-top: 10px; 
+                    }
+                    th, td { 
+                        border: 1.5px solid #000; 
+                        height: 28px; 
+                        font-size: 10pt; 
+                    }
+                    th { 
+                        font-weight: bold; 
+                        text-transform: uppercase; 
+                        background-color: #f2f2f2;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="doc-no-container">
+                    <div class="doc-no-box">BORANG C4</div>
+                </div>
+                
+                <div class="title">SENARAI PENERIMA MURID RMT TAHUN ${tahunSemasa}</div>
+                <div class="school-name">SEKOLAH : SK FELDA CHEMOMOI</div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">BIL</th>
+                            <th style="width: 67%;">NAMA</th>
+                            <th style="width: 25%;">KELAS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHtml}
+                    </tbody>
+                </table>
+            </body>
+            </html>
+        `);
+
+        printWindow.document.close();
+        printWindow.focus();
+        setTimeout(() => {
+            printWindow.print();
+        }, 500);
+
+    } catch (err) {
+        console.error("Gagal menjana Borang C4:", err);
+        alert("Ralat semasa menjana Borang C4.");
+    }
+}
 
 // ==========================================
 // FUNGSI JANA & CETAK BORANG C5 (SUPABASE)
@@ -2536,11 +2864,7 @@ async function downloadBorangC5() {
         // 2. Susunan hari mengikut urutan persekolahan (Isnin - Jumaat)
         const daysOrder = ["Isnin", "Selasa", "Rabu", "Khamis", "Jumaat"];
 
-        // 3. Tarikh keputusan jawatankuasa
-        const tarikhKeputusan = document.getElementById('tarikhMenuJawatankuasa')?.value 
-            || new Date().toLocaleDateString('ms-MY', { day: '2-digit', month: '2-digit', year: 'numeric' });
-
-        // 4. Bina kotak Menu 1 hingga Menu 5 mengikut urutan hari
+        // 3. Bina kotak Menu 1 hingga Menu 5
         let menuBoxesHtml = '';
         daysOrder.forEach((dayName, index) => {
             const menuNo = index + 1;
@@ -2550,19 +2874,17 @@ async function downloadBorangC5() {
                 m.hari && m.hari.trim().toLowerCase() === dayName.toLowerCase()
             );
 
-            const makananText = menuItem ? menuItem.makanan : 'Tiada Tetapan Menu';
+            const makananText = menuItem ? menuItem.makanan : '';
 
             menuBoxesHtml += `
-                <div style="margin-bottom: 12px;">
-                    <div style="font-weight: bold; font-size: 11pt; margin-bottom: 4px;">MENU ${menuNo} (${dayName.toUpperCase()})</div>
-                    <div style="border: 1.5px solid #000; min-height: 45px; padding: 8px 12px; font-size: 10pt; line-height: 1.4; background-color: #fff;">
-                        ${makananText}
-                    </div>
+                <div class="menu-box">
+                    <div class="menu-title">MENU ${menuNo}</div>
+                    <div class="menu-content">${makananText}</div>
                 </div>
             `;
         });
 
-        // 5. Buka tetingkap cetakan
+        // 4. Buka tetingkap cetakan
         const printWindow = window.open('', '_blank');
         if (!printWindow) {
             alert("Sila benarkan 'Pop-up' pada browser untuk mencetak Borang C5.");
@@ -2576,44 +2898,68 @@ async function downloadBorangC5() {
                 <title>BORANG C5 - MENU RMT</title>
                 <style>
                     @page { size: A4 portrait; margin: 15mm; }
-                    body { font-family: Arial, sans-serif; padding: 10px; color: #000; }
-                    .doc-no { text-align: right; font-weight: bold; font-size: 10pt; margin-bottom: 10px; }
-                    .title { font-weight: bold; font-size: 14pt; margin-bottom: 20px; text-transform: uppercase; }
-                    .date-section { margin-top: 25px; border: 1.5px solid #000; padding: 8px 12px; font-weight: bold; font-size: 10pt; width: max-content; }
-                    .footer-sign { margin-top: 40px; display: flex; justify-content: space-between; font-size: 10pt; }
+                    body { font-family: Arial, sans-serif; padding: 0; color: #000; }
+                    
+                    .doc-no-container { text-align: right; margin-bottom: 25px; }
+                    .doc-no-box { 
+                        display: inline-block; 
+                        border: 1.5px solid #000; 
+                        padding: 4px 15px; 
+                        font-weight: bold; 
+                        font-size: 10pt; 
+                    }
+                    
+                    .title { font-weight: bold; font-size: 11pt; margin-bottom: 20px; text-transform: uppercase; }
+                    
+                    .menu-box {
+                        border: 1.5px solid #000;
+                        margin-bottom: 18px;
+                        padding: 10px 14px;
+                        min-height: 110px; /* Saiz kotak dibesarkan supaya muat elok dalam 1 A4 */
+                        box-sizing: border-box;
+                    }
+                    .menu-title {
+                        font-weight: bold;
+                        font-size: 10.5pt;
+                        margin-bottom: 8px;
+                    }
+                    .menu-content {
+                        font-size: 10pt;
+                        line-height: 1.5;
+                    }
+
+                    .date-section { 
+                        margin-top: 30px; 
+                        border: 1.5px solid #000; 
+                        padding: 12px; 
+                        font-weight: bold; 
+                        font-size: 10pt; 
+                        width: 100%; 
+                        box-sizing: border-box; 
+                        text-align: center;
+                    }
                 </style>
             </head>
             <body>
-                <div class="doc-no">BORANG C5</div>
+                <div class="doc-no-container">
+                    <div class="doc-no-box">BORANG C5</div>
+                </div>
+                
                 <div class="title">MENU RMT</div>
 
                 ${menuBoxesHtml}
 
                 <div class="date-section">
-                    TARIKH MENU DIPUTUSKAN OLEH JAWATANKUASA BANTUAN : ${tarikhKeputusan}
-                </div>
-
-                <div class="footer-sign">
-                    <div style="width: 45%;">
-                        <p>Disediakan oleh:</p>
-                        <br><br><br>
-                        <p>___________________________<br>(Penyelaras RMT / Guru RMT)</p>
-                    </div>
-                    <div style="width: 45%;">
-                        <p>Disahkan oleh:</p>
-                        <br><br><br>
-                        <p>___________________________<br>(Guru Besar / PK HEM)</p>
-                    </div>
+                    TARIKH MENU DIPUTUSKAN OLEH JAWATANKUASA BANTUAN
                 </div>
             </body>
             </html>
         `);
 
-        printWindow.document.close();
+       printWindow.document.close();
         printWindow.focus();
         setTimeout(() => {
-            printWindow.print();
-            printWindow.close();
+            printWindow.print(); // Hanya panggil dialog cetak, window kekal terbuka
         }, 500);
 
     } catch (err) {
@@ -2621,7 +2967,6 @@ async function downloadBorangC5() {
         alert("Ralat semasa menjana Borang C5.");
     }
 }
-
 
 // Fungsi Cetak Borang C6 (Diperbaiki: Elak Ralat Pop-up & Menyokong Backdated)
 async function downloadBorangC6() {
@@ -3201,6 +3546,102 @@ async function printBorangC8() {
     }
 }
 
+// Fungsi Memuatkan Data Murid RMT untuk Paparan Awam (Formal & Tersusun)
+async function loadSenaraiMuridAwam() {
+    const tbody = document.getElementById('tbodyMuridAwam');
+    const badge = document.getElementById('badgeTotalMuridAwam');
+    if (!tbody) return;
+
+    // Papar indikator memuatkan data gaya formal
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="3" class="py-8 text-center text-slate-500 font-medium border border-slate-300">
+                <i class="fa-solid fa-circle-notch fa-spin text-emerald-600 text-xl mr-2"></i> Memuatkan senarai murid dari Supabase...
+            </td>
+        </tr>
+    `;
+
+    try {
+        // Tarik data murid dari Supabase
+        const { data: senaraiMurid, error } = await db
+            .from('murid')
+            .select('*');
+
+        if (error) {
+            console.error("Ralat Supabase:", error);
+            throw error;
+        }
+
+        // Semak jika tiada data
+        if (!senaraiMurid || senaraiMurid.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="3" class="py-6 text-center text-slate-500 font-medium border border-slate-300">Tiada rekod murid ditemui dalam pangkalan data.</td></tr>`;
+            if (badge) badge.innerHTML = `<i class="fa-solid fa-users"></i> 0 Murid`;
+            return;
+        }
+
+        // Tapis murid berstatus 'aktif' atau yang tiada penetapan status_rmt
+        const muridAktif = senaraiMurid.filter(m => 
+            !m.status_rmt || String(m.status_rmt).toLowerCase() === 'aktif'
+        );
+
+        // 🟢 SUSUNAN KEUTAMAAN KELAS (1 Azkiya -> 6 Najihin)
+        const orderKelas = [
+            '1 AZKIYA', '1 NAJIHIN',
+            '2 AZKIYA', '2 NAJIHIN',
+            '3 AZKIYA', '3 NAJIHIN',
+            '4 AZKIYA', '4 NAJIHIN',
+            '5 AZKIYA', '5 NAJIHIN',
+            '6 AZKIYA', '6 NAJIHIN'
+        ];
+
+        // LOGIK SUSUNAN: Mengikut Keutamaan Kelas, Kemudian Nama Murid
+        muridAktif.sort((a, b) => {
+            const kelasA = (a.kelas || '').toUpperCase().trim();
+            const kelasB = (b.kelas || '').toUpperCase().trim();
+
+            let indexA = orderKelas.indexOf(kelasA);
+            let indexB = orderKelas.indexOf(kelasB);
+
+            // Jika kelas tiada dalam senarai keutamaan, letakkan di bahagian paling bawah
+            if (indexA === -1) indexA = 99;
+            if (indexB === -1) indexB = 99;
+
+            if (indexA !== indexB) {
+                return indexA - indexB;
+            }
+
+            // Jika kelas sama, susun mengikut abjad nama murid (A-Z)
+            const namaA = (a.nama_murid || a.nama || '').toUpperCase();
+            const namaB = (b.nama_murid || b.nama || '').toUpperCase();
+            return namaA.localeCompare(namaB);
+        });
+
+        if (badge) {
+            badge.innerHTML = `<i class="fa-solid fa-users font-bold"></i> ${muridAktif.length} Murid Layak`;
+        }
+
+        // 🟢 BINA BARIS JADUAL FORMAL BERKOTAK (Border Kelabu Jelas)
+        let html = '';
+        muridAktif.forEach((m, index) => {
+            const namaMurid = m.nama_murid || m.nama || 'TIADA NAMA';
+            const kelasMurid = m.kelas || '-';
+
+            html += `
+                <tr class="hover:bg-slate-50 transition border-b border-slate-300">
+                    <td class="py-2.5 px-3 text-center font-bold text-slate-700 border-r border-slate-300 w-16">${index + 1}</td>
+                    <td class="py-2.5 px-4 font-semibold text-slate-800 uppercase border-r border-slate-300">${namaMurid}</td>
+                    <td class="py-2.5 px-3 text-center uppercase font-bold text-slate-700 w-44">${kelasMurid}</td>
+                </tr>
+            `;
+        });
+
+        tbody.innerHTML = html;
+
+    } catch (err) {
+        console.error("Gagal memuatkan senarai murid awam:", err);
+        tbody.innerHTML = `<tr><td colspan="3" class="py-6 text-center text-rose-600 font-semibold border border-slate-300">Ralat memuatkan data dari Supabase. Sila semak konsol (F12).</td></tr>`;
+    }
+}
 
 // ==========================================
 // INISIALISASI PANGGILAN SISTEM
@@ -3209,6 +3650,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof loadWeeklyMenu === 'function') loadWeeklyMenu();
     if (typeof loadCanteenInfo === 'function') loadCanteenInfo();
     if (typeof updateTopStats === 'function') updateTopStats();
+    
+    // 🟢 TAMBAH BARIS INI (Muat data murid awam secara automatik semasa awal muat halaman)
+    if (typeof loadSenaraiMuridAwam === 'function') loadSenaraiMuridAwam();
 
     const currentMonth = new Date().getMonth() + 1;
     const currentYear = new Date().getFullYear();
