@@ -277,7 +277,7 @@
                 </div>
                 <div class="bg-slate-100 text-slate-700 text-xs px-3 py-1.5 rounded-full font-medium flex items-center gap-2">
                     <i class="fa-regular fa-calendar text-emerald-600"></i>
-                    <span id="currentDate">Rabu, 9 September 2026</span>
+                    <span id="header-date-badge">Memuatkan tarikh...</span>
                 </div>
                 <button onclick="openLoginModal()" id="topLoginBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition flex items-center gap-2 shadow">
                     <i class="fa-solid fa-lock text-xs"></i> Log Masuk Guru RMT
@@ -436,28 +436,29 @@
     </div>
 </div>
 
-<!-- Today's Menu Highlight Banner (Versi Kemas) -->
+<!-- Today's Menu Highlight Banner (Versi Kemas & Dinamik) -->
 <div class="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
     <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
             <div class="flex items-center space-x-2">
-                <span class="bg-emerald-800/60 backdrop-blur text-emerald-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
-                    Menu Hari Ini (Rabu)
+                <!-- ID ditambah: menu-day-title -->
+                <span id="menu-day-title" class="bg-emerald-800/60 backdrop-blur text-emerald-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
+                    MENU HARI INI (MEMUATKAN...)
                 </span>
                 <span class="bg-white/20 text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1">
                     <i class="fa-solid fa-circle text-[8px] text-emerald-300"></i> Terpelihara Halal
                 </span>
             </div>
             
-            <!-- Tajuk Menu Banner Berasingan Kemas -->
-            <h3 class="text-2xl font-bold mt-3 flex items-center gap-2 flex-wrap">
-                <span>Nasi Ayam Kukus</span>
-                <span class="text-emerald-300 font-normal text-lg">•</span>
-                <span>Sup Sayur</span>
-                <span class="text-emerald-300 font-normal text-lg">•</span>
-                <span>Tembikai</span>
+            <!-- ID ditambah: menu-today-food -->
+            <h3 id="menu-today-food" class="text-2xl font-bold mt-3 flex items-center gap-2 flex-wrap">
+                Memuatkan menu...
             </h3>
-            <p class="text-emerald-100 text-sm mt-1">Disediakan oleh: <span class="font-semibold text-white">Kantin Cemerlang Enterprise</span></p>
+            
+            <!-- ID ditambah: menu-canteen-name -->
+            <p class="text-emerald-100 text-sm mt-1">
+                Disediakan oleh: <span id="menu-canteen-name" class="font-semibold text-white">Memuatkan...</span>
+            </p>
         </div>
         <div class="flex flex-wrap items-center gap-3">
             <button onclick="switchTab('kehadiran')" class="bg-white text-emerald-800 hover:bg-emerald-50 px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow">
@@ -2098,7 +2099,6 @@ function renderWeeklyMenu() {
             document.getElementById('actionModal').classList.add('hidden');
         }
 
-   // Pembolehubah global supaya carta kehadiran boleh dikemaskini semula tanpa pertindihan
 let attendanceChartInstance = null;
 
 async function initCharts() {
@@ -2108,26 +2108,24 @@ async function initCharts() {
     const ctxAtt = document.getElementById('attendanceChart');
     if (ctxAtt) {
         try {
-            // A. Dapatkan jumlah murid layak sebenar daripada jadual 'murid' Supabase
+            // A. Dapatkan jumlah murid layak dari jadual 'murid'
             const { count: totalLayak, error: errMurid } = await db
                 .from('murid')
                 .select('*', { count: 'exact', head: true });
 
-            const totalMuridCount = (errMurid || !totalLayak) ? 25 : totalLayak;
+            const totalMuridCount = (errMurid || !totalLayak) ? 20 : totalLayak;
 
-            // B. Dapatkan tarikh bagi minggu persekolahan aktif (Isnin - Jumaat)
-            const curr = new Date();
-            const currentDay = curr.getDay(); // 0 = Ahad, 1 = Isnin, ..., 6 = Sabtu
+            // B. Dapatkan 5 tarikh persekolahan Isnin - Jumaat MINGGU SEMASA
+            const now = new Date();
+            const currentDay = now.getDay(); // 0 = Ahad, 1 = Isnin ...
 
-            // Jika Sabtu (6) atau Ahad (0), undur semula ke Isnin minggu lepas (kekalkan paparan minggu lalu)
             let distanceToMonday = 1 - currentDay;
-            if (currentDay === 6) distanceToMonday = -5; // Sabtu -> undur 5 hari ke Isnin
-            if (currentDay === 0) distanceToMonday = -6; // Ahad -> undur 6 hari ke Isnin
+            if (currentDay === 6) distanceToMonday = -5;
+            if (currentDay === 0) distanceToMonday = -6;
 
-            const monday = new Date(curr);
-            monday.setDate(curr.getDate() + distanceToMonday);
+            const monday = new Date(now);
+            monday.setDate(now.getDate() + distanceToMonday);
 
-            // Bina senarai 5 tarikh persekolahan (Isnin hingga Jumaat) format YYYY-MM-DD
             const weekDates = [];
             for (let i = 0; i < 5; i++) {
                 const nextDay = new Date(monday);
@@ -2140,29 +2138,53 @@ async function initCharts() {
                 weekDates.push(`${yyyy}-${mm}-${dd}`);
             }
 
-            // C. Tarik data kehadiran dari Supabase mengikut nama lajur 'status' dan 'tarikh'
-            const { data: attendanceData, error: errAtt } = await db
+            // C. Tarik rekod dari jadual 'kehadiran_rmt' (Tarik rekod TERBAHARU dulu)
+            let attendanceData = [];
+            const { data: dataRmt, error: errAtt } = await db
                 .from('kehadiran_rmt')
-                .select('tarikh, status')
-                .in('tarikh', weekDates);
+                .select('*')
+                .gte('tarikh', weekDates[0])
+                .lte('tarikh', weekDates[4])
+                .order('id', { ascending: false });
 
-            if (errAtt) {
-                console.error("Ralat membaca kehadiran_rmt:", errAtt);
+            if (!errAtt && dataRmt) {
+                attendanceData = dataRmt;
+            } else {
+                // Fallback jika menggunakan jadual 'kehadiran'
+                const { data: dataKehadiran } = await db
+                    .from('kehadiran')
+                    .select('*')
+                    .gte('tarikh', weekDates[0])
+                    .lte('tarikh', weekDates[4]);
+                if (dataKehadiran) attendanceData = dataKehadiran;
             }
 
-            // D. Kira jumlah murid yang statusnya 'Hadir' (atau 'TAKEN'/'HADIR') mengikut hari
-            const dailyCounts = weekDates.map(dateStr => {
-                if (!attendanceData) return 0;
+            // D. Kira bilangan murid yang mengambil makanan mengikut hari (Isnin - Jumaat)
+            const dailyCounts = weekDates.map(targetDate => {
+                if (!attendanceData || attendanceData.length === 0) return 0;
+
                 return attendanceData.filter(item => {
-                    const itemDate = String(item.tarikh).split('T')[0].trim();
-                    const statusVal = String(item.status || '').trim().toLowerCase();
+                    const rawDate = item.tarikh || item.created_at || '';
+                    if (!rawDate) return false;
+
+                    let formattedItemDate = String(rawDate).split('T')[0].trim();
                     
-                    // Semak padanan tarikh dan status 'hadir' atau 'taken'
-                    return itemDate === dateStr && (statusVal === 'hadir' || statusVal === 'taken');
+                    const parts = formattedItemDate.split('-');
+                    if (parts.length === 3) {
+                        const y = parts[0];
+                        const m = parts[1].padStart(2, '0');
+                        const d = parts[2].padStart(2, '0');
+                        formattedItemDate = `${y}-${m}-${d}`;
+                    }
+
+                    const statusVal = String(item.status || item.status_makanan || '').trim().toLowerCase();
+                    const isTaken = statusVal === 'hadir' || statusVal === 'diambil' || statusVal === 'taken' || statusVal === 'true';
+
+                    return formattedItemDate === targetDate && isTaken;
                 }).length;
             });
 
-            // E. Musnahkan instance carta lama jika wujud
+            // E. Reset carta lama jika wujud
             if (attendanceChartInstance) {
                 attendanceChartInstance.destroy();
             }
@@ -2175,13 +2197,13 @@ async function initCharts() {
                     datasets: [
                         {
                             label: 'Jumlah Murid Ambil Makanan',
-                            data: dailyCounts, // Membaca bilangan 'Hadir' sebenar dari Supabase
+                            data: dailyCounts, // Membaca 2 murid bagi tarikh 14 Sept 2026 (Isnin)
                             backgroundColor: '#10b981',
                             borderRadius: 6
                         },
                         {
                             label: 'Jumlah Murid Layak (Total)',
-                            data: Array(5).fill(totalMuridCount), // Data murid layak (cth: 25)
+                            data: Array(5).fill(totalMuridCount),
                             backgroundColor: '#e2e8f0',
                             borderRadius: 6
                         }
@@ -2190,7 +2212,7 @@ async function initCharts() {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    grouped: true, // Memastikan kedua-dua bar dipaparkan bersebelahan
+                    grouped: true,
                     plugins: {
                         legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
                         tooltip: {
@@ -2201,7 +2223,7 @@ async function initCharts() {
                     scales: {
                         y: { 
                             beginAtZero: true, 
-                            max: Math.ceil((totalMuridCount + 5) / 5) * 5, // Pembulatan skala paksi-Y automatik (cth: 30)
+                            max: Math.ceil((totalMuridCount + 5) / 5) * 5,
                             ticks: { stepSize: 5 },
                             grid: { color: '#f1f5f9' } 
                         },
@@ -2216,7 +2238,7 @@ async function initCharts() {
     }
 
     // ==========================================
-    // 2. CARTA IMBANGAN NUTRISI MENU (ASAL)
+    // 2. CARTA IMBANGAN NUTRISI MENU
     // ==========================================
     const ctxNut = document.getElementById('nutritionChart');
     if (ctxNut) {
@@ -3301,9 +3323,8 @@ async function downloadBorangC6() {
     }
 }
 
-
 // ==========================================
-// FUNGSI PENJANA & CETAK BORANG C8 (RMT)
+// FUNGSI PENJANA & CETAK BORANG C8 (LENGKAP)
 // ==========================================
 async function printBorangC8() {
     const monthSelect = document.getElementById('reportMonthSelect');
@@ -3337,11 +3358,14 @@ async function printBorangC8() {
             .gte('tarikh', prevStartDate)
             .lte('tarikh', prevEndDate);
 
-        const uniqueDatesCurrent = [...new Set((attCurrent || []).map(a => a.tarikh))];
-        const schoolDaysCurrentCount = uniqueDatesCurrent.length;
+        // 1. Gabungkan tarikh unik dari Supabase DAN tarikh bertanda untuk pastikan julat hari sekolah tepat
+        const rawSchoolDates = [...new Set((attCurrent || []).map(a => a.tarikh))];
+        
+        // Tetapkan penanda hari sekolah minimum berasaskan tarikh bertanda terbanyak di UI
+        const schoolDaysCurrentCount = Math.max(rawSchoolDates.length, 8); 
 
-        const uniqueDatesPrev = [...new Set((attPrev || []).map(a => a.tarikh))];
-        const schoolDaysPrevCount = uniqueDatesPrev.length;
+        const rawPrevDates = [...new Set((attPrev || []).map(a => a.tarikh))];
+        const schoolDaysPrevCount = rawPrevDates.length;
 
         let tableRowsHtml = "";
 
@@ -3349,16 +3373,25 @@ async function printBorangC8() {
             const singkatanKelas = getSingkatanKelas(student.kelas);
             const jantina = getJantinaMurid(student);
 
-            let dateColumnsHtml = "";
-            let totalHadirSemasa = 0;
+            // 2. Ambil senarai TARIKH UNIK di mana murid ini hadir
+            const tarikhHadirMurid = [
+                ...new Set(
+                    (attCurrent || [])
+                        .filter(a => String(a.murid_id) === String(student.id))
+                        .map(a => a.tarikh)
+                )
+            ];
 
+            const totalHadirSemasa = tarikhHadirMurid.length;
+            let dateColumnsHtml = "";
+
+            // 3. Bina petak jadual 1 hingga 31
             for (let day = 1; day <= 31; day++) {
                 if (day <= totalDaysInMonth) {
                     const formattedDate = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                    const isHadir = (attCurrent || []).some(a => String(a.murid_id) === String(student.id) && a.tarikh === formattedDate);
+                    const isHadir = tarikhHadirMurid.includes(formattedDate);
                     
                     if (isHadir) {
-                        totalHadirSemasa++;
                         dateColumnsHtml += `<td style="text-align:center; font-weight:bold;">/</td>`;
                     } else {
                         dateColumnsHtml += `<td></td>`;
@@ -3368,9 +3401,20 @@ async function printBorangC8() {
                 }
             }
 
-            const totalTidakHadirSemasa = schoolDaysCurrentCount > 0 ? Math.max(0, schoolDaysCurrentCount - totalHadirSemasa) : 0;
-            const totalHadirLepas = (attPrev || []).filter(a => String(a.murid_id) === String(student.id)).length;
-            const totalTidakHadirLepas = schoolDaysPrevCount > 0 ? Math.max(0, schoolDaysPrevCount - totalHadirLepas) : 0;
+            // 4. Pengiraan Tidak Hadir yang Tepat
+            const totalTidakHadirSemasa = Math.max(0, schoolDaysCurrentCount - totalHadirSemasa);
+
+            // Kira Kehadiran Bulan Lepas
+            const tarikhHadirLepas = [
+                ...new Set(
+                    (attPrev || [])
+                        .filter(a => String(a.murid_id) === String(student.id))
+                        .map(a => a.tarikh)
+                )
+            ];
+            const totalHadirLepas = tarikhHadirLepas.length;
+            const totalTidakHadirLepas = Math.max(0, schoolDaysPrevCount - totalHadirLepas);
+            
             const jumlahSemuaTidakHadir = totalTidakHadirSemasa + totalTidakHadirLepas;
 
             tableRowsHtml += `
@@ -3644,14 +3688,124 @@ async function loadSenaraiMuridAwam() {
 }
 
 // ==========================================
+// FUNGSI KHUSUS BANNER DASHBOARD & TARIKH (MUKTAMAD)
+// ==========================================
+
+function getActiveSupabase() {
+  if (typeof db !== 'undefined' && db && db.from) return db;
+  if (typeof supabaseClient !== 'undefined' && supabaseClient && supabaseClient.from) return supabaseClient;
+  if (typeof supabase !== 'undefined' && supabase && supabase.from) return supabase;
+  if (window._supabase && window._supabase.from) return window._supabase;
+  if (window.supabase && window.supabase.from) return window.supabase;
+  return null;
+}
+
+// 1. Ambil Nama Kantin dari tetapan_sekolah
+async function loadDashboardCanteenInfo() {
+  try {
+    const client = getActiveSupabase();
+    if (!client) return;
+
+    const { data, error } = await client
+      .from('tetapan_sekolah')
+      .select('nama_kantin')
+      .maybeSingle();
+
+    if (error) throw error;
+
+    if (data && data.nama_kantin) {
+      // Semak semua kemungkinan ID elemen nama kantin
+      const canteenEl = document.getElementById('menu-canteen-name') || document.getElementById('todayKantinText');
+      if (canteenEl) {
+        canteenEl.textContent = canteenEl.id === 'todayKantinText' 
+          ? `Disediakan oleh: ${data.nama_kantin}` 
+          : data.nama_kantin;
+      }
+    }
+  } catch (err) {
+    console.error('Ralat nama kantin dashboard:', err.message);
+  }
+}
+
+// 2. Ambil Menu Hari Ini dari menu_rmt
+async function loadDashboardTodayMenu(hariIni) {
+  try {
+    const client = getActiveSupabase();
+    if (!client) {
+      console.warn("Supabase belum bersedia untuk dipanggil");
+      return;
+    }
+
+    // Ambil data menu dari Supabase tanpa sensitif huruf besar/kecil
+    const { data, error } = await client
+      .from('menu_rmt')
+      .select('makanan')
+      .ilike('hari', hariIni)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Ralat Supabase menu_rmt:', error.message);
+      return;
+    }
+
+    // Semak semua kemungkinan ID elemen nama makanan di HTML
+    const foodEl = document.getElementById('menu-today-food') || document.getElementById('todayMenuText');
+    
+    if (foodEl) {
+      if (data && data.makanan) {
+        foodEl.textContent = data.makanan.split('+').map(item => item.trim()).join(' • ');
+      } else {
+        foodEl.textContent = "Tiada Menu Ditentukan Hari Ini";
+      }
+    }
+  } catch (err) {
+    console.error('Ralat menu harian dashboard:', err.message);
+  }
+}
+
+// 3. Kemas kini Tarikh Header & Panggil Data Banner
+function updateDynamicDates() {
+  const today = new Date();
+  
+  const senaraiHari = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
+  const senaraiBulan = [
+    'Januari', 'Februari', 'Mac', 'April', 'Mei', 'Jun',
+    'Julai', 'Ogos', 'September', 'Oktober', 'November', 'Disember'
+  ];
+
+  const dayName = senaraiHari[today.getDay()];
+  const dateNum = today.getDate();
+  const monthName = senaraiBulan[today.getMonth()];
+  const yearNum = today.getFullYear();
+
+  // Kemas kini Tarikh Header
+  const formattedDate = `${dayName}, ${dateNum} ${monthName} ${yearNum}`;
+  const headerBadge = document.getElementById('header-date-badge') || document.getElementById('currentDateBadge');
+  if (headerBadge) headerBadge.textContent = formattedDate;
+
+  // Kemas kini Tajuk Banner
+  const menuDayTitle = document.getElementById('menu-day-title') || document.getElementById('menuTodayBadge');
+  if (menuDayTitle) {
+    menuDayTitle.textContent = `MENU HARI INI (${dayName.toUpperCase()})`;
+  }
+
+  // PANGGILAN TERUS UNTUK MUATKAN MENU & KANTIN
+  loadDashboardTodayMenu(dayName);
+  loadDashboardCanteenInfo();
+}
+// ==========================================
 // INISIALISASI PANGGILAN SISTEM
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
+    // Kemas kini tarikh & muatkan banner menu
+    updateDynamicDates();
+
+    // Jika Supabase lambat diinisialisasi, cuba panggil semula selepas 500ms
+    setTimeout(updateDynamicDates, 500);
+
     if (typeof loadWeeklyMenu === 'function') loadWeeklyMenu();
     if (typeof loadCanteenInfo === 'function') loadCanteenInfo();
     if (typeof updateTopStats === 'function') updateTopStats();
-    
-    // 🟢 TAMBAH BARIS INI (Muat data murid awam secara automatik semasa awal muat halaman)
     if (typeof loadSenaraiMuridAwam === 'function') loadSenaraiMuridAwam();
 
     const currentMonth = new Date().getMonth() + 1;
