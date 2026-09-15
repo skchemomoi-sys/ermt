@@ -169,98 +169,108 @@
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 min-h-screen flex flex-col md:flex-row antialiased selection:bg-emerald-200">
 
-    <!-- Sidebar / Navigation -->
-    <aside class="w-full md:w-64 bg-slate-900 text-white flex-shrink-0 z-30 shadow-xl flex flex-col no-print">
-        <!-- Logo & Branding -->
-        <div class="p-5 flex items-center justify-between border-b border-slate-800">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-emerald-500/30">
-                    <i class="fa-solid font-bold fa-utensils"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-lg leading-tight tracking-wide text-white">e-RMT Sekolah</h1>
-                    <p class="text-[10px] text-emerald-400 font-medium flex items-center gap-1">
-                        <i class="fa-solid fa-cloud text-[9px]"></i> Terhubung Supabase
-                    </p>
-                </div>
+   <!-- Sidebar / Navigation -->
+<aside class="w-full md:w-64 bg-slate-900 text-white flex-shrink-0 z-30 shadow-xl flex flex-col no-print">
+    <!-- Logo & Branding -->
+    <div class="p-5 flex items-center justify-between border-b border-slate-800">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-emerald-500/30">
+                <i class="fa-solid font-bold fa-utensils"></i>
             </div>
-            <button id="mobileMenuBtn" class="md:hidden text-slate-400 hover:text-white focus:outline-none">
-                <i class="fa-solid fa-bars text-xl"></i>
+            <div>
+                <h1 class="font-bold text-lg leading-tight tracking-wide text-white">e-RMT Sekolah</h1>
+                <p class="text-[10px] text-emerald-400 font-medium flex items-center gap-1">
+                    <i class="fa-solid fa-cloud text-[9px]"></i> Terhubung Supabase
+                </p>
+            </div>
+        </div>
+        <button id="mobileMenuBtn" class="md:hidden text-slate-400 hover:text-white focus:outline-none">
+            <i class="fa-solid fa-bars text-xl"></i>
+        </button>
+    </div>
+
+    <!-- Role Badge Display -->
+    <div class="px-4 pt-4 pb-2">
+        <label class="text-[10px] uppercase tracking-wider font-semibold text-slate-400 block mb-1">Status Mod Akses</label>
+        <div id="roleBadgeContainer" class="bg-slate-800 text-xs rounded-xl p-3 border border-slate-700 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <span id="roleBadgeIcon" class="w-2.5 h-2.5 rounded-full bg-blue-400"></span>
+                <span id="roleBadgeText" class="font-semibold text-slate-200">Akses Awam / Ibu Bapa</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Navigation Links -->
+    <nav id="navMenu" class="hidden md:block flex-1 px-3 py-3 space-y-1 overflow-y-auto custom-scrollbar">
+        <!-- Tab Awam -->
+        <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 text-white shadow-md shadow-emerald-900/30">
+            <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+            <span>Dashboard Utama</span>
+        </a>
+        <a href="#" onclick="switchTab('kehadiran')" id="nav-kehadiran" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa-solid fa-qrcode w-5 text-center"></i>
+            <span>Semakan Kehadiran</span>
+        </a>
+        <a href="#" onclick="switchTab('menu')" id="nav-menu" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa-solid fa-utensils w-5 text-center"></i>
+            <span>Menu RMT Mingguan</span>
+        </a>
+        
+        <!-- Tab Awam Senarai Murid RMT -->
+        <a href="#" onclick="switchTab('senarai-murid-awam'); loadSenaraiMuridAwam();" id="nav-senarai-murid-awam" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
+            <i class="fa-solid fa-user-graduate w-5 text-center"></i>
+            <span>Senarai Murid Penerima RMT</span>
+        </a>
+        
+        <!-- Tab Pengurusan Data Murid (Khusus Admin) -->
+        <a href="#" onclick="handleAdminTabClick('pengurusan-murid')" id="nav-pengurusan-murid" class="nav-item admin-only hidden flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-users-gear w-5 text-center text-emerald-400"></i>
+                <span>Pengurusan Data Murid</span>
+            </div>
+            <span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded uppercase font-bold">Admin</span>
+        </a>
+
+        <!-- Tab Pengurusan RMT (Khusus Admin) -->
+        <a href="#" onclick="handleAdminTabClick('pengurusan-rmt')" id="nav-pengurusan-rmt" class="nav-item admin-only hidden flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-user-tie w-5 text-center text-emerald-400"></i>
+                <span>Pengurusan RMT</span>
+            </div>
+            <span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded uppercase font-bold">Admin</span>
+        </a>
+
+        <!-- Tab Laporan khusus Admin/PK HEM (LAST TAB) -->
+        <a href="#" onclick="handleAdminTabClick('laporan')" id="nav-laporan" class="nav-item admin-only hidden flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-file-invoice w-5 text-center text-emerald-400"></i>
+                <span>Laporan & Tuntutan</span>
+            </div>
+            <span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded uppercase font-bold">Admin</span>
+        </a>
+    </nav>
+
+    <!-- School Info Footer & Login Button -->
+    <div class="p-4 border-t border-slate-800 bg-slate-950/50 space-y-3">
+        <div id="authButtonSection">
+            <button onclick="openLoginModal()" id="loginSideBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/40">
+                <i class="fa-solid fa-right-to-bracket"></i> Log Masuk Admin / Guru
+            </button>
+            <button onclick="logoutAdmin()" id="logoutSideBtn" class="hidden w-full bg-slate-800 hover:bg-rose-950 text-rose-300 hover:text-rose-200 border border-slate-700 font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Log Keluar Mod Admin
             </button>
         </div>
-
-        <!-- Role Badge Display -->
-        <div class="px-4 pt-4 pb-2">
-            <label class="text-[10px] uppercase tracking-wider font-semibold text-slate-400 block mb-1">Status Mod Akses</label>
-            <div id="roleBadgeContainer" class="bg-slate-800 text-xs rounded-xl p-3 border border-slate-700 flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                    <span id="roleBadgeIcon" class="w-2.5 h-2.5 rounded-full bg-blue-400"></span>
-                    <span id="roleBadgeText" class="font-semibold text-slate-200">Akses Awam / Ibu Bapa</span>
-                </div>
+        <div class="flex items-center space-x-3 pt-1 border-t border-slate-800/80">
+            <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 text-xs">
+                <i class="fa-solid fa-school"></i>
+            </div>
+            <div class="truncate">
+                <p class="text-xs font-semibold text-slate-200 truncate">SK FELDA CHEMOMOI</p>
+                <p class="text-[10px] text-slate-400">Kod Sekolah: CBA0020</p>
             </div>
         </div>
-
-       <!-- Menu Navigation Links -->
-<nav id="navMenu" class="hidden md:block flex-1 px-3 py-3 space-y-1 overflow-y-auto custom-scrollbar">
-    <!-- Tab Awam -->
-    <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 text-white shadow-md shadow-emerald-900/30">
-        <i class="fa-solid fa-chart-pie w-5 text-center"></i>
-        <span>Dashboard Utama</span>
-    </a>
-    <a href="#" onclick="switchTab('kehadiran')" id="nav-kehadiran" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
-        <i class="fa-solid fa-qrcode w-5 text-center"></i>
-        <span>Semakan Kehadiran</span>
-    </a>
-    <a href="#" onclick="switchTab('menu')" id="nav-menu" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
-        <i class="fa-solid fa-utensils w-5 text-center"></i>
-        <span>Menu RMT Mingguan</span>
-    </a>
-    
-    <!-- 🟢 DITAMBAH: Tab Awam Senarai Murid RMT 🟢 -->
-    <a href="#" onclick="switchTab('senarai-murid-awam'); loadSenaraiMuridAwam();" id="nav-senarai-murid-awam" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
-        <i class="fa-solid fa-user-graduate w-5 text-center"></i>
-        <span>Senarai Murid Penerima RMT</span>
-    </a>
-    
-    <!-- Tab Pengurusan Data Murid (Khusus Admin) -->
-    <a href="#" onclick="handleAdminTabClick('pengurusan-murid')" id="nav-pengurusan-murid" class="nav-item admin-only hidden flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
-        <div class="flex items-center space-x-3">
-            <i class="fa-solid fa-users-gear w-5 text-center text-emerald-400"></i>
-            <span>Pengurusan Data Murid</span>
-        </div>
-        <span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded uppercase font-bold">Admin</span>
-    </a>
-
-    <!-- Tab Laporan khusus Admin/PK HEM -->
-    <a href="#" onclick="handleAdminTabClick('laporan')" id="nav-laporan" class="nav-item admin-only hidden flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
-        <div class="flex items-center space-x-3">
-            <i class="fa-solid fa-file-invoice w-5 text-center text-emerald-400"></i>
-            <span>Laporan & Tuntutan</span>
-        </div>
-        <span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded uppercase font-bold">Admin</span>
-    </a>
-</nav>
-        <!-- School Info Footer & Login Button -->
-        <div class="p-4 border-t border-slate-800 bg-slate-950/50 space-y-3">
-            <div id="authButtonSection">
-                <button onclick="openLoginModal()" id="loginSideBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/40">
-                    <i class="fa-solid fa-right-to-bracket"></i> Log Masuk Admin / Guru
-                </button>
-                <button onclick="logoutAdmin()" id="logoutSideBtn" class="hidden w-full bg-slate-800 hover:bg-rose-950 text-rose-300 hover:text-rose-200 border border-slate-700 font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Log Keluar Mod Admin
-                </button>
-            </div>
-            <div class="flex items-center space-x-3 pt-1 border-t border-slate-800/80">
-                <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 text-xs">
-                    <i class="fa-solid fa-school"></i>
-                </div>
-                <div class="truncate">
-                    <p class="text-xs font-semibold text-slate-200 truncate">SK FELDA CHEMOMOI</p>
-                    <p class="text-[10px] text-slate-400">Kod Sekolah: CBA0020</p>
-                </div>
-            </div>
-        </div>
-    </aside>
+    </div>
+</aside>
 
     <!-- Main Content Container -->
     <main class="flex-1 flex flex-col min-w-0 overflow-y-auto custom-scrollbar h-screen no-print">
@@ -288,11 +298,12 @@
         <!-- Main Content Dynamic Panels -->
         <div class="p-4 sm:p-6 lg:p-8 space-y-6 flex-1">
 
-          <!-- TAB 1: DASHBOARD UTAMA -->
+ <!-- TAB 1: DASHBOARD UTAMA -->
 <section id="tab-dashboard" class="tab-panel space-y-6">
-    <!-- Top Stat Cards Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-        <!-- Total RMT Students (Akses Awam) -->
+    <!-- Top Stat Cards Grid (KEKAL 3 KAD ASAL SUPAYA SEIMBANG & KEMAS) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        
+        <!-- 1. Total RMT Students (Akses Awam) -->
         <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
             <div class="flex justify-between items-start">
                 <div>
@@ -308,7 +319,7 @@
             </div>
         </div>
 
-        <!-- Attendance Today (Akses Awam) -->
+        <!-- 2. Attendance Today (Akses Awam) -->
         <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
             <div class="flex justify-between items-start">
                 <div>
@@ -324,35 +335,70 @@
             </div>
         </div>
 
-       <!-- Food Waste Percentage (RESTRICTED: HANYA ADMIN/GURU RMT) -->
-<div id="cardWasteStat" class="admin-only hidden bg-white rounded-2xl p-5 border border-amber-100 shadow-sm hover:shadow-md transition relative overflow-hidden">
-    <div class="absolute top-0 right-0 bg-amber-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl">Sulit Admin</div>
-    <div class="flex justify-between items-start">
-        <div>
-            <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Anggaran Pembaziran</p>
-            <h3 class="text-2xl font-bold text-slate-800 mt-1" id="statWaste">0.0 <span class="text-sm font-normal text-slate-500">kg</span></h3>
-            
-            <!-- Ditambah id="statWasteSubtext" untuk fungsi dinamik JavaScript -->
-            <p id="statWasteSubtext" class="text-xs text-emerald-600 mt-2 flex items-center font-medium">
-                <i class="fa-solid fa-check text-[10px] mr-1"></i> Tiada Pembaziran
-            </p>
+       <!-- KAD HITAM GABUNGAN (REKA BENTUK NAMA PENUH - TIADA TERPOTONG) -->
+<div id="cardPublicNotice" class="public-only bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 text-white rounded-2xl p-4 shadow-sm flex flex-col justify-between border border-slate-800">
+    <div>
+        <!-- Header Badge & Tajuk KPM -->
+        <div class="flex items-center justify-between mb-1">
+            <span class="text-[9px] bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded border border-emerald-500/30 uppercase tracking-wider">
+                e-RMT Info
+            </span>
+            <i class="fa-solid fa-utensils text-emerald-400 text-xs"></i>
         </div>
-        <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
-            <i class="fa-solid fa-dumpster"></i>
+
+        <h4 class="font-bold text-xs text-slate-100">Program Pemakanan KPM</h4>
+        <p class="text-[10px] text-slate-300 leading-tight mt-0.5">
+            Sajian sihat & seimbang membendung kemiskinan nutrisi.
+        </p>
+
+        <!-- Senarai Pegawai RMT dari Supabase (Susunan 2 Baris: Nama Penuh Terpapar) -->
+        <div class="mt-2 pt-1.5 border-t border-slate-800 space-y-1.5 text-[11px]">
+            <div>
+                <span class="text-[9px] text-slate-400 block uppercase font-medium leading-none">Penyelaras:</span>
+                <span id="dash-penyelaras-nama" class="font-bold text-emerald-400 block leading-tight">Memuatkan...</span>
+            </div>
+            <div>
+                <span class="text-[9px] text-slate-400 block uppercase font-medium leading-none">Guru Bertugas:</span>
+                <span id="dash-bertugas-nama" class="font-semibold text-slate-200 block leading-tight">Memuatkan...</span>
+            </div>
+            <div>
+                <span class="text-[9px] text-slate-400 block uppercase font-medium leading-none">PK HEM:</span>
+                <span id="dash-hem-nama" class="font-semibold text-slate-200 block leading-tight">Memuatkan...</span>
+            </div>
         </div>
+    </div>
+
+    <!-- Footer Nota -->
+    <div class="mt-2 pt-1.5 border-t border-slate-800 text-[9px] text-slate-400 flex items-center justify-between">
+        <span>Dipantau oleh Pentadbir</span>
+        <i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i>
     </div>
 </div>
 
-        <!-- Kad 1: Tuntutan Sebenar Hari Ini (Murid Hadir) -->
-        <div id="cardActualClaimStat" class="admin-only hidden bg-white rounded-2xl p-5 border border-emerald-100 shadow-sm hover:shadow-md transition relative overflow-hidden">
+        <!-- RESTRICTED ADMIN CARDS (Hanya Muncul Bila Admin Log Masuk) -->
+        <div id="cardWasteStat" class="admin-only hidden bg-white rounded-2xl p-5 border border-amber-100 shadow-sm relative overflow-hidden">
+            <div class="absolute top-0 right-0 bg-amber-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl">Sulit Admin</div>
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Anggaran Pembaziran</p>
+                    <h3 class="text-2xl font-bold text-slate-800 mt-1" id="statWaste">0.0 <span class="text-sm font-normal text-slate-500">kg</span></h3>
+                    <p id="statWasteSubtext" class="text-xs text-emerald-600 mt-2 flex items-center font-medium">
+                        <i class="fa-solid fa-check text-[10px] mr-1"></i> Tiada Pembaziran
+                    </p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-dumpster"></i>
+                </div>
+            </div>
+        </div>
+
+        <div id="cardActualClaimStat" class="admin-only hidden bg-white rounded-2xl p-5 border border-emerald-100 shadow-sm relative overflow-hidden">
             <div class="absolute top-0 right-0 bg-emerald-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl">Kewangan Sah</div>
             <div class="flex justify-between items-start">
                 <div>
                     <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Tuntutan Sebenar Hari Ini</p>
                     <h3 class="text-2xl font-bold text-slate-800 mt-1" id="statActualClaimToday">RM 0.00</h3>
-                    <p class="text-xs text-slate-500 mt-2 font-medium">
-                        Berdasarkan: <span class="text-emerald-700 font-semibold">Kehadiran Murid</span>
-                    </p>
+                    <p class="text-xs text-slate-500 mt-2 font-medium">Berdasarkan: <span class="text-emerald-700 font-semibold">Kehadiran Murid</span></p>
                 </div>
                 <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
                     <i class="fa-solid fa-receipt"></i>
@@ -360,16 +406,13 @@
             </div>
         </div>
 
-        <!-- Kad 2: Anggaran Maksimum Harian (Keseluruhan Murid Layak) -->
-        <div id="cardMaxBudgetStat" class="admin-only hidden bg-white rounded-2xl p-5 border border-purple-100 shadow-sm hover:shadow-md transition relative overflow-hidden">
+        <div id="cardMaxBudgetStat" class="admin-only hidden bg-white rounded-2xl p-5 border border-purple-100 shadow-sm relative overflow-hidden">
             <div class="absolute top-0 right-0 bg-purple-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl">Siling Peruntukan</div>
             <div class="flex justify-between items-start">
                 <div>
                     <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Anggaran Maksimum Harian</p>
                     <h3 class="text-2xl font-bold text-slate-800 mt-1" id="statMaxDailyBudget">RM 0.00</h3>
-                    <p class="text-xs text-slate-500 mt-2 font-medium">
-                        Kadar: <span class="text-purple-700 font-semibold">RM3.50 × Murid Layak</span>
-                    </p>
+                    <p class="text-xs text-slate-500 mt-2 font-medium">Kadar: <span class="text-purple-700 font-semibold">RM3.50 × Murid Layak</span></p>
                 </div>
                 <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl">
                     <i class="fa-solid fa-wallet"></i>
@@ -377,100 +420,86 @@
             </div>
         </div>
 
-        <!-- Public Notice Card -->
-        <div id="cardPublicNotice" class="public-only bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-5 text-white shadow-sm flex flex-col justify-between">
-            <div>
-                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded">e-RMT Info</span>
-                <h4 class="font-bold text-sm mt-2">Program Pemakanan KPM</h4>
-                <p class="text-xs text-slate-300 mt-1 leading-relaxed">Menyediakan sajian sihat, seimbang dan berkualiti untuk membendung kemiskinan nutrisi.</p>
-            </div>
-            <div class="mt-3 pt-2 border-t border-slate-700 text-[11px] text-slate-400">
-                Dipantau oleh Pentadbir Sekolah
-            </div>
-        </div>
     </div>
-               <!-- Graphs Section -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Kehadiran Mingguan Chart -->
-    <div class="lg:col-span-2 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
-        <div class="flex items-center justify-between mb-4">
-            <div>
-                <h3 class="font-bold text-slate-800">Analisis Kehadiran RMT (Minggu Ini)</h3>
-                <p class="text-xs text-slate-500">Perbandingan murid mengambil makanan berbanding murid hadir</p>
+
+    <!-- Graphs Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Kehadiran Mingguan Chart -->
+        <div class="lg:col-span-2 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="font-bold text-slate-800">Analisis Kehadiran RMT (Minggu Ini)</h3>
+                    <p class="text-xs text-slate-500">Perbandingan murid mengambil makanan berbanding murid hadir</p>
+                </div>
+                <span class="text-xs bg-slate-100 text-slate-600 font-medium px-2.5 py-1 rounded-md">Minggu Semasa</span>
             </div>
-            <span class="text-xs bg-slate-100 text-slate-600 font-medium px-2.5 py-1 rounded-md">Minggu Semasa</span>
+            <div class="h-64">
+                <canvas id="attendanceChart"></canvas>
+            </div>
         </div>
-        <div class="h-64">
-            <canvas id="attendanceChart"></canvas>
+
+        <!-- Nutritional Breakdown Chart (Versi Kemas) -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-bold text-slate-800">Imbangan Nutrisi Menu</h3>
+                    <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full uppercase">Standard KPM</span>
+                </div>
+                
+                <div class="bg-slate-50 rounded-xl p-2.5 border border-slate-100 my-2 text-center">
+                    <p class="text-xs font-semibold text-slate-700 flex items-center justify-center gap-2 flex-wrap">
+                        <span>Nasi Ayam Kukus</span>
+                        <span class="text-emerald-500 font-bold">•</span>
+                        <span>Sup Sayur</span>
+                        <span class="text-emerald-500 font-bold">•</span>
+                        <span>Tembikai</span>
+                    </p>
+                </div>
+
+                <div class="h-44 flex justify-center items-center my-1">
+                    <canvas id="nutritionChart"></canvas>
+                </div>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 text-xs text-slate-500 flex justify-between items-center bg-slate-50/50 -mx-5 -mb-5 p-4 rounded-b-2xl">
+                <span>Jumlah Kalori: <strong class="text-slate-800 font-bold">420 kcal</strong></span>
+                <span>Protein: <strong class="text-slate-800 font-bold">18g</strong></span>
+            </div>
         </div>
     </div>
 
-    <!-- Nutritional Breakdown Chart (Versi Kemas) -->
-    <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex flex-col justify-between">
-        <div>
-            <div class="flex items-center justify-between mb-2">
-                <h3 class="font-bold text-slate-800">Imbangan Nutrisi Menu</h3>
-                <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full uppercase">Standard KPM</span>
-            </div>
-            
-            <!-- Format Nama Menu Berbentuk Lencana Kemas -->
-            <div class="bg-slate-50 rounded-xl p-2.5 border border-slate-100 my-2 text-center">
-                <p class="text-xs font-semibold text-slate-700 flex items-center justify-center gap-2 flex-wrap">
-                    <span>Nasi Ayam Kukus</span>
-                    <span class="text-emerald-500 font-bold">•</span>
-                    <span>Sup Sayur</span>
-                    <span class="text-emerald-500 font-bold">•</span>
-                    <span>Tembikai</span>
+    <!-- Today's Menu Highlight Banner (Versi Kemas & Dinamik) -->
+    <div class="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+        <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+                <div class="flex items-center space-x-2">
+                    <span id="menu-day-title" class="bg-emerald-800/60 backdrop-blur text-emerald-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
+                        MENU HARI INI (MEMUATKAN...)
+                    </span>
+                    <span class="bg-white/20 text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1">
+                        <i class="fa-solid fa-circle text-[8px] text-emerald-300"></i> Terpelihara Halal
+                    </span>
+                </div>
+                
+                <h3 id="menu-today-food" class="text-2xl font-bold mt-3 flex items-center gap-2 flex-wrap">
+                    Memuatkan menu...
+                </h3>
+                
+                <p class="text-emerald-100 text-sm mt-1">
+                    Disediakan oleh: <span id="menu-canteen-name" class="font-semibold text-white">Memuatkan...</span>
                 </p>
             </div>
-
-            <div class="h-44 flex justify-center items-center my-1">
-                <canvas id="nutritionChart"></canvas>
+            <div class="flex flex-wrap items-center gap-3">
+                <button onclick="switchTab('kehadiran')" class="bg-white text-emerald-800 hover:bg-emerald-50 px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow">
+                    <i class="fa-solid fa-search"></i> Semak Senarai Murid
+                </button>
+                <button onclick="switchTab('menu')" class="bg-emerald-800/50 hover:bg-emerald-800 text-white px-4 py-2.5 rounded-xl text-xs font-medium transition">
+                    Jadual Mingguan
+                </button>
             </div>
         </div>
-
-        <div class="pt-3 border-t border-slate-100 text-xs text-slate-500 flex justify-between items-center bg-slate-50/50 -mx-5 -mb-5 p-4 rounded-b-2xl">
-            <span>Jumlah Kalori: <strong class="text-slate-800 font-bold">420 kcal</strong></span>
-            <span>Protein: <strong class="text-slate-800 font-bold">18g</strong></span>
-        </div>
+        <i class="fa-solid fa-bowl-rice text-9xl absolute -bottom-6 -right-6 text-white/10 pointer-events-none"></i>
     </div>
-</div>
-
-<!-- Today's Menu Highlight Banner (Versi Kemas & Dinamik) -->
-<div class="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
-    <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div>
-            <div class="flex items-center space-x-2">
-                <!-- ID ditambah: menu-day-title -->
-                <span id="menu-day-title" class="bg-emerald-800/60 backdrop-blur text-emerald-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
-                    MENU HARI INI (MEMUATKAN...)
-                </span>
-                <span class="bg-white/20 text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1">
-                    <i class="fa-solid fa-circle text-[8px] text-emerald-300"></i> Terpelihara Halal
-                </span>
-            </div>
-            
-            <!-- ID ditambah: menu-today-food -->
-            <h3 id="menu-today-food" class="text-2xl font-bold mt-3 flex items-center gap-2 flex-wrap">
-                Memuatkan menu...
-            </h3>
-            
-            <!-- ID ditambah: menu-canteen-name -->
-            <p class="text-emerald-100 text-sm mt-1">
-                Disediakan oleh: <span id="menu-canteen-name" class="font-semibold text-white">Memuatkan...</span>
-            </p>
-        </div>
-        <div class="flex flex-wrap items-center gap-3">
-            <button onclick="switchTab('kehadiran')" class="bg-white text-emerald-800 hover:bg-emerald-50 px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow">
-                <i class="fa-solid fa-search"></i> Semak Senarai Murid
-            </button>
-            <button onclick="switchTab('menu')" class="bg-emerald-800/50 hover:bg-emerald-800 text-white px-4 py-2.5 rounded-xl text-xs font-medium transition">
-                Jadual Mingguan
-            </button>
-        </div>
-    </div>
-    <i class="fa-solid fa-bowl-rice text-9xl absolute -bottom-6 -right-6 text-white/10 pointer-events-none"></i>
-</div>
 </section>
 
     <!-- TAB 2: SEMAKAN KEHADIRAN MURID -->
@@ -807,6 +836,109 @@
                     </div>
                 </div>
             </section>
+
+
+<!-- 🟢 TAB BARU: PENGURUSAN RMT (ADMIN ONLY) 🟢 -->
+<section id="tab-pengurusan-rmt" class="tab-panel hidden space-y-6">
+    <!-- Header Title -->
+    <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase">Pentadbir Sahaja</span>
+                <h3 class="font-bold text-slate-800 text-lg">Pengurusan RMT & Pentadbir Sekolah</h3>
+            </div>
+            <p class="text-xs text-slate-500">Kemaskini nama dan jawatan 4 pihak utama untuk ruangan tandatangan borang rasmi (C4 & C8) dan paparan dashboard.</p>
+        </div>
+        <button type="submit" form="formPengurusanRMT" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow transition flex items-center gap-2">
+            <i class="fa-solid fa-floppy-disk"></i> Simpan Maklumat
+        </button>
+    </div>
+
+    <!-- Form Input 4 Pegawai -->
+    <form id="formPengurusanRMT" onsubmit="handleSavePengurusanRMT(event)" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        
+        <!-- 1. Guru Bertugas RMT -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+            <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+                <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs">
+                    1
+                </div>
+                <h3 class="font-bold text-slate-800 text-sm">Guru Bertugas RMT</h3>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Nama Guru Bertugas</label>
+                    <input type="text" id="input_nama_guru_bertugas" required class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Contoh: En. Ahmad Bin Ali">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Jawatan</label>
+                    <input type="text" id="input_jawatan_guru_bertugas" value="Guru Bertugas Harian RMT" required class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Guru Penyelaras RMT -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+            <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+                <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs">
+                    2
+                </div>
+                <h3 class="font-bold text-slate-800 text-sm">Guru Penyelaras RMT</h3>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Nama Penyelaras RMT</label>
+                    <input type="text" id="input_nama_penyelaras" required class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Contoh: Pn. Siti Aminah">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Jawatan</label>
+                    <input type="text" id="input_jawatan_penyelaras" value="Guru Penyelaras RMT" required class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. PK HEM -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+            <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+                <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs">
+                    3
+                </div>
+                <h3 class="font-bold text-slate-800 text-sm">Penolong Kanan HEM</h3>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Nama PK HEM</label>
+                    <input type="text" id="input_nama_gpk_hem" required class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Contoh: En. Razali Bin Hassan">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Jawatan</label>
+                    <input type="text" id="input_jawatan_gpk_hem" value="Penolong Kanan Hal Ehwal Murid" required class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Guru Besar -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+            <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+                <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs">
+                    4
+                </div>
+                <h3 class="font-bold text-slate-800 text-sm">Guru Besar</h3>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Nama Guru Besar</label>
+                    <input type="text" id="input_nama_guru_besar" required class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Contoh: Pn. Hajah Norliah">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Jawatan</label>
+                    <input type="text" id="input_jawatan_guru_besar" value="Guru Besar" required class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
 
       <!-- TAB 5: LAPORAN & TUNTUTAN KEWANGAN -->
 <section id="tab-laporan" class="tab-panel hidden space-y-6">
@@ -2782,16 +2914,40 @@ async function downloadBorangC4() {
             return;
         }
 
-        printWindow.document.write(`
+       printWindow.document.write(`
             <!DOCTYPE html>
-            <html>
+            <html lang="ms">
             <head>
                 <title>BORANG C4 - SENARAI PENERIMA MURID RMT</title>
                 <style>
-                    @page { size: A4 portrait; margin: 15mm; }
-                    body { font-family: Arial, sans-serif; padding: 10px; color: #000; }
+                    @page { 
+                        size: A4 portrait; 
+                        margin: 10mm; /* Jidar asas A4 */
+                    }
+                    * { 
+                        box-sizing: border-box; 
+                    }
+                    html, body { 
+                        width: 100%; 
+                        height: 100%;
+                        margin: 0; 
+                        padding: 0; 
+                        background: #fff; 
+                        font-family: Arial, sans-serif; 
+                        color: #000; 
+                    }
                     
-                    .doc-no-container { text-align: right; margin-bottom: 15px; }
+                    /* KONTAINER UTAMA: Memaksa ruang margin kiri & kanan di dalam kertas */
+                    .print-page {
+                        width: 100%;
+                        padding: 10mm 15mm; /* 15mm Kiri & Kanan (Ruang Selamat Terjamin) */
+                        margin: 0 auto;
+                    }
+                    
+                    .doc-no-container { 
+                        text-align: right; 
+                        margin-bottom: 12px; 
+                    }
                     .doc-no-box { 
                         display: inline-block; 
                         border: 1.5px solid #000; 
@@ -2803,7 +2959,7 @@ async function downloadBorangC4() {
                     .title { 
                         font-weight: bold; 
                         font-size: 11pt; 
-                        margin-bottom: 5px; 
+                        margin-bottom: 4px; 
                         text-transform: uppercase; 
                     }
                     .school-name { 
@@ -2817,39 +2973,52 @@ async function downloadBorangC4() {
                         width: 100%; 
                         border-collapse: collapse; 
                         margin-top: 10px; 
+                        table-layout: fixed; 
                     }
+                    
                     th, td { 
                         border: 1.5px solid #000; 
-                        height: 28px; 
-                        font-size: 10pt; 
+                        padding: 5px 8px; 
+                        font-size: 9.5pt; 
+                        vertical-align: middle;
+                        word-wrap: break-word;
                     }
+                    
                     th { 
                         font-weight: bold; 
                         text-transform: uppercase; 
                         background-color: #f2f2f2;
+                        text-align: center;
+                    }
+                    
+                    td.text-center {
+                        text-align: center;
                     }
                 </style>
             </head>
             <body>
-                <div class="doc-no-container">
-                    <div class="doc-no-box">BORANG C4</div>
-                </div>
-                
-                <div class="title">SENARAI PENERIMA MURID RMT TAHUN ${tahunSemasa}</div>
-                <div class="school-name">SEKOLAH : SK FELDA CHEMOMOI</div>
+                <!-- Pembungkus Wajib Untuk Elak Terlalu Rapat Ke Sisi -->
+                <div class="print-page">
+                    <div class="doc-no-container">
+                        <div class="doc-no-box">BORANG C4</div>
+                    </div>
+                    
+                    <div class="title">SENARAI PENERIMA MURID RMT TAHUN ${tahunSemasa}</div>
+                    <div class="school-name">SEKOLAH : SK FELDA CHEMOMOI</div>
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width: 8%;">BIL</th>
-                            <th style="width: 67%;">NAMA</th>
-                            <th style="width: 25%;">KELAS</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${rowsHtml}
-                    </tbody>
-                </table>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 10%;">BIL</th>
+                                <th style="width: 65%;">NAMA</th>
+                                <th style="width: 25%;">KELAS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml}
+                        </tbody>
+                    </table>
+                </div>
             </body>
             </html>
         `);
@@ -2865,7 +3034,6 @@ async function downloadBorangC4() {
         alert("Ralat semasa menjana Borang C4.");
     }
 }
-
 // ==========================================
 // FUNGSI JANA & CETAK BORANG C5 (SUPABASE)
 // ==========================================
@@ -2913,16 +3081,40 @@ async function downloadBorangC5() {
             return;
         }
 
-        printWindow.document.write(`
+       printWindow.document.write(`
             <!DOCTYPE html>
             <html>
             <head>
                 <title>BORANG C5 - MENU RMT</title>
                 <style>
-                    @page { size: A4 portrait; margin: 15mm; }
-                    body { font-family: Arial, sans-serif; padding: 0; color: #000; }
+                    @page { 
+                        size: A4 portrait; 
+                        margin: 10mm; 
+                    }
+                    * { 
+                        box-sizing: border-box; 
+                    }
+                    html, body { 
+                        width: 100%; 
+                        height: 100%;
+                        margin: 0; 
+                        padding: 0; 
+                        background: #fff; 
+                        font-family: Arial, sans-serif; 
+                        color: #000; 
+                    }
                     
-                    .doc-no-container { text-align: right; margin-bottom: 25px; }
+                    /* KONTAINER UTAMA: Ruang Selamat Kiri & Kanan Terjamin */
+                    .print-page {
+                        width: 100%;
+                        padding: 10mm 15mm; 
+                        margin: 0 auto;
+                    }
+                    
+                    .doc-no-container { 
+                        text-align: right; 
+                        margin-bottom: 25px; 
+                    }
                     .doc-no-box { 
                         display: inline-block; 
                         border: 1.5px solid #000; 
@@ -2931,13 +3123,18 @@ async function downloadBorangC5() {
                         font-size: 10pt; 
                     }
                     
-                    .title { font-weight: bold; font-size: 11pt; margin-bottom: 20px; text-transform: uppercase; }
+                    .title { 
+                        font-weight: bold; 
+                        font-size: 11pt; 
+                        margin-bottom: 20px; 
+                        text-transform: uppercase; 
+                    }
                     
                     .menu-box {
                         border: 1.5px solid #000;
                         margin-bottom: 18px;
                         padding: 10px 14px;
-                        min-height: 110px; /* Saiz kotak dibesarkan supaya muat elok dalam 1 A4 */
+                        min-height: 110px;
                         box-sizing: border-box;
                     }
                     .menu-title {
@@ -2963,25 +3160,28 @@ async function downloadBorangC5() {
                 </style>
             </head>
             <body>
-                <div class="doc-no-container">
-                    <div class="doc-no-box">BORANG C5</div>
-                </div>
-                
-                <div class="title">MENU RMT</div>
+                <!-- Pembungkus Wajib Supaya Tak Rapat Ke Sisi -->
+                <div class="print-page">
+                    <div class="doc-no-container">
+                        <div class="doc-no-box">BORANG C5</div>
+                    </div>
+                    
+                    <div class="title">MENU RMT</div>
 
-                ${menuBoxesHtml}
+                    ${menuBoxesHtml}
 
-                <div class="date-section">
-                    TARIKH MENU DIPUTUSKAN OLEH JAWATANKUASA BANTUAN
+                    <div class="date-section">
+                        TARIKH MENU DIPUTUSKAN OLEH JAWATANKUASA BANTUAN
+                    </div>
                 </div>
             </body>
             </html>
         `);
 
-       printWindow.document.close();
+        printWindow.document.close();
         printWindow.focus();
         setTimeout(() => {
-            printWindow.print(); // Hanya panggil dialog cetak, window kekal terbuka
+            printWindow.print();
         }, 500);
 
     } catch (err) {
@@ -2990,7 +3190,7 @@ async function downloadBorangC5() {
     }
 }
 
-// Fungsi Cetak Borang C6 (Diperbaiki: Elak Ralat Pop-up & Menyokong Backdated)
+// Fungsi Cetak Borang C6 (Lengkap Data Supabase & Margin Kekal)
 async function downloadBorangC6() {
     try {
         // 1. Dapatkan tarikh dari pemilih tarikh atau guna tarikh hari ini
@@ -3009,8 +3209,7 @@ async function downloadBorangC6() {
             return;
         }
 
-        // Tulis mesej sementara semasa data dimuat turun
-        printWindow.document.write("<html><body style='font-family:sans-serif; padding:20px;'>Memuat turun data kehadiran... Sila tunggu.</body></html>");
+        printWindow.document.write("<html><body style='font-family:sans-serif; padding:20px;'>Memuat turun data kehadiran & maklumat pentadbir... Sila tunggu.</body></html>");
 
         // 4. Tarik data kehadiran sebenar dari Supabase
         const { data: attData, error: attErr } = await db
@@ -3022,6 +3221,30 @@ async function downloadBorangC6() {
             printWindow.close();
             throw attErr;
         }
+
+        // Tarik data Pegawai RMT dari jadual pengurusan_rmt
+        const { data: configData } = await db
+            .from('pengurusan_rmt')
+            .select('*')
+            .limit(1)
+            .maybeSingle();
+
+        // Tarik data Nama Kantin dari jadual tetapan_sekolah
+        const { data: sekolahData } = await db
+            .from('tetapan_sekolah')
+            .select('nama_kantin')
+            .limit(1)
+            .maybeSingle();
+
+        // Pembolehubah Data Supabase
+        const namaPenyelaras = configData?.nama_penyelaras || '';
+        const jawatanPenyelaras = configData?.jawatan_penyelaras || 'Guru Penyelaras RMT';
+        
+        const namaGB = configData?.nama_guru_besar || '';
+        const jawatanGB = configData?.jawatan_guru_besar || 'Guru Besar';
+        
+        const namaKantin = sekolahData?.nama_kantin || 'KANTIN GEMILANG ENTERPRISE';
+        const jawatanKantin = 'PENGUSAHA KANTIN';
 
         // Tapis rekod murid yang HADIR sahaja
         const attendedRecords = (attData || []).filter(item => {
@@ -3038,7 +3261,7 @@ async function downloadBorangC6() {
         const daysMalay = ["Ahad", "Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu"];
         const dayName = daysMalay[dateObj.getDay()];
 
-        // 6. Tulis Dokumen Cetakan Lengkap
+   // 6. Tulis Dokumen Cetakan Lengkap (Jarak Blok Tandatangan Diluaskan)
         printWindow.document.open();
         printWindow.document.write(`
             <!DOCTYPE html>
@@ -3106,16 +3329,16 @@ async function downloadBorangC6() {
                         text-align: center;
                         font-size: 12.5pt;
                         text-decoration: underline;
-                        margin-bottom: 20px;
+                        margin-bottom: 25px;
                     }
 
                     table.data-table { 
                         width: 100%; 
                         border-collapse: collapse; 
-                        margin-bottom: 20px; 
+                        margin-bottom: 30px; 
                     }
                     table.data-table td { 
-                        padding: 3px 0; 
+                        padding: 4px 0; 
                         vertical-align: bottom; 
                         font-size: 11pt; 
                     }
@@ -3137,45 +3360,45 @@ async function downloadBorangC6() {
                     .val-overlay {
                         font-weight: bold;
                         padding-left: 4px;
+                        text-transform: uppercase;
                     }
 
-                    .section-block { margin-bottom: 18px; }
+                    /* DITINGKATKAN KEPADA 55px UNTUK RUANG COP YANG LUAS */
+                    .section-block { 
+                        margin-bottom: 55px; 
+                    }
+                    
                     .section-title { 
                         font-weight: bold; 
-                        margin-bottom: 6px; 
+                        margin-bottom: 12px; 
                         font-size: 11pt; 
                     }
                     .section-title-normal {
                         font-weight: normal;
-                        margin-bottom: 6px;
+                        margin-bottom: 12px;
                         font-size: 11pt;
                     }
-                    
-                    .sig-container { 
-                        display: flex; 
-                        justify-content: space-between; 
-                        width: 100%; 
+
+                    .sig-table {
+                        width: 100%;
+                        border-collapse: collapse;
                     }
-                    .sig-left { width: 55%; }
-                    .sig-right { 
-                        width: 38%; 
-                        text-align: center; 
-                        display: flex; 
-                        flex-direction: column; 
-                        justify-content: flex-end; 
+                    .sig-table td {
+                        padding: 3px 0;
+                        vertical-align: top;
                     }
                     
                     .cap-text { 
                         font-size: 9.5pt; 
                         color: #000; 
-                        margin-top: 3px; 
+                        margin-top: 4px; 
                         text-align: center; 
                     }
                     
                     .footer-note { 
                         font-size: 9pt; 
                         text-align: center; 
-                        margin-top: 25px; 
+                        margin-top: 40px; 
                     }
                 </style>
             </head>
@@ -3228,81 +3451,93 @@ async function downloadBorangC6() {
                         </tr>
                     </table>
 
+                    <!-- 1. PESANAN DIBUAT OLEH (PENYELARAS) -->
                     <div class="section-block">
                         <div class="section-title">Pesanan dibuat oleh</div>
-                        <div class="sig-container">
-                            <div class="sig-left">
-                                <table class="data-table" style="margin-bottom: 0;">
-                                    <tr>
-                                        <td style="width: 25%;">Nama</td>
-                                        <td style="width: 5%;">:</td>
-                                        <td><div class="dots-line"></div></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Jawatan</td>
-                                        <td>:</td>
-                                        <td><div class="dots-line"></div></td>
-                                    </tr>
-                                </table>
-                            </div>
-                            <div class="sig-right">
-                                <div class="dots-line"></div>
-                                <div class="cap-text">(Tandatangan & Cop )</div>
-                            </div>
-                        </div>
+                        <table class="sig-table">
+                            <tr>
+                                <td style="width: 55%;">
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="width: 25%;">Nama</td>
+                                            <td style="width: 5%;">:</td>
+                                            <td><div class="dots-line"><span class="val-overlay">${namaPenyelaras}</span></div></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Jawatan</td>
+                                            <td>:</td>
+                                            <td><div class="dots-line"><span class="val-overlay">${jawatanPenyelaras}</span></div></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td style="width: 7%;"></td>
+                                <td style="width: 38%; vertical-align: top; padding-top: 15px;">
+                                    <div class="dots-line"></div>
+                                    <div class="cap-text">(Tandatangan & Cop )</div>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
 
+                    <!-- 2. DISAHKAN OLEH (GURU BESAR) -->
                     <div class="section-block">
                         <div class="section-title-normal">Disahkan oleh</div>
-                        <div class="sig-container">
-                            <div class="sig-left">
-                                <table class="data-table" style="margin-bottom: 0;">
-                                    <tr>
-                                        <td style="width: 25%;">Nama</td>
-                                        <td style="width: 5%;">: :</td>
-                                        <td><div class="dots-line"></div></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Jawatan</td>
-                                        <td>: :</td>
-                                        <td><div class="dots-line"></div></td>
-                                    </tr>
-                                </table>
-                            </div>
-                            <div class="sig-right">
-                                <div class="dots-line"></div>
-                                <div class="cap-text">(Tandatangan & Cop )</div>
-                            </div>
-                        </div>
+                        <table class="sig-table">
+                            <tr>
+                                <td style="width: 55%;">
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="width: 25%;">Nama</td>
+                                            <td style="width: 5%;">:</td>
+                                            <td><div class="dots-line"><span class="val-overlay">${namaGB}</span></div></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Jawatan</td>
+                                            <td>:</td>
+                                            <td><div class="dots-line"><span class="val-overlay">${jawatanGB}</span></div></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td style="width: 7%;"></td>
+                                <td style="width: 38%; vertical-align: top; padding-top: 15px;">
+                                    <div class="dots-line"></div>
+                                    <div class="cap-text">(Tandatangan & Cop )</div>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
 
+                    <!-- 3. PEMBEKAL MAKANAN (KANTIN) -->
                     <div class="section-block">
                         <div class="section-title">Borang pesanan diterima oleh pembekal makanan</div>
-                        <div class="sig-container">
-                            <div class="sig-left">
-                                <table class="data-table" style="margin-bottom: 0;">
-                                    <tr>
-                                        <td style="width: 25%;">Nama</td>
-                                        <td style="width: 5%;">:</td>
-                                        <td><div class="dots-line"></div></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Jawatan</td>
-                                        <td>:</td>
-                                        <td><div class="dots-line"></div></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Tarikh</td>
-                                        <td>:</td>
-                                        <td><div class="dots-line"></div></td>
-                                    </tr>
-                                </table>
-                            </div>
-                            <div class="sig-right">
-                                <div class="dots-line"></div>
-                                <div class="cap-text">(Tandatangan & Cop )</div>
-                            </div>
-                        </div>
+                        <table class="sig-table">
+                            <tr>
+                                <td style="width: 55%;">
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="width: 25%;">Nama</td>
+                                            <td style="width: 5%;">:</td>
+                                            <td><div class="dots-line"><span class="val-overlay">${namaKantin}</span></div></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Jawatan</td>
+                                            <td>:</td>
+                                            <td><div class="dots-line"><span class="val-overlay">${jawatanKantin}</span></div></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Tarikh</td>
+                                            <td>:</td>
+                                            <td><div class="dots-line"><span class="val-overlay">${formattedDate}</span></div></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td style="width: 7%;"></td>
+                                <td style="width: 38%; vertical-align: top; padding-top: 15px;">
+                                    <div class="dots-line"></div>
+                                    <div class="cap-text">(Tandatangan & Cop )</div>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
 
                     <div class="footer-note">
@@ -3312,7 +3547,6 @@ async function downloadBorangC6() {
             </body>
             </html>
         `);
-
         printWindow.document.close();
         printWindow.document.title = `BORANG C6 - PESANAN RMT (${formattedDate})`;
         printWindow.focus();
@@ -3347,49 +3581,79 @@ async function printBorangC8() {
     const prevStartDate = `${prevYear}-${String(prevMonth).padStart(2, '0')}-01`;
     const prevEndDate = `${prevYear}-${String(prevMonth).padStart(2, '0')}-${String(prevMonthDate.getDate()).padStart(2, '0')}`;
 
-    try {
-        const { data: attCurrent } = await db.from('kehadiran_rmt')
-            .select('tarikh, murid_id')
+try {
+        // 1. Tarik data kehadiran dari Supabase
+        const { data: attCurrent, error: errCurrent } = await db.from('kehadiran_rmt')
+            .select('tarikh, murid_id, status')
             .gte('tarikh', startDate)
             .lte('tarikh', endDate);
 
-        const { data: attPrev } = await db.from('kehadiran_rmt')
-            .select('tarikh, murid_id')
+        const { data: attPrev, error: errPrev } = await db.from('kehadiran_rmt')
+            .select('tarikh, murid_id, status')
             .gte('tarikh', prevStartDate)
             .lte('tarikh', prevEndDate);
 
-        // 1. Gabungkan tarikh unik dari Supabase DAN tarikh bertanda untuk pastikan julat hari sekolah tepat
-        const rawSchoolDates = [...new Set((attCurrent || []).map(a => a.tarikh))];
-        
-        // Tetapkan penanda hari sekolah minimum berasaskan tarikh bertanda terbanyak di UI
-        const schoolDaysCurrentCount = Math.max(rawSchoolDates.length, 8); 
+        if (errCurrent) console.error("Ralat attCurrent:", errCurrent);
 
-        const rawPrevDates = [...new Set((attPrev || []).map(a => a.tarikh))];
-        const schoolDaysPrevCount = rawPrevDates.length;
+        // 2. Dapatkan senarai TARIKH UNIK persekolahan yang telah diisi bagi bulan semasa & bulan lepas
+        const schoolDatesCurrent = [...new Set((attCurrent || [])
+            .filter(a => String(a.status || '').toLowerCase().trim() === 'hadir')
+            .map(a => a.tarikh)
+        )];
+        const schoolDaysCurrentCount = schoolDatesCurrent.length;
+
+        const schoolDatesPrev = [...new Set((attPrev || [])
+            .filter(a => String(a.status || '').toLowerCase().trim() === 'hadir')
+            .map(a => a.tarikh)
+        )];
+        const schoolDaysPrevCount = schoolDatesPrev.length;
 
         let tableRowsHtml = "";
 
         (studentsData || []).forEach((student, index) => {
             const singkatanKelas = getSingkatanKelas(student.kelas);
             const jantina = getJantinaMurid(student);
+            
+            // Ambil ID sebenar murid dari jadual Supabase (Pastikan jenis data Integer/String sama)
+            const studentPrimaryId = String(student.id || '').trim();
 
-            // 2. Ambil senarai TARIKH UNIK di mana murid ini hadir
-            const tarikhHadirMurid = [
+            // 3. Cari tarikh unik murid ini HADIR pada bulan semasa mengikut studentPrimaryId
+            const tarikhHadirMuridCurrent = [
                 ...new Set(
                     (attCurrent || [])
-                        .filter(a => String(a.murid_id) === String(student.id))
+                        .filter(a => String(a.murid_id).trim() === studentPrimaryId && String(a.status || '').toLowerCase().trim() === 'hadir')
                         .map(a => a.tarikh)
                 )
             ];
+            const totalHadirSemasa = tarikhHadirMuridCurrent.length;
 
-            const totalHadirSemasa = tarikhHadirMurid.length;
+            // 4. Cari tarikh unik murid ini HADIR pada bulan lepas
+            const tarikhHadirMuridPrev = [
+                ...new Set(
+                    (attPrev || [])
+                        .filter(a => String(a.murid_id).trim() === studentPrimaryId && String(a.status || '').toLowerCase().trim() === 'hadir')
+                        .map(a => a.tarikh)
+                )
+            ];
+            const totalHadirLepas = tarikhHadirMuridPrev.length;
+
+            // 5. PENGIRAAN TIDAK HADIR SEBENAR
+            const totalTidakHadirSemasa = schoolDaysCurrentCount > 0 
+                ? Math.max(0, schoolDaysCurrentCount - totalHadirSemasa) 
+                : 0;
+
+            const totalTidakHadirLepas = schoolDaysPrevCount > 0 
+                ? Math.max(0, schoolDaysPrevCount - totalHadirLepas) 
+                : 0;
+
+            const jumlahSemuaTidakHadir = totalTidakHadirSemasa + totalTidakHadirLepas;
+
+            // 6. Bina petak tarikh 1 hingga 31 hari
             let dateColumnsHtml = "";
-
-            // 3. Bina petak jadual 1 hingga 31
             for (let day = 1; day <= 31; day++) {
                 if (day <= totalDaysInMonth) {
                     const formattedDate = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                    const isHadir = tarikhHadirMurid.includes(formattedDate);
+                    const isHadir = tarikhHadirMuridCurrent.includes(formattedDate);
                     
                     if (isHadir) {
                         dateColumnsHtml += `<td style="text-align:center; font-weight:bold;">/</td>`;
@@ -3401,22 +3665,7 @@ async function printBorangC8() {
                 }
             }
 
-            // 4. Pengiraan Tidak Hadir yang Tepat
-            const totalTidakHadirSemasa = Math.max(0, schoolDaysCurrentCount - totalHadirSemasa);
-
-            // Kira Kehadiran Bulan Lepas
-            const tarikhHadirLepas = [
-                ...new Set(
-                    (attPrev || [])
-                        .filter(a => String(a.murid_id) === String(student.id))
-                        .map(a => a.tarikh)
-                )
-            ];
-            const totalHadirLepas = tarikhHadirLepas.length;
-            const totalTidakHadirLepas = Math.max(0, schoolDaysPrevCount - totalHadirLepas);
-            
-            const jumlahSemuaTidakHadir = totalTidakHadirSemasa + totalTidakHadirLepas;
-
+            // 7. Masukkan ke dalam baris jadual Borang C8
             tableRowsHtml += `
                 <tr style="height: 20px;">
                     <td style="text-align:center;">${index + 1}</td>
@@ -3793,21 +4042,136 @@ function updateDynamicDates() {
   loadDashboardTodayMenu(dayName);
   loadDashboardCanteenInfo();
 }
+
 // ==========================================
-// INISIALISASI PANGGILAN SISTEM
+// MODUL PENGURUSAN RMT & PENTADBIR
+// ==========================================
+
+// Variable untuk menyimpan ID rekod sedia ada
+let currentPengurusanID = null;
+
+// 1. Fungsi penanganan klik tab Admin khas untuk Pengurusan RMT
+function handleAdminTabClick(tabName) {
+    if (!isAdminLoggedIn) {
+        openLoginModal();
+        return;
+    }
+    
+    // Tukar tab paparan
+    switchTab(tabName);
+    
+    // Jika tab Pengurusan RMT dipilih, muatkan data dari Supabase
+    if (tabName === 'pengurusan-rmt') {
+        loadPengurusanRMTData();
+    }
+}
+
+// 2. Fungsi Muat Data dari Supabase ke Form & Dashboard
+async function loadPengurusanRMTData() {
+    try {
+        // Guna getActiveSupabase() jika wujud, atau fallback ke supabase
+        const client = typeof getActiveSupabase === 'function' ? getActiveSupabase() : supabase;
+        if (!client) return;
+
+        const { data, error } = await client
+            .from('pengurusan_rmt')
+            .select('*')
+            .limit(1)
+            .maybeSingle();
+
+        if (error) throw error;
+
+        if (data) {
+            currentPengurusanID = data.id;
+
+            // Isikan Form Admin di tab-pengurusan-rmt
+            if (document.getElementById('input_nama_guru_bertugas')) {
+                document.getElementById('input_nama_guru_bertugas').value = data.nama_guru_bertugas || '';
+                document.getElementById('input_jawatan_guru_bertugas').value = data.jawatan_guru_bertugas || '';
+                document.getElementById('input_nama_penyelaras').value = data.nama_penyelaras || '';
+                document.getElementById('input_jawatan_penyelaras').value = data.jawatan_penyelaras || '';
+                document.getElementById('input_nama_gpk_hem').value = data.nama_gpk_hem || '';
+                document.getElementById('input_jawatan_gpk_hem').value = data.jawatan_gpk_hem || '';
+                document.getElementById('input_nama_guru_besar').value = data.nama_guru_besar || '';
+                document.getElementById('input_jawatan_guru_besar').value = data.jawatan_guru_besar || '';
+            }
+
+            // Kemaskini Paparan Kad di Dashboard Utama
+            if (document.getElementById('dash-penyelaras-nama')) {
+                document.getElementById('dash-penyelaras-nama').innerText = data.nama_penyelaras || '-';
+                document.getElementById('dash-bertugas-nama').innerText = data.nama_guru_bertugas || '-';
+                document.getElementById('dash-hem-nama').innerText = data.nama_gpk_hem || '-';
+            }
+
+            // Simpan secara Global untuk kegunaan cetakan Borang C4 & C8
+            window.pengurusanRMTConfig = data;
+        }
+    } catch (err) {
+        console.error('Ralat muat data pengurusan RMT:', err.message);
+    }
+}
+
+// 3. Fungsi Simpan / Kemaskini Data ke Supabase (Upsert)
+async function handleSavePengurusanRMT(e) {
+    e.preventDefault();
+
+    const client = typeof getActiveSupabase === 'function' ? getActiveSupabase() : supabase;
+    if (!client) {
+        alert('Supabase belum bersedia');
+        return;
+    }
+
+    const payload = {
+        nama_guru_bertugas: document.getElementById('input_nama_guru_bertugas').value,
+        jawatan_guru_bertugas: document.getElementById('input_jawatan_guru_bertugas').value,
+        nama_penyelaras: document.getElementById('input_nama_penyelaras').value,
+        jawatan_penyelaras: document.getElementById('input_jawatan_penyelaras').value,
+        nama_gpk_hem: document.getElementById('input_nama_gpk_hem').value,
+        jawatan_gpk_hem: document.getElementById('input_jawatan_gpk_hem').value,
+        nama_guru_besar: document.getElementById('input_nama_guru_besar').value,
+        jawatan_guru_besar: document.getElementById('input_jawatan_guru_besar').value
+    };
+
+    if (currentPengurusanID) {
+        payload.id = currentPengurusanID;
+    }
+
+    const { data, error } = await client
+        .from('pengurusan_rmt')
+        .upsert(payload)
+        .select();
+
+    if (error) {
+        alert('Gagal mengemaskini maklumat: ' + error.message);
+    } else {
+        alert('Maklumat Pengurusan RMT & Pentadbir berjaya disimpan!');
+        if (data && data.length > 0) currentPengurusanID = data[0].id;
+        loadPengurusanRMTData(); // Refresh paparan UI
+    }
+}
+
+
+// ==========================================
+// INISIALISASI PANGGILAN SISTEM (SINGLE EVENT LISTENER)
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    // Kemas kini tarikh & muatkan banner menu
+    // 1. Muat Data Pengurusan RMT & Tarikh Dinamik
+    loadPengurusanRMTData();
     updateDynamicDates();
 
     // Jika Supabase lambat diinisialisasi, cuba panggil semula selepas 500ms
-    setTimeout(updateDynamicDates, 500);
+    setTimeout(() => {
+        updateDynamicDates();
+        loadPengurusanRMTData();
+    }, 500);
 
+    // 2. Muatkan fungsi-fungsi modul lain (jika wujud)
     if (typeof loadWeeklyMenu === 'function') loadWeeklyMenu();
     if (typeof loadCanteenInfo === 'function') loadCanteenInfo();
     if (typeof updateTopStats === 'function') updateTopStats();
     if (typeof loadSenaraiMuridAwam === 'function') loadSenaraiMuridAwam();
 
+    // 3. Tetapan Bulan & Tahun Laporan
     const currentMonth = new Date().getMonth() + 1;
     const currentYear = new Date().getFullYear();
 
@@ -3816,14 +4180,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (typeof loadFinancialReport === 'function') loadFinancialReport(currentMonth, currentYear);
 
-    // 1. SEMAK & PULIHKAN SESI ADMIN DARI SESSIONSTORAGE
+    // 4. Semak & Pulihkan Sesi Admin dari sessionStorage
     const savedAdminState = sessionStorage.getItem('isAdminLoggedIn') === 'true';
     if (savedAdminState) {
         isAdminLoggedIn = true;
         if (typeof updateRoleUI === 'function') updateRoleUI();
     }
 
-    // 2. SEMAK & PENGEKALAN TAB TERAKHIR SELEPAS REFRESH
+    // 5. Semak & Mengekalkan Tab Terakhir Selepas Refresh
     const savedTab = sessionStorage.getItem('activeRmtTab');
     if (savedTab && document.getElementById('tab-' + savedTab)) {
         switchTab(savedTab);
