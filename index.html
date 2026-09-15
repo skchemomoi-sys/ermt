@@ -715,6 +715,7 @@
                 </div>
                
             </section>
+	
 	<!-- TAB PAPARAN AWAM: SENARAI MURID PENERIMA RMT (FORMAL BERKOTAK) -->
 <section id="tab-senarai-murid-awam" class="tab-panel hidden space-y-6">
     
@@ -726,7 +727,8 @@
                 <i class="fa-solid fa-users"></i> Memuatkan...
             </span>
             
-            <h2 class="text-base md:text-lg font-bold text-slate-900 uppercase tracking-wide">SK FELDA CHEMOMOI</h2>
+            <!-- 🟢 TAMBAH ID PADA H2 DI SINI 🟢 -->
+            <h2 id="public_card_nama_sekolah" class="text-base md:text-lg font-bold text-slate-900 uppercase tracking-wide">SK FELDA CHEMOMOI</h2>
             <h3 class="text-sm md:text-base font-bold text-slate-700 uppercase tracking-wide mt-0.5">SENARAI MURID PENERIMA BANTUAN RANCANGAN MAKANAN TAMBAHAN (RMT)</h3>
             <p class="text-xs text-slate-500 font-medium mt-1">Susunan Rasmi Mengikut Tahun & Kelas</p>
         </div>
@@ -753,12 +755,12 @@
 
         <!-- Nota Kakian Dokumen -->
         <div class="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-100">
-            <span>Sistem e-RMT SK Felda Chemomoi</span>
+            <!-- 🟢 TAMBAH ID PADA SPAN FOOTER DI SINI 🟢 -->
+            <span id="public_footer_nama_sekolah">Sistem e-RMT SK Felda Chemomoi</span>
             <span>Status: Aktif</span>
         </div>
     </div>
 </section>
-
             <!-- TAB 4: PENGURUSAN DATA MURID (ADMIN ONLY) -->
             <section id="tab-pengurusan-murid" class="tab-panel hidden space-y-6">
                 <!-- Header Actions -->
@@ -1623,12 +1625,17 @@ function switchTab(tabId) {
         activeNav.classList.remove('text-slate-300', 'hover:bg-slate-800');
     }
 
-    // 6. Pemetaan Tajuk Utama & Subtajuk Halaman
+    // 🟢 AMBIL NAMA SEKOLAH DINAMIK DARI SUPABASE (FALLBACK SMART DOM)
+    const config = window.pengurusanRMTConfig || {};
+    const sidebarText = document.getElementById('sidebar_nama_sekolah')?.innerText?.trim();
+    const namaSekolah = config.nama_sekolah || sidebarText || 'SK FELDA CHEMOMOI';
+
+    // 6. Pemetaan Tajuk Utama & Subtajuk Halaman (DINAMIK)
     const titleMap = {
         'dashboard': ['Dashboard Utama', 'Ringkasan status harian & maklumat nutrisi murid RMT'],
         'kehadiran': ['Semakan Kehadiran Murid', 'Rekod pengambilan makanan harian murid RMT (Supabase)'],
         'menu': ['Jadual Menu RMT Mingguan', 'Perancangan menu sihat mengikut standard KPM'],
-        'senarai-murid-awam': ['Senarai Murid Penerima RMT', 'Maklumat murid SK Felda Chemomoi yang layak menerima bantuan RMT'],
+        'senarai-murid-awam': ['Senarai Murid Penerima RMT', `Maklumat murid ${namaSekolah} yang layak menerima bantuan RMT`],
         'pengurusan-murid': ['Pengurusan Data Murid', 'Muat naik CSV/APDM, tambah murid baharu, dan cetak Kad QR'],
         'laporan': ['Laporan & Tuntutan Kewangan', 'Jana rekod tuntutan bulanan untuk PPD / KPM (Admin)']
     };
@@ -1647,12 +1654,24 @@ function switchTab(tabId) {
         }
     }
 }
+
 function refreshAllViews() {
     renderStudentTable(studentsData);
     renderAdminStudentTable(studentsData);
     populateScanDropdown();
     updateTopStats();
     
+    // 🟢 KEMAS KINI TAJUK KAD SENARAI MURID AWAM (DISAPADAN KAN DENGAN ID HTML)
+    const config = window.pengurusanRMTConfig || {};
+    const sidebarText = document.getElementById('sidebar_nama_sekolah')?.innerText?.trim();
+    const namaSekolah = config.nama_sekolah || sidebarText || 'SK FELDA CHEMOMOI';
+
+    const elCardNama = document.getElementById('public_card_nama_sekolah');
+    const elFooterNama = document.getElementById('public_footer_nama_sekolah');
+
+    if (elCardNama) elCardNama.innerText = namaSekolah;
+    if (elFooterNama) elFooterNama.innerText = `Sistem e-RMT ${namaSekolah}`;
+
     // Pastikan senarai murid awam turut dikemaskini jika berada dalam paparan awam
     if (typeof loadSenaraiMuridAwam === 'function') {
         loadSenaraiMuridAwam();
@@ -3931,6 +3950,16 @@ try {
 
 // Fungsi Memuatkan Data Murid RMT untuk Paparan Awam (Formal & Tersusun)
 async function loadSenaraiMuridAwam() {
+    // 🟢 1. KEMAS KINI TAJUK KAD & FOOTER SECARA DINAMIK DARI SUPABASE
+    const config = window.pengurusanRMTConfig || {};
+    const namaSekolah = config.nama_sekolah || 'SK FELDA CHEMOMOI';
+
+    const elHeaderNama = document.getElementById('public_card_nama_sekolah');
+    const elFooterNama = document.getElementById('public_footer_nama_sekolah');
+
+    if (elHeaderNama) elHeaderNama.innerText = namaSekolah;
+    if (elFooterNama) elFooterNama.innerText = `Sistem e-RMT ${namaSekolah}`;
+
     const tbody = document.getElementById('tbodyMuridAwam');
     const badge = document.getElementById('badgeTotalMuridAwam');
     if (!tbody) return;
@@ -4224,6 +4253,22 @@ async function loadPengurusanRMTData() {
 
             // Simpan secara Global untuk kegunaan cetakan Borang C4 & C8
             window.pengurusanRMTConfig = data;
+
+            // --- D. 🟢 KEMAS KINI PAPARAN SENARAI MURID AWAM & SUBTAJUK HEADER (DINAMIK) 🟢 ---
+            const namaSekolah = data.nama_sekolah || 'SK FELDA CHEMOMOI';
+
+            // 1. Kemaskini Subtajuk Topbar (jika sedang aktif di Tab Senarai Murid Awam)
+            const activeTab = sessionStorage.getItem('activeRmtTab') || 'dashboard';
+            const subTitleEl = document.getElementById('pageSubtitle');
+            if (subTitleEl && activeTab === 'senarai-murid-awam') {
+                subTitleEl.innerText = `Maklumat murid ${namaSekolah} yang layak menerima bantuan RMT`;
+            }
+
+            // 2. Kemaskini Tajuk Kad Utama & Footer Halaman Senarai Murid Awam
+            const elCardNama = document.getElementById('public_card_nama_sekolah');
+            const elFooterNama = document.getElementById('public_footer_nama_sekolah');
+            if (elCardNama) elCardNama.innerText = namaSekolah;
+            if (elFooterNama) elFooterNama.innerText = `Sistem e-RMT ${namaSekolah}`;
         }
     } catch (err) {
         console.error('Ralat muat data pengurusan RMT:', err.message);
