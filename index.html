@@ -2918,6 +2918,10 @@ function getJantinaMurid(murid) {
 
 async function downloadBorangC4() {
     try {
+        // 🟢 AMBIL DATA SEKOLAH DINAMIK DARI SUPABASE (WITH FALLBACK)
+        const config = window.pengurusanRMTConfig || {};
+        const namaSekolah = config.nama_sekolah || 'SK FELDA CHEMOMOI';
+
         // 1. Dapatkan data murid daripada jadual 'murid' Supabase
         const { data: senaraiMurid, error: errMurid } = await db
             .from('murid')
@@ -2996,11 +3000,11 @@ async function downloadBorangC4() {
             return;
         }
 
-       printWindow.document.write(`
+        printWindow.document.write(`
             <!DOCTYPE html>
             <html lang="ms">
             <head>
-                <title>BORANG C4 - SENARAI PENERIMA MURID RMT</title>
+                <title>BORANG C4 - SENARAI PENERIMA MURID RMT - ${namaSekolah}</title>
                 <style>
                     @page { 
                         size: A4 portrait; 
@@ -3086,7 +3090,7 @@ async function downloadBorangC4() {
                     </div>
                     
                     <div class="title">SENARAI PENERIMA MURID RMT TAHUN ${tahunSemasa}</div>
-                    <div class="school-name">SEKOLAH : SK FELDA CHEMOMOI</div>
+                    <div class="school-name">SEKOLAH : ${namaSekolah}</div>
 
                     <table>
                         <thead>
