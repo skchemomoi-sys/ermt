@@ -2839,81 +2839,120 @@ async function loadImbanganNutrisi() {
             }
         }
 
-        async function exportReportToCSV() {
-            const monthSelect = document.getElementById('reportMonthSelect');
-            const yearSelect = document.getElementById('reportYearSelect');
+    // ==========================================
+// FUNGSI EKSPORT LAPORAN EXCEL/CSV (TEPAT DARI PENGURUSAN_RMT)
+// ==========================================
+async function exportReportToCSV() {
+    const monthSelect = document.getElementById('reportMonthSelect');
+    const yearSelect = document.getElementById('reportYearSelect');
 
-            const selectedMonth = monthSelect ? monthSelect.value : (new Date().getMonth() + 1);
-            const selectedYear = yearSelect ? yearSelect.value : new Date().getFullYear();
-            const monthName = getMonthNameMY(parseInt(selectedMonth));
+    const selectedMonth = monthSelect ? parseInt(monthSelect.value) : (new Date().getMonth() + 1);
+    const selectedYear = yearSelect ? parseInt(yearSelect.value) : new Date().getFullYear();
 
-            try {
-                const startDate = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-01`;
-                const lastDay = new Date(selectedYear, selectedMonth, 0).getDate();
-                const endDate = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+    const monthNames = ["Januari", "Februari", "Mac", "April", "Mei", "Jun", "Julai", "Ogos", "September", "Oktober", "November", "Disember"];
+    const namaBulan = monthNames[selectedMonth - 1];
 
-                const { data: attendanceData, error } = await db
-                    .from('kehadiran_rmt')
-                    .select('tarikh, murid_id, status')
-                    .gte('tarikh', startDate)
-                    .lte('tarikh', endDate);
+    const totalDaysInMonth = new Date(selectedYear, selectedMonth, 0).getDate();
+    const startDate = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-01`;
+    const endDate = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-${String(totalDaysInMonth).padStart(2, '0')}`;
 
-                if (error) throw error;
-
-                const rawAttended = (attendanceData || []).filter(item => {
-                    if (item.status === undefined || item.status === null) return true;
-                    const st = String(item.status).toLowerCase().trim();
-                    return st === 'hadir' || st === 'true' || st === '1' || st === 'h';
-                });
-
-                const uniqueAttendance = [];
-                const seenKeys = new Set();
-                rawAttended.forEach(item => {
-                    const key = `${item.tarikh}_${item.murid_id}`;
-                    if (!seenKeys.has(key)) {
-                        seenKeys.add(key);
-                        uniqueAttendance.push(item);
-                    }
-                });
-
-                const { data: studentsData, error: studError } = await db
-                    .from('murid')
-                    .select('*');
-
-                if (studError) throw studError;
-
-                let csvContent = "data:text/csv;charset=utf-8,";
-                csvContent += `LAPORAN TUNTUTAN KEWANGAN RMT - SK FELDA CHEMEMOI\n`;
-                csvContent += `Bulan: ${monthName} ${selectedYear}\n\n`;
-                csvContent += `Bil,Nama Murid,Kelas,Jumlah Hari Hadir,Kadar Harian (RM),Jumlah Tuntutan (RM)\n`;
-
-                let totalOverallClaim = 0;
-
-                (studentsData || []).forEach((student, index) => {
-                    const studentAttendCount = uniqueAttendance.filter(att => att.murid_id === student.id).length;
-                    const studentClaim = studentAttendCount * 3.50;
-                    totalOverallClaim += studentClaim;
-
-                    const namaMurid = student.nama_murid || student.nama || "Murid";
-                    csvContent += `${index + 1},"${namaMurid}","${student.kelas || '-'}",${studentAttendCount},3.50,${studentClaim.toFixed(2)}\n`;
-                });
-
-                csvContent += `\n,,JUMLAH BESAR TUNTUTAN,,,RM ${totalOverallClaim.toFixed(2)}\n`;
-
-                const encodedUri = encodeURI(csvContent);
-                const link = document.createElement("a");
-                link.setAttribute("href", encodedUri);
-                link.setAttribute("download", `Laporan_RMT_${monthName}_${selectedYear}.csv`);
-                document.body.appendChild(link);
-
-                link.click();
-                document.body.removeChild(link);
-
-            } catch (err) {
-                alert("Ralat semasa mengeksport laporan: " + err.message);
-            }
+    try {
+        // 1. Dapatkan Nama Sekolah Dinamik terus dari jadual pengurusan_rmt
+        let currentSchoolName = '';
+        const { data: configData } = await db.from('pengurusan_rmt').select('nama_sekolah').limit(1).maybeSingle();
+        
+        if (configData && configData.nama_sekolah) {
+            currentSchoolName = configData.nama_sekolah;
+        } else if (typeof namaSekolahGlobal !== 'undefined' && namaSekolahGlobal) {
+            currentSchoolName = namaSekolahGlobal;
+        } else {
+            currentSchoolName = 'SK FELDA CHEMEMOI';
         }
 
+        // 2. Tarik data kehadiran dari Supabase
+        const { data: attCurrent, error: errCurrent } = await db.from('kehadiran_rmt')
+            .select('tarikh, murid_id, status')
+            .gte('tarikh', startDate)
+            .lte('tarikh', endDate);
+
+        if (errCurrent) throw errCurrent;
+
+        // 3. LOGIK SUSUNAN KELAS (1->6) & NAMA (A-Z) - KALIS HANG
+        let sortedStudents = [...(studentsData || [])];
+
+        sortedStudents.sort((a, b) => {
+            const rawKelasA = String(a.kelas || '').toUpperCase().trim();
+            const rawKelasB = String(b.kelas || '').toUpperCase().trim();
+
+            const matchA = rawKelasA.match(/\d+/);
+            const matchB = rawKelasB.match(/\d+/);
+
+            const yearA = matchA ? parseInt(matchA[0], 10) : 99;
+            const yearB = matchB ? parseInt(matchB[0], 10) : 99;
+
+            // Susun Tahun (1 hingga 6)
+            if (yearA !== yearB) {
+                return yearA - yearB;
+            }
+
+            // Susun Nama Kelas (cth: 1 Azkiya -> 1 Najihin)
+            if (rawKelasA !== rawKelasB) {
+                return rawKelasA.localeCompare(rawKelasB);
+            }
+
+            // Susun Nama Murid (A-Z)
+            const namaA = String(a.nama_murid || a.nama || '').toUpperCase().trim();
+            const namaB = String(b.nama_murid || b.nama || '').toUpperCase().trim();
+            return namaA.localeCompare(namaB);
+        });
+
+        // 4. Bina kandungan CSV dengan Nama Sekolah Dinamik
+        let csvContent = "\uFEFF"; // BOM untuk sokongan aksara khas dalam Excel
+        csvContent += `LAPORAN TUNTUTAN KEWANGAN RMT - ${currentSchoolName.toUpperCase()}\n`;
+        csvContent += `Bulan: ${namaBulan} ${selectedYear}\n\n`;
+        csvContent += `Bil,Nama Murid,Kelas,Jumlah Hari Hadir,Kadar Hari (RM),Jumlah Tuntutan (RM)\n`;
+
+        let grandTotal = 0;
+        const kadarHari = 3.50; // Kadar RM3.50 sehari
+
+        sortedStudents.forEach((student, index) => {
+            const studentPrimaryId = String(student.id || '').trim();
+
+            // KIRA HARI HADIR
+            const tarikhHadir = [
+                ...new Set(
+                    (attCurrent || [])
+                        .filter(a => String(a.murid_id).trim() === studentPrimaryId && String(a.status || '').toLowerCase().trim() === 'hadir')
+                        .map(a => a.tarikh)
+                )
+            ];
+
+            const totalHadir = tarikhHadir.length;
+            const jumlahTuntutan = totalHadir * kadarHari;
+            grandTotal += jumlahTuntutan;
+
+            const namaClean = `"${(student.nama_murid || student.nama || '').replace(/"/g, '""')}"`;
+            const kelasClean = `"${(student.kelas || '').replace(/"/g, '""')}"`;
+
+            csvContent += `${index + 1},${namaClean},${kelasClean},${totalHadir},${kadarHari.toFixed(2)},${jumlahTuntutan.toFixed(2)}\n`;
+        });
+
+        csvContent += `\n,,,JUMLAH BESAR TUNTUTAN,,RM ${grandTotal.toFixed(2)}\n`;
+
+        // 5. Muat turun fail CSV
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `Laporan_RMT_${namaBulan}_${selectedYear}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+    } catch (err) {
+        alert("Ralat semasa mengeksport laporan CSV: " + err.message);
+    }
+}
         // ==========================================
         // FUNGSI PENJANA & CETAK BORANG C8 (RMT)
         // ==========================================
@@ -3685,7 +3724,7 @@ async function downloadBorangC6() {
 }
 
 // ==========================================
-// FUNGSI PENJANA & CETAK BORANG C8 (LENGKAP)
+// FUNGSI PENJANA & CETAK BORANG C8 (STABIL & TERDUSUN)
 // ==========================================
 async function printBorangC8() {
     const monthSelect = document.getElementById('reportMonthSelect');
@@ -3708,7 +3747,7 @@ async function printBorangC8() {
     const prevStartDate = `${prevYear}-${String(prevMonth).padStart(2, '0')}-01`;
     const prevEndDate = `${prevYear}-${String(prevMonth).padStart(2, '0')}-${String(prevMonthDate.getDate()).padStart(2, '0')}`;
 
-try {
+    try {
         // 1. Tarik data kehadiran dari Supabase
         const { data: attCurrent, error: errCurrent } = await db.from('kehadiran_rmt')
             .select('tarikh, murid_id, status')
@@ -3722,7 +3761,37 @@ try {
 
         if (errCurrent) console.error("Ralat attCurrent:", errCurrent);
 
-        // 2. Dapatkan senarai TARIKH UNIK persekolahan yang telah diisi bagi bulan semasa & bulan lepas
+       // 2. LOGIK SUSUNAN KELAS (1->6) & NAMA (A-Z) - KALIS FORMAT (1A/1 AZKIYA)
+        let sortedStudents = [...(studentsData || [])];
+
+        sortedStudents.sort((a, b) => {
+            const rawKelasA = String(a.kelas || '').toUpperCase().trim();
+            const rawKelasB = String(b.kelas || '').toUpperCase().trim();
+
+            // Ekstrak nombor darjah/tahun (1-6) di hadapan kelas
+            const matchA = rawKelasA.match(/\d+/);
+            const matchB = rawKelasB.match(/\d+/);
+
+            const yearA = matchA ? parseInt(matchA[0], 10) : 99;
+            const yearB = matchB ? parseInt(matchB[0], 10) : 99;
+
+            // 1. Susun mengikut Tahun/Darjah (Tahun 1 hingga Tahun 6)
+            if (yearA !== yearB) {
+                return yearA - yearB;
+            }
+
+            // 2. Jika Tahun sama, susun mengikut Nama Kelas (cth: 1A -> 1N / 1 Azkiya -> 1 Najihin)
+            if (rawKelasA !== rawKelasB) {
+                return rawKelasA.localeCompare(rawKelasB);
+            }
+
+            // 3. Jika Kelas sama, susun mengikut Nama Murid (A-Z)
+            const namaA = String(a.nama_murid || a.nama || '').toUpperCase().trim();
+            const namaB = String(b.nama_murid || b.nama || '').toUpperCase().trim();
+            return namaA.localeCompare(namaB);
+        });
+
+        // 3. Dapatkan tarikh unik kehadiran
         const schoolDatesCurrent = [...new Set((attCurrent || [])
             .filter(a => String(a.status || '').toLowerCase().trim() === 'hadir')
             .map(a => a.tarikh)
@@ -3737,14 +3806,12 @@ try {
 
         let tableRowsHtml = "";
 
-        (studentsData || []).forEach((student, index) => {
-            const singkatanKelas = getSingkatanKelas(student.kelas);
-            const jantina = getJantinaMurid(student);
-            
-            // Ambil ID sebenar murid dari jadual Supabase (Pastikan jenis data Integer/String sama)
+        // Loop murid yang telah disusun mengikut kelas & nama
+        sortedStudents.forEach((student, index) => {
+            const singkatanKelas = typeof getSingkatanKelas === 'function' ? getSingkatanKelas(student.kelas) : student.kelas;
+            const jantina = typeof getJantinaMurid === 'function' ? getJantinaMurid(student) : 'L';
             const studentPrimaryId = String(student.id || '').trim();
 
-            // 3. Cari tarikh unik murid ini HADIR pada bulan semasa mengikut studentPrimaryId
             const tarikhHadirMuridCurrent = [
                 ...new Set(
                     (attCurrent || [])
@@ -3754,7 +3821,6 @@ try {
             ];
             const totalHadirSemasa = tarikhHadirMuridCurrent.length;
 
-            // 4. Cari tarikh unik murid ini HADIR pada bulan lepas
             const tarikhHadirMuridPrev = [
                 ...new Set(
                     (attPrev || [])
@@ -3764,7 +3830,6 @@ try {
             ];
             const totalHadirLepas = tarikhHadirMuridPrev.length;
 
-            // 5. PENGIRAAN TIDAK HADIR SEBENAR
             const totalTidakHadirSemasa = schoolDaysCurrentCount > 0 
                 ? Math.max(0, schoolDaysCurrentCount - totalHadirSemasa) 
                 : 0;
@@ -3775,7 +3840,6 @@ try {
 
             const jumlahSemuaTidakHadir = totalTidakHadirSemasa + totalTidakHadirLepas;
 
-            // 6. Bina petak tarikh 1 hingga 31 hari
             let dateColumnsHtml = "";
             for (let day = 1; day <= 31; day++) {
                 if (day <= totalDaysInMonth) {
@@ -3792,7 +3856,6 @@ try {
                 }
             }
 
-            // 7. Masukkan ke dalam baris jadual Borang C8
             tableRowsHtml += `
                 <tr style="height: 20px;">
                     <td style="text-align:center;">${index + 1}</td>
@@ -3809,6 +3872,7 @@ try {
             `;
         });
 
+        // 4. KEKALKAN REKABENTUK & MARGIN ASAL 100%
         const printWindow = window.open('', '_blank');
         printWindow.document.write(`
             <!DOCTYPE html>
