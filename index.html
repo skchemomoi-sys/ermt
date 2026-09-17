@@ -1005,28 +1005,33 @@
             </div>
         </div>
         
-        <!-- Senarai Butang Cetakan (Kembali Rapi 1/2 Kolum di Telefon & Baris Pendek di PC) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap lg:justify-end gap-2.5">
-            <button onclick="downloadBorangC4()" class="admin-only hidden w-full lg:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center justify-center gap-2">
-                <i class="fa-solid fa-list-check"></i> Cetak Borang C4
-            </button>
+     <!-- Senarai Butang Cetakan (Kembali Rapi 1/2 Kolum di Telefon & Baris Pendek di PC) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap lg:justify-end gap-2.5">
+    <!-- BUTANG BAHARU: BORANG C1 -->
+    <button onclick="downloadBorangC1()" class="w-full lg:w-auto bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center justify-center gap-2">
+        <i class="fa-solid fa-weight-scale"></i> Cetak Borang C1
+    </button>
 
-            <button onclick="downloadBorangC5()" class="w-full lg:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center justify-center gap-2">
-                <i class="fa-solid fa-utensils"></i> Cetak Borang C5
-            </button>
+    <button onclick="downloadBorangC4()" class="admin-only hidden w-full lg:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center justify-center gap-2">
+        <i class="fa-solid fa-list-check"></i> Cetak Borang C4
+    </button>
 
-            <button onclick="downloadBorangC6()" class="w-full lg:w-auto bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center justify-center gap-2">
-                <i class="fa-solid fa-print"></i> Cetak Borang C6
-            </button>
+    <button onclick="downloadBorangC5()" class="w-full lg:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center justify-center gap-2">
+        <i class="fa-solid fa-utensils"></i> Cetak Borang C5
+    </button>
 
-            <button onclick="printBorangC8()" class="admin-only hidden w-full lg:w-auto bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center justify-center gap-2">
-                <i class="fa-solid fa-print"></i> Cetak Borang C8
-            </button>
+    <button onclick="downloadBorangC6()" class="w-full lg:w-auto bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center justify-center gap-2">
+        <i class="fa-solid fa-print"></i> Cetak Borang C6
+    </button>
 
-            <button onclick="exportReportToCSV()" class="w-full lg:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center justify-center gap-2 sm:col-span-2 lg:col-span-1">
-                <i class="fa-solid fa-file-csv"></i> Eksport Excel/CSV
-            </button>
-        </div>
+    <button onclick="printBorangC8()" class="admin-only hidden w-full lg:w-auto bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center justify-center gap-2">
+        <i class="fa-solid fa-print"></i> Cetak Borang C8
+    </button>
+
+    <button onclick="exportReportToCSV()" class="w-full lg:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center justify-center gap-2 sm:col-span-2 lg:col-span-1">
+        <i class="fa-solid fa-file-csv"></i> Eksport Excel/CSV
+    </button>
+</div>
     </div>
 
     <!-- 2. KAD RINGKASAN TUNTUTAN KEWANGAN DINAMIK -->
@@ -1332,6 +1337,86 @@
             }
         }
 
+
+// ==========================================
+// FUNGSI TUKAR STATUS KEHADIRAN INDIVIDU (KEKALKAN TAPISAN KELAS)
+// ==========================================
+async function toggleStatusKehadiranMurid(muridId, statusSemasa) {
+    try {
+        let dateInput = document.getElementById('attendanceDatePicker');
+        let selectedDate = (dateInput && dateInput.value) ? dateInput.value : getLocalDateString();
+
+        if (statusSemasa === 'hadir') {
+            // POP-UP PENGESAHAN
+            const sahBatal = confirm("Adakah anda pasti mahu membatalkan kehadiran murid ini?");
+            if (!sahBatal) return;
+
+            // BATALKAN KEHADIRAN DARI SUPABASE
+            const { error } = await db
+                .from('kehadiran_rmt')
+                .delete()
+                .eq('murid_id', muridId)
+                .eq('tarikh', selectedDate);
+
+            if (error) throw error;
+        } else {
+            // TANDAKAN HADIR SELAMAT
+            const { data: existing, error: errCheck } = await db
+                .from('kehadiran_rmt')
+                .select('id')
+                .eq('murid_id', muridId)
+                .eq('tarikh', selectedDate)
+                .maybeSingle();
+
+            if (errCheck) throw errCheck;
+
+            if (!existing) {
+                const { error: errInsert } = await db
+                    .from('kehadiran_rmt')
+                    .insert([
+                        { murid_id: muridId, tarikh: selectedDate, status: 'hadir' }
+                    ]);
+
+                if (errInsert) throw errInsert;
+            }
+        }
+
+        // 1. Dapatkan data kehadiran terkini dari Supabase
+        const { data: attList, error: errAtt } = await db
+            .from('kehadiran_rmt')
+            .select('*')
+            .eq('tarikh', selectedDate);
+
+        if (!errAtt) {
+            attendanceDataToday = attList || [];
+        }
+
+        // 2. Kemaskini kad statistik & graf
+        updateTopStats();
+        if (typeof initCharts === 'function') {
+            initCharts();
+        }
+
+        // 3. 🟢 PAKSA JADUAL MENJALANKAN TAPISAN SEMASA (KEKALKAN KELAS DIPILIH)
+        const classFilterSelect = document.getElementById('classFilterSelect') || 
+                                  document.getElementById('filterKelas') || 
+                                  document.querySelector('select[onchange*="filter"]');
+
+        if (classFilterSelect) {
+            classFilterSelect.dispatchEvent(new Event('change'));
+        } else if (typeof filterStudents === 'function') {
+            filterStudents();
+        } else {
+            renderStudentTable(studentsData);
+        }
+
+    } catch (err) {
+        console.error("Ralat menukar status kehadiran:", err);
+        alert("Gagal menukar status kehadiran murid: " + err.message);
+    }
+}
+
+
         // --- MUAT KEHADIRAN MENGIKUT TARIKH DIPILIH ---
         async function loadAttendanceForSelectedDate() {
             const dateInput = document.getElementById('attendanceDatePicker');
@@ -1352,6 +1437,7 @@
                 console.error("Ralat memuat data kehadiran:", err);
             }
         }
+
       // --- CAMERA QR SCANNER LOGIC ---
         function openCameraScannerModal() {
             document.getElementById('cameraScannerModal').classList.remove('hidden');
@@ -1679,7 +1765,12 @@ function refreshAllViews() {
     populateScanDropdown();
     updateTopStats();
     
-    // 🟢 KEMAS KINI TAJUK KAD SENARAI MURID AWAM (DISAPADAN KAN DENGAN ID HTML)
+    // 🟢 PEMICU REAL-TIME GRAF DASHBOARD (MEMANGGIL initCharts)
+    if (typeof initCharts === 'function') {
+        initCharts();
+    }
+    
+    // 🟢 KEMAS KINI TAJUK KAD SENARAI MURID AWAM
     const config = window.pengurusanRMTConfig || {};
     const sidebarText = document.getElementById('sidebar_nama_sekolah')?.innerText?.trim();
     const namaSekolah = config.nama_sekolah || sidebarText || 'SK FELDA CHEMOMOI';
@@ -1878,48 +1969,53 @@ function renderAdminStudentTable(data) {
             return attendanceDataToday.some(a => a.murid_id === studentId);
         }
 
-        function renderStudentTable(data) {
-            const tbody = document.getElementById('studentTableBody');
-            tbody.innerHTML = '';
+      function renderStudentTable(data) {
+    const tbody = document.getElementById('studentTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
 
-            if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400 font-medium">Tiada murid RMT dalam pangkalan data. Sila tambah murid di modul Pengurusan Murid.</td></tr>`;
-                return;
-            }
+    if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400 font-medium">Tiada murid RMT dalam pangkalan data. Sila tambah murid di modul Pengurusan Murid.</td></tr>`;
+        return;
+    }
 
-            data.forEach(student => {
-                const attended = isStudentAttended(student.id);
+    data.forEach(student => {
+        const attended = isStudentAttended(student.id);
 
-                let badgeClass = attended ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
-                let statusText = attended ? '<i class="fa-solid fa-circle-check mr-1"></i> Telah Ambil' : '<i class="fa-solid fa-clock mr-1"></i> Belum Ambil';
+        let badgeClass = attended ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
+        let statusText = attended ? '<i class="fa-solid fa-circle-check mr-1"></i> Telah Ambil' : '<i class="fa-solid fa-clock mr-1"></i> Belum Ambil';
 
-                let actionButton = '';
-                if (isAdminLoggedIn) {
-                    actionButton = !attended 
-                        ? `<button onclick="markStudentAttendance(${student.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg shadow transition">Tanda Ambil</button>`
-                        : `<span class="text-emerald-600 text-[11px] font-semibold"><i class="fa-solid fa-check mr-1"></i>Selesai</span>`;
-                }
+        // 🟢 BUTANG SENTIASA DIJANA TANPA MENUNGGU REFRESH
+        let actionButton = !attended 
+            ? `<button onclick="toggleStatusKehadiranMurid('${student.id}', 'belum')" 
+                       class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg shadow transition cursor-pointer flex items-center gap-1 ml-auto">
+                   <i class="fa-solid fa-check"></i> Tanda Ambil
+               </button>`
+            : `<button onclick="toggleStatusKehadiranMurid('${student.id}', 'hadir')" 
+                       class="bg-rose-100 hover:bg-rose-200 text-rose-700 border border-rose-300 text-[11px] font-bold px-3 py-1.5 rounded-lg shadow-sm transition cursor-pointer flex items-center gap-1 ml-auto">
+                   <i class="fa-solid fa-xmark"></i> Batal
+               </button>`;
 
-                let tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
-                tr.innerHTML = `
-                    <td class="p-3">
-                        <div class="font-bold text-slate-800">${student.nama}</div>
-                        <div class="text-[10px] text-slate-400">MyKid: ${student.mykid || '-'}</div>
-                    </td>
-                    <td class="p-3 font-medium text-slate-600">${student.kelas}</td>
-                    <td class="p-3">
-                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${badgeClass}">
-                            ${statusText}
-                        </span>
-                    </td>
-                    <td class="p-3 text-right admin-only ${isAdminLoggedIn ? '' : 'hidden'}">
-                        ${actionButton}
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
+        let tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
+        tr.innerHTML = `
+            <td class="p-3">
+                <div class="font-bold text-slate-800">${student.nama}</div>
+                <div class="text-[10px] text-slate-400">MyKid: ${student.mykid || '-'}</div>
+            </td>
+            <td class="p-3 font-medium text-slate-600">${student.kelas}</td>
+            <td class="p-3">
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${badgeClass}">
+                    ${statusText}
+                </span>
+            </td>
+            <td class="p-3 text-right">
+                ${actionButton}
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
 
     // --- FUNGSI CETAK SENARAI KEHADIRAN (DINAMIK MENGIKUT SUPABASE) ---
 function printAttendanceReport() {
@@ -2346,7 +2442,7 @@ async function initCharts() {
                 weekDates.push(`${yyyy}-${mm}-${dd}`);
             }
 
-            // C. Tarik rekod dari jadual 'kehadiran_rmt' (Tarik rekod TERBAHARU dulu)
+            // C. Tarik rekod dari jadual 'kehadiran_rmt'
             let attendanceData = [];
             const { data: dataRmt, error: errAtt } = await db
                 .from('kehadiran_rmt')
@@ -2358,7 +2454,6 @@ async function initCharts() {
             if (!errAtt && dataRmt) {
                 attendanceData = dataRmt;
             } else {
-                // Fallback jika menggunakan jadual 'kehadiran'
                 const { data: dataKehadiran } = await db
                     .from('kehadiran')
                     .select('*')
@@ -2367,7 +2462,7 @@ async function initCharts() {
                 if (dataKehadiran) attendanceData = dataKehadiran;
             }
 
-            // D. Kira bilangan murid yang mengambil makanan mengikut hari (Isnin - Jumaat)
+            // D. Kira bilangan murid yang mengambil makanan (Isnin - Jumaat)
             const dailyCounts = weekDates.map(targetDate => {
                 if (!attendanceData || attendanceData.length === 0) return 0;
 
@@ -2386,26 +2481,27 @@ async function initCharts() {
                     }
 
                     const statusVal = String(item.status || item.status_makanan || '').trim().toLowerCase();
-                    const isTaken = statusVal === 'hadir' || statusVal === 'diambil' || statusVal === 'taken' || statusVal === 'true';
+                    // 🟢 KEMASKINI: Ditambah 'telah_ambil' & 'telah ambil'
+                    const isTaken = statusVal === 'hadir' || statusVal === 'diambil' || statusVal === 'taken' || statusVal === 'true' || statusVal === 'telah_ambil' || statusVal === 'telah ambil';
 
                     return formattedItemDate === targetDate && isTaken;
                 }).length;
             });
 
             // E. Reset carta lama jika wujud
-            if (attendanceChartInstance) {
-                attendanceChartInstance.destroy();
+            if (window.attendanceChartInstance) {
+                window.attendanceChartInstance.destroy();
             }
 
             // F. Bina Carta Kehadiran Baharu
-            attendanceChartInstance = new Chart(ctxAtt.getContext('2d'), {
+            window.attendanceChartInstance = new Chart(ctxAtt.getContext('2d'), {
                 type: 'bar',
                 data: {
                     labels: ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat'],
                     datasets: [
                         {
                             label: 'Jumlah Murid Ambil Makanan',
-                            data: dailyCounts, // Membaca 2 murid bagi tarikh 14 Sept 2026 (Isnin)
+                            data: dailyCounts,
                             backgroundColor: '#10b981',
                             borderRadius: 6
                         },
@@ -2423,10 +2519,7 @@ async function initCharts() {
                     grouped: true,
                     plugins: {
                         legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false
-                        }
+                        tooltip: { mode: 'index', intersect: false }
                     },
                     scales: {
                         y: { 
@@ -2988,20 +3081,317 @@ function getJantinaMurid(murid) {
     return "-";
 }
 
+async function downloadBorangC1() {
+    try {
+        const config = window.pengurusanRMTConfig || {};
+        const namaSekolah = config.nama_sekolah || 'SK FELDA CHEMOMOI';
+        const kodSekolah = config.kod_sekolah || 'CBA0020';
+        const namaPenyelaras = config.nama_penyelaras || '';
+        const jawatanPenyelaras = config.jawatan_penyelaras || 'PENYELARAS RMT';
+        const namaGPKHEM = config.nama_gpk_hem || '';
+        const jawatanGPKHEM = config.jawatan_gpk_hem || 'GPK HEM';
+
+        // Tarik data murid dari Supabase
+        const { data: senaraiMurid, error } = await db
+            .from('murid')
+            .select('*')
+            .order('kelas', { ascending: true });
+
+        if (error) throw error;
+
+        let rowsHtml = '';
+        const muridData = senaraiMurid || [];
+
+        muridData.forEach((m, idx) => {
+            const namaPenuh = m.nama || m.nama_murid || '';
+
+            rowsHtml += `
+                <tr style="height: 34px;">
+                    <td style="text-align:center;">${idx + 1}</td>
+                    <td style="text-align:left; padding-left:6px; padding-right:4px; font-weight:bold; text-transform:uppercase; font-size: 8pt; line-height: 1.25; word-break: break-word;">${namaPenuh}</td>
+                    <td style="text-align:center;">${m.kelas || ''}</td>
+                    <!-- Sesi Januari -->
+                    <td>${m.berat_jan || ''}</td>
+                    <td>${m.tinggi_jan || ''}</td>
+                    <td>${m.bmi_jan || ''}</td>
+                    <td>${m.klasifikasi_jan || ''}</td>
+                    <!-- Sesi November -->
+                    <td>${m.berat_nov || ''}</td>
+                    <td>${m.tinggi_nov || ''}</td>
+                    <td>${m.bmi_nov || ''}</td>
+                    <td>${m.klasifikasi_nov || ''}</td>
+                </tr>
+            `;
+        });
+
+        // Jika rekod murid kurang daripada 10, tambah baris kosong dengan ketinggian seragam 34px
+        for (let i = muridData.length; i < 10; i++) {
+            rowsHtml += `
+                <tr style="height: 34px;">
+                    <td style="text-align:center;">${i + 1}</td>
+                    <td></td><td></td>
+                    <td></td><td></td><td></td><td></td>
+                    <td></td><td></td><td></td><td></td>
+                </tr>
+            `;
+        }
+
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) return alert("Sila benarkan Pop-up pelayar untuk mencetak.");
+
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html lang="ms">
+            <head>
+                <title>BORANG C1 - REKOD FIZIKAL MURID</title>
+                <style>
+                    @page { 
+                        size: A4 landscape; 
+                        margin: 10mm 10mm 8mm 10mm; 
+                    }
+                    * { box-sizing: border-box; }
+                    html, body { 
+                        width: 100%; 
+                        margin: 0; 
+                        padding: 0; 
+                        background: #fff;
+                        font-family: Arial, sans-serif; 
+                        font-size: 8.5pt; 
+                        color: #000; 
+                    }
+
+                    /* KONTAINER UTAMA */
+                    .print-page {
+                        width: 100%;
+                        padding: 2mm 4mm;
+                        margin: 0 auto;
+                    }
+                    
+                    /* Header Top Layout */
+                    .top-header {
+                        position: relative;
+                        width: 100%;
+                        min-height: 52px;
+                        margin-bottom: 6px;
+                    }
+                    .logo-left {
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        text-align: center;
+                    }
+                    .logo-img {
+                        height: 38px;
+                        width: auto;
+                        object-fit: contain;
+                        margin-bottom: 3px;
+                    }
+                    .kpm-subtext {
+                        font-size: 6.5pt;
+                        font-weight: bold;
+                        text-transform: uppercase;
+                        line-height: 1;
+                    }
+                    .borang-tag-right {
+                        position: absolute;
+                        right: 0;
+                        top: 0;
+                        border: 1px solid #000;
+                        padding: 2px 10px;
+                        font-weight: bold;
+                        font-size: 8.5pt;
+                    }
+
+                    /* Document Title */
+                    .doc-title {
+                        text-align: center;
+                        font-size: 13pt;
+                        font-weight: bold;
+                        text-transform: uppercase;
+                        margin: 4px 0 10px 0;
+                        letter-spacing: 0.5px;
+                    }
+
+                    /* Header Info Table (Titik Bertindih Selari) */
+                    table.info-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-bottom: 8px;
+                        font-size: 8.5pt;
+                        font-weight: bold;
+                    }
+                    table.info-table td {
+                        padding: 2px 0;
+                        vertical-align: top;
+                    }
+
+                    /* Main Antropometri Table */
+                    table.main-table { 
+                        width: 100%; 
+                        border-collapse: collapse; 
+                        table-layout: fixed;
+                        page-break-inside: auto;
+                    }
+                    table.main-table tr {
+                        height: 34px; /* Ketinggian Seragam Untuk Semua Baris */
+                        page-break-inside: avoid;
+                        page-break-after: auto;
+                    }
+                    table.main-table th, table.main-table td { 
+                        border: 1px solid #000; 
+                        padding: 3px 2px; 
+                        text-align: center; 
+                        font-size: 8pt; 
+                        vertical-align: middle;
+                    }
+                    table.main-table th { 
+                        background-color: #ffffff; 
+                        text-transform: uppercase; 
+                        font-weight: bold;
+                    }
+
+                    /* Footer Signatures */
+                    .footer-container {
+                        margin-top: 25px;
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 0 50px;
+                        font-size: 8.5pt;
+                        page-break-inside: avoid;
+                    }
+                    .sig-block {
+                        width: 230px;
+                        text-align: center;
+                    }
+                    .dots-line {
+                        border-bottom: 1px dotted #000;
+                        margin: 35px 0 4px 0;
+                        width: 100%;
+                    }
+                    .jawatan-text {
+                        font-weight: bold;
+                        text-transform: uppercase;
+                    }
+                    .nama-text {
+                        text-transform: uppercase;
+                        font-size: 8pt;
+                        color: #000;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="print-page">
+                    <!-- Header Top Section -->
+                    <div class="top-header">
+                        <div class="logo-left">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Coat_of_arms_of_Malaysia.svg/250px-Coat_of_arms_of_Malaysia.svg.png" class="logo-img" alt="Jata Negara">
+                            <div class="kpm-subtext">KEMENTERIAN PENDIDIKAN</div>
+                        </div>
+                        <div class="borang-tag-right">BORANG C1</div>
+                    </div>
+
+                    <!-- Title -->
+                    <div class="doc-title">REKOD FIZIKAL MURID</div>
+
+                    <!-- Info Section -->
+                    <table class="info-table">
+                        <tr>
+                            <td style="width: 130px;">NAMA SEKOLAH</td>
+                            <td style="width: 15px; text-align: center;">:</td>
+                            <td>${namaSekolah}</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td style="width: 130px;">KOD SEKOLAH</td>
+                            <td style="width: 15px; text-align: center;">:</td>
+                            <td>${kodSekolah}</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td style="width: 130px;">DAERAH</td>
+                            <td style="width: 15px; text-align: center;">:</td>
+                            <td>BENTONG</td>
+                            <td style="text-align: right;">NEGERI : PAHANG</td>
+                        </tr>
+                    </table>
+
+                    <!-- Main Table -->
+                    <table class="main-table">
+                        <thead>
+                            <tr style="height: 20px;">
+                                <th rowspan="3" style="width:3.5%;">BIL</th>
+                                <th rowspan="3" style="width:26%;">NAMA MURID</th>
+                                <th rowspan="3" style="width:7.5%;">TAHUN</th>
+                                <th colspan="8">MAKLUMAT ANTROPOMETRI MURID</th>
+                            </tr>
+                            <tr style="height: 18px;">
+                                <th colspan="4">JANUARI</th>
+                                <th colspan="4">NOVEMBER</th>
+                            </tr>
+                            <tr style="height: 20px;">
+                                <th style="width:6.5%;">BERAT<br>(kg)</th>
+                                <th style="width:6.5%;">TINGGI<br>(m)</th>
+                                <th style="width:6.5%;">BMI<br>(kg/m²)</th>
+                                <th style="width:11%;">KLASIFIKASI<br>BMI</th>
+                                <th style="width:6.5%;">BERAT<br>(kg)</th>
+                                <th style="width:6.5%;">TINGGI<br>(m)</th>
+                                <th style="width:6.5%;">BMI<br>(kg/m²)</th>
+                                <th style="width:11.5%;">KLASIFIKASI<br>BMI</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml}
+                        </tbody>
+                    </table>
+
+                    <!-- Signatures -->
+                    <div class="footer-container">
+                        <div class="sig-block">
+                            <div>DISEDIAKAN OLEH</div>
+                            <div class="dots-line"></div>
+                            <div class="jawatan-text">${jawatanPenyelaras}</div>
+                            <div class="nama-text">${namaPenyelaras ? '(' + namaPenyelaras + ')' : ''}</div>
+                        </div>
+                        <div class="sig-block">
+                            <div>DISAHKAN OLEH</div>
+                            <div class="dots-line"></div>
+                            <div class="jawatan-text">${jawatanGPKHEM}</div>
+                            <div class="nama-text">${namaGPKHEM ? '(' + namaGPKHEM + ')' : ''}</div>
+                        </div>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `);
+
+        printWindow.document.close();
+        printWindow.focus();
+        setTimeout(() => printWindow.print(), 500);
+
+    } catch (err) {
+        alert("Ralat semasa menjana Borang C1: " + err.message);
+    }
+}
+
+
 // ==========================================
 // FUNGSI JANA & CETAK BORANG C4 (SUPABASE)
 // ==========================================
 
 async function downloadBorangC4() {
     try {
-        // 🟢 AMBIL DATA SEKOLAH DINAMIK DARI SUPABASE (WITH FALLBACK)
+        // Ambil data sekolah dari tetapan
         const config = window.pengurusanRMTConfig || {};
         const namaSekolah = config.nama_sekolah || 'SK FELDA CHEMOMOI';
 
         // 1. Dapatkan data murid daripada jadual 'murid' Supabase
         const { data: senaraiMurid, error: errMurid } = await db
             .from('murid')
-            .select('nama, kelas, status_rmt');
+            .select('nama, kelas, status_rmt')
+            .order('kelas', { ascending: true });
 
         if (errMurid) {
             console.error("Ralat membaca data murid:", errMurid);
@@ -3009,12 +3399,12 @@ async function downloadBorangC4() {
             return;
         }
 
-        // Tapis hanya murid berstatus 'Aktif' (jika ada)
+        // Tapis hanya murid berstatus 'Aktif'
         let muridAktif = (senaraiMurid || []).filter(m => 
             !m.status_rmt || String(m.status_rmt).toLowerCase() === 'aktif'
         );
 
-        // 🟢 SUSUNAN KEUTAMAAN KELAS (1 Azkiya -> 6 Najihin)
+        // Susunan Keutamaan Kelas (1 Azkiya -> 6 Najihin)
         const orderKelas = [
             '1 AZKIYA', '1 NAJIHIN', '1 CERDAS',
             '2 AZKIYA', '2 NAJIHIN',
@@ -3024,7 +3414,6 @@ async function downloadBorangC4() {
             '6 AZKIYA', '6 NAJIHIN'
         ];
 
-        // LOGIK SUSUNAN: Mengikut Keutamaan Kelas, Kemudian Nama Murid
         muridAktif.sort((a, b) => {
             const kelasA = (a.kelas || '').toUpperCase().trim();
             const kelasB = (b.kelas || '').toUpperCase().trim();
@@ -3046,22 +3435,22 @@ async function downloadBorangC4() {
 
         const tahunSemasa = new Date().getFullYear();
 
-        // 2. Bina baris jadual murid
+        // 2. Bina baris jadual murid (Tinggi Seragam 34px)
         let rowsHtml = '';
         muridAktif.forEach((murid, index) => {
             rowsHtml += `
-                <tr>
-                    <td style="text-align: center;">${index + 1}</td>
-                    <td style="text-align: left; padding-left: 10px; text-transform: uppercase;">${murid.nama || ''}</td>
-                    <td style="text-align: center; text-transform: uppercase;">${murid.kelas || ''}</td>
+                <tr style="height: 34px;">
+                    <td style="text-align: center; font-weight: bold;">${index + 1}</td>
+                    <td style="text-align: left; padding-left: 10px; font-weight: bold; text-transform: uppercase; line-height: 1.25; word-break: break-word;">${murid.nama || ''}</td>
+                    <td style="text-align: center; font-weight: bold; text-transform: uppercase;">${murid.kelas || ''}</td>
                 </tr>
             `;
         });
 
-        // Pastikan sekurang-kurangnya 20 baris wujud mengikut templat asal
-        for (let i = muridAktif.length; i < 20; i++) {
+        // Pastikan sekurang-kurangnya 15 baris kosong jika tiada murid
+        for (let i = muridAktif.length; i < 15; i++) {
             rowsHtml += `
-                <tr>
+                <tr style="height: 34px;">
                     <td style="text-align: center;">${i + 1}</td>
                     <td></td>
                     <td></td>
@@ -3072,7 +3461,7 @@ async function downloadBorangC4() {
         // 3. Buka tetingkap cetakan
         const printWindow = window.open('', '_blank');
         if (!printWindow) {
-            alert("Sila benarkan 'Pop-up' pada browser untuk mencetak Borang C4.");
+            alert("Sila benarkan 'Pop-up' pada pelayar web untuk mencetak Borang C4.");
             return;
         }
 
@@ -3084,91 +3473,108 @@ async function downloadBorangC4() {
                 <style>
                     @page { 
                         size: A4 portrait; 
-                        margin: 10mm; /* Jidar asas A4 */
+                        margin: 10mm 15mm 10mm 15mm; 
                     }
                     * { 
                         box-sizing: border-box; 
                     }
                     html, body { 
                         width: 100%; 
-                        height: 100%;
                         margin: 0; 
                         padding: 0; 
                         background: #fff; 
                         font-family: Arial, sans-serif; 
+                        font-size: 9pt; 
                         color: #000; 
                     }
                     
-                    /* KONTAINER UTAMA: Memaksa ruang margin kiri & kanan di dalam kertas */
+                    /* KONTAINER UTAMA */
                     .print-page {
                         width: 100%;
-                        padding: 10mm 15mm; /* 15mm Kiri & Kanan (Ruang Selamat Terjamin) */
+                        padding: 2mm 2mm; 
                         margin: 0 auto;
                     }
                     
-                    .doc-no-container { 
-                        text-align: right; 
+                    /* Header Top Section */
+                    .top-header {
+                        position: relative;
+                        width: 100%;
+                        min-height: 30px;
+                        margin-bottom: 10px;
+                    }
+                    .borang-tag-right { 
+                        position: absolute;
+                        right: 0;
+                        top: 0;
+                        border: 1px solid #000; 
+                        padding: 2px 10px; 
+                        font-weight: bold; 
+                        font-size: 9pt; 
+                    }
+                    
+                    /* Document Title Centered */
+                    .doc-title { 
+                        text-align: center;
+                        font-weight: bold; 
+                        font-size: 13pt; 
+                        margin: 5px 0 15px 0; 
+                        text-transform: uppercase; 
+                        letter-spacing: 0.5px;
+                    }
+
+                    /* School Info */
+                    .school-info { 
+                        font-weight: bold; 
+                        font-size: 9.5pt; 
                         margin-bottom: 12px; 
-                    }
-                    .doc-no-box { 
-                        display: inline-block; 
-                        border: 1.5px solid #000; 
-                        padding: 3px 12px; 
-                        font-weight: bold; 
-                        font-size: 10pt; 
-                    }
-                    
-                    .title { 
-                        font-weight: bold; 
-                        font-size: 11pt; 
-                        margin-bottom: 4px; 
-                        text-transform: uppercase; 
-                    }
-                    .school-name { 
-                        font-weight: bold; 
-                        font-size: 11pt; 
-                        margin-bottom: 15px; 
                         text-transform: uppercase; 
                     }
                     
-                    table { 
+                    /* Table Formatting */
+                    table.main-table { 
                         width: 100%; 
                         border-collapse: collapse; 
-                        margin-top: 10px; 
                         table-layout: fixed; 
+                        page-break-inside: auto;
                     }
-                    
-                    th, td { 
-                        border: 1.5px solid #000; 
-                        padding: 5px 8px; 
-                        font-size: 9.5pt; 
-                        vertical-align: middle;
-                        word-wrap: break-word;
+                    table.main-table tr {
+                        page-break-inside: avoid;
+                        page-break-after: auto;
                     }
-                    
-                    th { 
+                    table.main-table th { 
+                        height: 38px;
                         font-weight: bold; 
+                        font-size: 10pt;
                         text-transform: uppercase; 
-                        background-color: #f2f2f2;
+                        background-color: #ffffff;
                         text-align: center;
+                        border: 1.5px solid #000; 
+                        padding: 6px; 
+                        vertical-align: middle;
                     }
-                    
-                    td.text-center {
-                        text-align: center;
+                    table.main-table td { 
+                        border: 1px solid #000; 
+                        padding: 4px 6px; 
+                        font-size: 8.5pt; 
+                        vertical-align: middle;
                     }
                 </style>
             </head>
             <body>
-                <!-- Pembungkus Wajib Untuk Elak Terlalu Rapat Ke Sisi -->
                 <div class="print-page">
-                    <div class="doc-no-container">
-                        <div class="doc-no-box">BORANG C4</div>
+                    <!-- Top Right Tag -->
+                    <div class="top-header">
+                        <div class="borang-tag-right">BORANG C4</div>
                     </div>
                     
-                    <div class="title">SENARAI PENERIMA MURID RMT TAHUN ${tahunSemasa}</div>
-                    <div class="school-name">SEKOLAH : ${namaSekolah}</div>
+                    <!-- Centered Title -->
+                    <div class="doc-title">SENARAI PENERIMA MURID RMT TAHUN ${tahunSemasa}</div>
+                    
+                    <!-- School Name Left Aligned -->
+                    <div class="school-info">SEKOLAH : ${namaSekolah}</div>
 
-                    <table>
+                    <!-- Main Table -->
+                    <table class="main-table">
                         <thead>
                             <tr>
                                 <th style="width: 10%;">BIL</th>
@@ -3196,6 +3602,7 @@ async function downloadBorangC4() {
         alert("Ralat semasa menjana Borang C4.");
     }
 }
+
 // ==========================================
 // FUNGSI JANA & CETAK BORANG C5 (SUPABASE)
 // ==========================================
@@ -3353,18 +3760,16 @@ async function downloadBorangC5() {
 }
 
 // Fungsi Cetak Borang C6 (Lengkap Data Supabase & Margin Kekal)
+
 async function downloadBorangC6() {
     try {
-        // 1. Dapatkan tarikh dari pemilih tarikh atau guna tarikh hari ini
         let dateInput = document.getElementById('attendanceDatePicker');
         let selectedDate = (dateInput && dateInput.value) ? dateInput.value : new Date().toISOString().split('T')[0];
 
-        // 2. Tetingkap prompt untuk pengesahan / tukar tarikh backdated
         const userSelectedDate = prompt("Masukkan tarikh Borang C6 yang ingin dicetak (YYYY-MM-DD):", selectedDate);
         if (!userSelectedDate) return; 
         selectedDate = userSelectedDate.trim();
 
-        // 3. BUKA TETINGKAP DAHULU (Supaya pelayar tidak menyekat popup)
         const printWindow = window.open('', '_blank');
         if (!printWindow) {
             alert("Sila benarkan 'Pop-up' pada pelayar web anda untuk mencetak borang.");
@@ -3373,7 +3778,7 @@ async function downloadBorangC6() {
 
         printWindow.document.write("<html><body style='font-family:sans-serif; padding:20px;'>Memuat turun data kehadiran & maklumat pentadbir... Sila tunggu.</body></html>");
 
-        // 4. Tarik data kehadiran sebenar dari Supabase
+        // Tarik data kehadiran sebenar dari Supabase
         const { data: attData, error: attErr } = await db
             .from('kehadiran_rmt')
             .select('murid_id, status')
@@ -3384,7 +3789,7 @@ async function downloadBorangC6() {
             throw attErr;
         }
 
-        // Tarik data Pegawai RMT dari jadual pengurusan_rmt
+        // Tarik data Pegawai RMT & Nama Sekolah dari jadual pengurusan_rmt
         const { data: configData } = await db
             .from('pengurusan_rmt')
             .select('*')
@@ -3399,6 +3804,7 @@ async function downloadBorangC6() {
             .maybeSingle();
 
         // Pembolehubah Data Supabase
+        const namaSekolah = configData?.nama_sekolah || 'SK FELDA CHEMOMOI';
         const namaPenyelaras = configData?.nama_penyelaras || '';
         const jawatanPenyelaras = configData?.jawatan_penyelaras || 'Guru Penyelaras RMT';
         
@@ -3406,7 +3812,7 @@ async function downloadBorangC6() {
         const jawatanGB = configData?.jawatan_guru_besar || 'Guru Besar';
         
         const namaKantin = sekolahData?.nama_kantin || 'KANTIN GEMILANG ENTERPRISE';
-        const jawatanKantin = 'PENGUSAHA KANTIN';
+        const jawatanKantin = 'Pengusaha Kantin';
 
         // Tapis rekod murid yang HADIR sahaja
         const attendedRecords = (attData || []).filter(item => {
@@ -3417,13 +3823,12 @@ async function downloadBorangC6() {
 
         const totalAttended = attendedRecords.length;
 
-        // 5. Formatkan Tarikh & Hari Bahasa Melayu
+        // Formatkan Tarikh & Hari Bahasa Melayu
         const dateObj = new Date(selectedDate);
         const formattedDate = dateObj.toLocaleDateString('ms-MY', { day: '2-digit', month: '2-digit', year: 'numeric' });
         const daysMalay = ["Ahad", "Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu"];
         const dayName = daysMalay[dateObj.getDay()];
 
-	// 6. Tulis Dokumen Cetakan Lengkap (Borang C6 Kemaskini PK HEM)
         printWindow.document.open();
         printWindow.document.write(`
             <!DOCTYPE html>
@@ -3448,10 +3853,10 @@ async function downloadBorangC6() {
                         margin: 0 auto;
                     }
                     body { 
-                        font-family: 'Arial Narrow', 'Arial', sans-serif; 
+                        font-family: 'Arial', sans-serif; 
                         font-size: 11pt; 
                         color: #000; 
-                        line-height: 1.35; 
+                        line-height: 1.4; 
                     }
                     
                     .top-header { 
@@ -3464,34 +3869,44 @@ async function downloadBorangC6() {
                     }
                     .header-left-title { 
                         font-weight: bold; 
-                        font-size: 13pt; 
+                        font-size: 11pt; 
                     }
                     .borang-box { 
-                        border: 1px solid #000; 
-                        padding: 2px 8px; 
+                        font-weight: bold;
                         font-size: 10pt; 
-                        font-family: Calibri, sans-serif;
                     }
 
                     .center-title { 
                         text-align: center; 
                         font-weight: bold; 
-                        font-size: 13pt; 
+                        font-size: 12pt; 
                         margin-bottom: 2px; 
+                        text-transform: uppercase;
+                    }
+
+                    .school-title { 
+                        text-align: center; 
+                        font-weight: bold; 
+                        font-size: 12pt; 
+                        margin-bottom: 15px; 
+                        text-transform: uppercase;
                     }
                     
                     .no-ref { 
                         text-align: right; 
                         margin-top: 5px; 
-                        margin-bottom: 12px; 
+                        margin-bottom: 15px; 
                         font-size: 11pt; 
+                        font-weight: bold;
                     }
 
                     .sub-header-title {
                         text-align: center;
-                        font-size: 12.5pt;
+                        font-size: 11pt;
+                        font-weight: bold;
                         text-decoration: underline;
                         margin-bottom: 25px;
+                        text-transform: uppercase;
                     }
 
                     table.data-table { 
@@ -3500,7 +3915,7 @@ async function downloadBorangC6() {
                         margin-bottom: 30px; 
                     }
                     table.data-table td { 
-                        padding: 4px 0; 
+                        padding: 5px 0; 
                         vertical-align: bottom; 
                         font-size: 11pt; 
                     }
@@ -3509,14 +3924,14 @@ async function downloadBorangC6() {
                         border-bottom: 1px dotted #000;
                         display: inline-block;
                         width: 100%;
-                        min-height: 17px;
+                        min-height: 18px;
                     }
 
                     .dots-line-short {
                         border-bottom: 1px dotted #000;
                         display: inline-block;
-                        width: 180px;
-                        min-height: 17px;
+                        width: 200px;
+                        min-height: 18px;
                     }
                     
                     .val-overlay {
@@ -3525,20 +3940,14 @@ async function downloadBorangC6() {
                         text-transform: uppercase;
                     }
 
-                    /* JARAK RUANG COP & TANDATANGAN */
                     .section-block { 
-                        margin-bottom: 55px; 
+                        margin-bottom: 40px; 
                     }
                     
                     .section-title { 
                         font-weight: bold; 
-                        margin-bottom: 12px; 
+                        margin-bottom: 10px; 
                         font-size: 11pt; 
-                    }
-                    .section-title-normal {
-                        font-weight: normal;
-                        margin-bottom: 12px;
-                        font-size: 11pt;
                     }
 
                     .sig-table {
@@ -3558,9 +3967,11 @@ async function downloadBorangC6() {
                     }
                     
                     .footer-note { 
-                        font-size: 9pt; 
+                        font-size: 9.5pt; 
                         text-align: center; 
-                        margin-top: 40px; 
+                        margin-top: 30px; 
+                        border-top: 1px solid #000;
+                        padding-top: 8px;
                     }
                 </style>
             </head>
@@ -3571,19 +3982,21 @@ async function downloadBorangC6() {
                         <div class="borang-box">BORANG C6</div>
                     </div>
 
-                    <div class="center-title">BORANG PESANAN</div>
-                    <div class="no-ref">No : ……………</div>
+                    <!-- Tajuk Dinamik Dengan Nama Sekolah Dari Supabase -->
+                    <div class="center-title">BORANG PESANAN HARIAN RMT</div>
+                    <div class="school-title">${namaSekolah}</div>
+                    
+                    <div class="no-ref">NO : ……………</div>
 
                     <div class="sub-header-title">
-                        BEKALAN MAKANAN RANCANGAN MAKANAN TAMBAHAN
+                        BEKALAN MAKANAN RANCANGAN MAKANAN TAMBAHAN SEKOLAH
                     </div>
 
                     <table class="data-table">
                         <tr>
-                            <td style="width: 25%;">Tarikh pesanan dibuat</td>
-                            <td style="width: 3%;">:</td>
-                            <td style="width: 72%;">
-                                <!-- KOSONG UNTUK TULISAN TANGAN -->
+                            <td style="width: 28%;">Tarikh pesanan dibuat</td>
+                            <td style="width: 2%;">:</td>
+                            <td style="width: 70%;">
                                 <div class="dots-line-short"><span class="val-overlay"></span></div>
                             </td>
                         </tr>
@@ -3600,8 +4013,8 @@ async function downloadBorangC6() {
                             <td>
                                 <table style="width: 100%; border-collapse: collapse;">
                                     <tr>
-                                        <td style="width: 180px; padding:0;">
-                                            <div class="dots-line" style="width: 180px;"><span class="val-overlay">${dayName}</span></div>
+                                        <td style="width: 200px; padding:0;">
+                                            <div class="dots-line" style="width: 200px;"><span class="val-overlay">${dayName}</span></div>
                                         </td>
                                         <td style="text-align: right; padding:0 6px 0 10px; white-space: nowrap;">Tarikh Pelaksanaan</td>
                                         <td style="width: 12px; text-align: center; padding:0;">:</td>
@@ -3614,16 +4027,16 @@ async function downloadBorangC6() {
                         </tr>
                     </table>
 
-                    <!-- 1. PESANAN DIBUAT OLEH (PENYELARAS) -->
+                    <!-- 1. PESANAN DIBUAT OLEH -->
                     <div class="section-block">
-                        <div class="section-title">Pesanan dibuat oleh</div>
+                        <div class="section-title">Pesanan dibuat oleh:</div>
                         <table class="sig-table">
                             <tr>
                                 <td style="width: 55%;">
                                     <table style="width: 100%; border-collapse: collapse;">
                                         <tr>
-                                            <td style="width: 25%;">Nama</td>
-                                            <td style="width: 5%;">:</td>
+                                            <td style="width: 22%;">Nama</td>
+                                            <td style="width: 4%;">:</td>
                                             <td><div class="dots-line"><span class="val-overlay">${namaPenyelaras}</span></div></td>
                                         </tr>
                                         <tr>
@@ -3634,24 +4047,24 @@ async function downloadBorangC6() {
                                     </table>
                                 </td>
                                 <td style="width: 7%;"></td>
-                                <td style="width: 38%; vertical-align: top; padding-top: 15px;">
+                                <td style="width: 38%; vertical-align: top; padding-top: 10px;">
                                     <div class="dots-line"></div>
-                                    <div class="cap-text">(Tandatangan & Cop )</div>
+                                    <div class="cap-text">(Tandatangan & Cop)</div>
                                 </td>
                             </tr>
                         </table>
                     </div>
 
-                    <!-- 2. DISAHKAN OLEH (GURU BESAR) -->
+                    <!-- 2. DISAHKAN OLEH -->
                     <div class="section-block">
-                        <div class="section-title-normal">Disahkan oleh</div>
+                        <div class="section-title">Disahkan oleh:</div>
                         <table class="sig-table">
                             <tr>
                                 <td style="width: 55%;">
                                     <table style="width: 100%; border-collapse: collapse;">
                                         <tr>
-                                            <td style="width: 25%;">Nama</td>
-                                            <td style="width: 5%;">:</td>
+                                            <td style="width: 22%;">Nama</td>
+                                            <td style="width: 4%;">:</td>
                                             <td><div class="dots-line"><span class="val-overlay">${namaGB}</span></div></td>
                                         </tr>
                                         <tr>
@@ -3662,24 +4075,24 @@ async function downloadBorangC6() {
                                     </table>
                                 </td>
                                 <td style="width: 7%;"></td>
-                                <td style="width: 38%; vertical-align: top; padding-top: 15px;">
+                                <td style="width: 38%; vertical-align: top; padding-top: 10px;">
                                     <div class="dots-line"></div>
-                                    <div class="cap-text">(Tandatangan & Cop )</div>
+                                    <div class="cap-text">(Tandatangan & Cop)</div>
                                 </td>
                             </tr>
                         </table>
                     </div>
 
-                    <!-- 3. PEMBEKAL MAKANAN (KANTIN) -->
+                    <!-- 3. PEMBEKAL MAKANAN -->
                     <div class="section-block">
-                        <div class="section-title">Borang pesanan diterima oleh pembekal makanan</div>
+                        <div class="section-title">Borang pesanan diterima oleh pembekal makanan:</div>
                         <table class="sig-table">
                             <tr>
                                 <td style="width: 55%;">
                                     <table style="width: 100%; border-collapse: collapse;">
                                         <tr>
-                                            <td style="width: 25%;">Nama</td>
-                                            <td style="width: 5%;">:</td>
+                                            <td style="width: 22%;">Nama</td>
+                                            <td style="width: 4%;">:</td>
                                             <td><div class="dots-line"><span class="val-overlay">${namaKantin}</span></div></td>
                                         </tr>
                                         <tr>
@@ -3688,30 +4101,28 @@ async function downloadBorangC6() {
                                             <td><div class="dots-line"><span class="val-overlay">${jawatanKantin}</span></div></td>
                                         </tr>
                                         <tr>
-                                            <td>Tarikh</td>
+                                            <td>Tarikh terima</td>
                                             <td>:</td>
-                                            <!-- KOSONG UNTUK TULISAN TANGAN -->
                                             <td><div class="dots-line"><span class="val-overlay"></span></div></td>
                                         </tr>
                                     </table>
                                 </td>
                                 <td style="width: 7%;"></td>
-                                <td style="width: 38%; vertical-align: top; padding-top: 15px;">
+                                <td style="width: 38%; vertical-align: top; padding-top: 10px;">
                                     <div class="dots-line"></div>
-                                    <div class="cap-text">(Tandatangan & Cop )</div>
+                                    <div class="cap-text">(Tandatangan & Cop)</div>
                                 </td>
                             </tr>
                         </table>
                     </div>
 
                     <div class="footer-note">
-                        (Sila kepilkan salinan asal borang ini apabila membuat tuntutan bayaran)
+                        (Sila kepilkan salinan borang ini apabila membuat tuntutan bayaran)
                     </div>
                 </div>
             </body>
             </html>
         `);
-
 
         printWindow.document.close();
         printWindow.document.title = `BORANG C6 - PESANAN RMT (${formattedDate})`;
@@ -3724,7 +4135,7 @@ async function downloadBorangC6() {
 }
 
 // ==========================================
-// FUNGSI PENJANA & CETAK BORANG C8 (STABIL & TERDUSUN)
+// FUNGSI PENJANA & CETAK BORANG C8 (TANPA TANDATANGAN - FORMAT ASAL)
 // ==========================================
 async function printBorangC8() {
     const monthSelect = document.getElementById('reportMonthSelect');
@@ -3761,31 +4172,27 @@ async function printBorangC8() {
 
         if (errCurrent) console.error("Ralat attCurrent:", errCurrent);
 
-       // 2. LOGIK SUSUNAN KELAS (1->6) & NAMA (A-Z) - KALIS FORMAT (1A/1 AZKIYA)
+        // 2. LOGIK SUSUNAN KELAS (1->6) & NAMA (A-Z)
         let sortedStudents = [...(studentsData || [])];
 
         sortedStudents.sort((a, b) => {
             const rawKelasA = String(a.kelas || '').toUpperCase().trim();
             const rawKelasB = String(b.kelas || '').toUpperCase().trim();
 
-            // Ekstrak nombor darjah/tahun (1-6) di hadapan kelas
             const matchA = rawKelasA.match(/\d+/);
             const matchB = rawKelasB.match(/\d+/);
 
             const yearA = matchA ? parseInt(matchA[0], 10) : 99;
             const yearB = matchB ? parseInt(matchB[0], 10) : 99;
 
-            // 1. Susun mengikut Tahun/Darjah (Tahun 1 hingga Tahun 6)
             if (yearA !== yearB) {
                 return yearA - yearB;
             }
 
-            // 2. Jika Tahun sama, susun mengikut Nama Kelas (cth: 1A -> 1N / 1 Azkiya -> 1 Najihin)
             if (rawKelasA !== rawKelasB) {
                 return rawKelasA.localeCompare(rawKelasB);
             }
 
-            // 3. Jika Kelas sama, susun mengikut Nama Murid (A-Z)
             const namaA = String(a.nama_murid || a.nama || '').toUpperCase().trim();
             const namaB = String(b.nama_murid || b.nama || '').toUpperCase().trim();
             return namaA.localeCompare(namaB);
@@ -3806,7 +4213,7 @@ async function printBorangC8() {
 
         let tableRowsHtml = "";
 
-        // Loop murid yang telah disusun mengikut kelas & nama
+        // Loop murid yang telah disusun mengikut kelas & nama (Ketinggian 34px)
         sortedStudents.forEach((student, index) => {
             const singkatanKelas = typeof getSingkatanKelas === 'function' ? getSingkatanKelas(student.kelas) : student.kelas;
             const jantina = typeof getJantinaMurid === 'function' ? getJantinaMurid(student) : 'L';
@@ -3857,9 +4264,9 @@ async function printBorangC8() {
             }
 
             tableRowsHtml += `
-                <tr style="height: 20px;">
+                <tr style="height: 34px;">
                     <td style="text-align:center;">${index + 1}</td>
-                    <td style="text-align:left; font-size: 7.5pt; font-weight:normal; padding: 2px 3px; word-break: break-word; line-height: 1.1; text-transform:uppercase;">
+                    <td style="text-align:left; font-size: 8pt; font-weight:bold; padding: 2px 4px; word-break: break-word; line-height: 1.25; text-transform:uppercase;">
                         ${student.nama_murid || student.nama}
                     </td>
                     <td style="text-align:center;">${singkatanKelas}</td>
@@ -3872,17 +4279,17 @@ async function printBorangC8() {
             `;
         });
 
-        // 4. KEKALKAN REKABENTUK & MARGIN ASAL 100%
+        // 4. MARGIN & REKABENTUK FORMAL A4 LANDSCAPE (TANPA FOOTER TANDATANGAN)
         const printWindow = window.open('', '_blank');
         printWindow.document.write(`
             <!DOCTYPE html>
-            <html>
+            <html lang="ms">
             <head>
                 <title>REKOD KEHADIRAN MURID RMT - ${namaBulan} ${selectedYear}</title>
                 <style>
                     @page { 
                         size: A4 landscape; 
-                        margin: 0; 
+                        margin: 10mm 10mm 10mm 10mm; /* Jidar Kemas & Seimbang Bagi Semua Page */
                     }
                     * { box-sizing: border-box; }
                     html, body { 
@@ -3890,63 +4297,71 @@ async function printBorangC8() {
                         margin: 0; 
                         padding: 0;
                         background: #fff;
+                        font-family: Arial, sans-serif; 
+                        font-size: 8.5pt; 
+                        color: #000; 
                     }
                     .print-page {
-                        padding: 10mm 12mm 8mm 12mm;
                         width: 100%;
+                        padding: 2mm 2mm;
                         margin: 0 auto;
-                    }
-
-                    body { 
-                        font-family: 'Arial Narrow', 'Calibri', sans-serif; 
-                        font-size: 9pt; 
-                        color: #000; 
                     }
 
                     .header-container {
                         width: 100%;
                         position: relative;
                         margin-bottom: 8px;
+                        min-height: 25px;
                     }
 
                     .borang-label { 
                         position: absolute;
                         right: 0;
                         top: 0;
-                        font-size: 10pt; 
+                        border: 1px solid #000;
+                        padding: 2px 10px;
+                        font-size: 8.5pt; 
                         font-weight: bold; 
                     }
 
                     .doc-title { 
                         text-align: center;
-                        font-size: 15pt; 
+                        font-size: 13pt; 
                         font-weight: bold; 
                         text-transform: uppercase;
                         letter-spacing: 0.5px;
-                        padding-top: 5px;
+                        margin-top: 4px;
                     }
 
-                    table { 
+                    table.main-table { 
                         width: 100%; 
                         border-collapse: collapse; 
                         table-layout: fixed; 
+                        page-break-inside: auto;
                     }
 
-                    th, td { 
+                    table.main-table tr {
+                        height: 34px; /* Ketinggian Kotak Seragam 34px */
+                        page-break-inside: avoid;
+                        page-break-after: auto;
+                    }
+
+                    table.main-table th, table.main-table td { 
                         border: 1px solid #000; 
-                        padding: 0; 
-                        font-size: 8.5pt; 
+                        padding: 2px 1px; 
+                        font-size: 8pt; 
                         text-align: center; 
                         vertical-align: middle; 
                     }
 
-                    th { 
+                    table.main-table th { 
                         font-weight: bold; 
                         background-color: #ffffff;
+                        text-transform: uppercase;
                     }
 
                     .v-header-cell {
-                        height: 90px;
+                        height: 85px;
                         display: flex;
                         align-items: center;
                         justify-content: center;
@@ -3958,15 +4373,16 @@ async function printBorangC8() {
                         transform: rotate(180deg);
                         white-space: nowrap;
                         font-size: 6.5pt;
-                        letter-spacing: -0.3px;
+                        font-weight: bold;
+                        letter-spacing: -0.2px;
                         line-height: 1;
                     }
 
-                    .col-bil { width: 2.2%; }
-                    .col-nama { width: 22%; }
-                    .col-tahun { width: 2.2%; }
+                    .col-bil { width: 2.5%; }
+                    .col-nama { width: 21%; }
+                    .col-tahun { width: 2.5%; }
                     .col-jantina { width: 2.2%; }
-                    .col-day { width: 1.93%; }
+                    .col-day { width: 1.95%; }
                     .col-th-semasa { width: 4.8%; }
                     .col-th-lepas { width: 4.8%; }
                     .col-th-jumlah { width: 4.8%; }
@@ -3980,18 +4396,18 @@ async function printBorangC8() {
                         <div class="doc-title">REKOD KEHADIRAN MURID RMT</div>
                     </div>
 
-                    <table>
+                    <table class="main-table">
                         <thead>
                             <tr style="height: 22px;">
                                 <th rowspan="2" class="col-bil">BIL</th>
                                 <th rowspan="2" class="col-nama" style="text-align:center;">NAMA PENUH MURID</th>
-                                <th rowspan="2" class="col-tahun"><div class="v-header-cell" style="height: 110px;"><div class="v-text" style="font-size: 7.5pt;">TAHUN</div></div></th>
-                                <th rowspan="2" class="col-jantina"><div class="v-header-cell" style="height: 110px;"><div class="v-text" style="font-size: 7.5pt;">JANTINA</div></div></th>
-                                <th colspan="31" style="font-size: 9.5pt;">BULAN ${namaBulan} ${selectedYear}</th>
-                                <th colspan="3" style="font-size: 9.5pt;">TIDAK HADIR</th>
+                                <th rowspan="2" class="col-tahun"><div class="v-header-cell"><div class="v-text" style="font-size: 7.5pt;">TAHUN</div></div></th>
+                                <th rowspan="2" class="col-jantina"><div class="v-header-cell"><div class="v-text" style="font-size: 7.5pt;">JANTINA</div></div></th>
+                                <th colspan="31" style="font-size: 9pt;">BULAN ${namaBulan} ${selectedYear}</th>
+                                <th colspan="3" style="font-size: 9pt;">TIDAK HADIR</th>
                             </tr>
-                            <tr style="height: 88px;">
-                                ${Array.from({length: 31}, (_, i) => `<th class="col-day" style="font-size: 8pt;">${i + 1}</th>`).join('')}
+                            <tr style="height: 85px;">
+                                ${Array.from({length: 31}, (_, i) => `<th class="col-day" style="font-size: 7.5pt;">${i + 1}</th>`).join('')}
                                 <th class="col-th-semasa"><div class="v-header-cell"><div class="v-text">BULAN SEMASA</div></div></th>
                                 <th class="col-th-lepas"><div class="v-header-cell"><div class="v-text">BULAN LEPAS</div></div></th>
                                 <th class="col-th-jumlah"><div class="v-header-cell"><div class="v-text">JUMLAH SEMUA</div></div></th>
@@ -4001,19 +4417,6 @@ async function printBorangC8() {
                             ${tableRowsHtml}
                         </tbody>
                     </table>
-
-                    <div style="margin-top: 15px; display: flex; justify-content: space-between; font-size: 8.5pt; padding: 0 10px;">
-                        <div>
-                            <p>Disediakan oleh (Guru RMT):</p>
-                            <br><br>
-                            <p>___________________________</p>
-                        </div>
-                        <div>
-                            <p>Disahkan oleh (GB / PK HEM):</p>
-                            <br><br>
-                            <p>___________________________</p>
-                        </div>
-                    </div>
                 </div>
             </body>
             </html>
