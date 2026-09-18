@@ -1508,18 +1508,30 @@ async function onCameraScanSuccess(decodedText) {
 
     // 3. Jika murid dijumpai, tanda kehadiran ke Supabase
     if (student) {
+        let isSuccess = false;
         if (typeof markStudentAttendance === 'function') {
-            await markStudentAttendance(student.id);
+            // Memanggil penandaan kehadiran & menyemak samada rekod baharu berjaya (true) atau bertindih (false)
+            isSuccess = await markStudentAttendance(student.id);
         }
 
-        // 🟢 KEMASKINI REAL-TIME: Panggil refreshAllViews supaya Dashboard & Graf dikemaskini terus!
-        if (typeof refreshAllViews === 'function') {
+        // 🟢 KEMASKINI REAL-TIME: Muat semula pangkalan data Supabase & kemaskini Dashboard
+        if (typeof loadDataFromSupabase === 'function') {
+            await loadDataFromSupabase();
+        } else if (typeof refreshAllViews === 'function') {
             refreshAllViews();
         }
 
+        // 🟢 PAPARAN MESEJ KINEMATIK
         if (msgBox) {
-            msgBox.className = "mt-4 p-3 rounded-xl text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300";
-            msgBox.innerHTML = `<i class="fa-solid fa-circle-check"></i> Imbasan Berjaya!<br>${student.nama} (${student.kelas})`;
+            if (isSuccess) {
+                // Mesej Hijau: Imbasan Pertama Berjaya
+                msgBox.className = "mt-4 p-3 rounded-xl text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300";
+                msgBox.innerHTML = `<i class="fa-solid fa-circle-check"></i> Imbasan Berjaya!<br>${student.nama} (${student.kelas})`;
+            } else {
+                // Mesej Jingga: Imbasan Kali Kedua (Rekod Sudah Wujud)
+                msgBox.className = "mt-4 p-3 rounded-xl text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300";
+                msgBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Rekod Sudah Wujud!<br>${student.nama} telah pun diambil hari ini.`;
+            }
         }
     } else {
         if (msgBox) {
