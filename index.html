@@ -2201,7 +2201,12 @@ async function markStudentAttendance(studentId) {
         const student = studentsData.find(s => s.id === Number(studentId));
         showModal("Kehadiran Direkod!", `Sajian RMT disahkan untuk ${student ? student.nama : 'Murid'} bagi tarikh (${selectedDate}). Rekod disimpan ke Supabase.`);
         
+        // 🟢 KEMASKINI REAL-TIME: Panggil refreshAllViews supaya Dashboard & Graf terus bertukar tanpa perlu refresh!
         await loadAttendanceForSelectedDate();
+        if (typeof refreshAllViews === 'function') {
+            refreshAllViews();
+        }
+
         return true;
 
     } catch (err) {
@@ -2209,7 +2214,6 @@ async function markStudentAttendance(studentId) {
         return false;
     }
 }
-
       // --- Kemaskini Fungsi Attendance Pukal (Dengan Pengesahan) ---
         async function markAllPresent() {
             const dateInput = document.getElementById('attendanceDatePicker');
