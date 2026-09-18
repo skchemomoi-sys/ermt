@@ -4993,19 +4993,47 @@ async function loadImbanganNutrisi() {
 }
 
 // ==========================================
+// 🟢 PENDERIA REALTIME SUPABASE (SINKRONI TELEFON & PC)
+// ==========================================
+function initSupabaseRealtime() {
+    const client = typeof getActiveSupabase === 'function' ? getActiveSupabase() : null;
+    if (!client) return;
+    
+    client.channel('kehadiran-realtime-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'kehadiran_rmt' },
+        async (payload) => {
+            console.log('Perubahan data dikesan dari peranti lain!', payload);
+            
+            // Muat semula data dari Supabase secara automatik pada PC/Telefon ini
+            if (typeof loadDataFromSupabase === 'function') {
+                await loadDataFromSupabase();
+            } else if (typeof loadAttendanceForSelectedDate === 'function') {
+                await loadAttendanceForSelectedDate();
+                if (typeof refreshAllViews === 'function') refreshAllViews();
+            }
+        }
+      )
+      .subscribe();
+}
+
+// ==========================================
 // INISIALISASI PANGGILAN SISTEM (SINGLE EVENT LISTENER)
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Muat Data Pengurusan RMT, Tarikh Dinamik & Imbangan Nutrisi
+    // 1. Muat Data Pengurusan RMT, Tarikh Dinamik, Imbangan Nutrisi & Penderia Realtime
     if (typeof loadPengurusanRMTData === 'function') loadPengurusanRMTData();
     if (typeof updateDynamicDates === 'function') updateDynamicDates();
     loadImbanganNutrisi(); // Panggilan untuk Carta Nutrisi
+    initSupabaseRealtime(); // 🟢 Panggil penderia Realtime Supabase
 
     // Jika Supabase lambat diinisialisasi, cuba panggil semula selepas 500ms
     setTimeout(() => {
         if (typeof updateDynamicDates === 'function') updateDynamicDates();
         if (typeof loadPengurusanRMTData === 'function') loadPengurusanRMTData();
         loadImbanganNutrisi(); // Panggilan semula Carta Nutrisi (fallback)
+        initSupabaseRealtime();
     }, 500);
 
     // 2. Muatkan fungsi-fungsi modul lain (jika wujud)
