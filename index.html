@@ -91,6 +91,38 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
+
+	/* --- CSS UNTUK KUNCUP SIDEBAR (COLLAPSED MODE) --- */
+        aside.collapsed-sidebar {
+            width: 5rem !important; /* Kelebaran 80px semasa kuncup */
+        }
+        aside.collapsed-sidebar .sidebar-text,
+        aside.collapsed-sidebar #roleBadgeContainer label,
+        aside.collapsed-sidebar .sidebar-badge-tag {
+            display: none !important;
+        }
+        aside.collapsed-sidebar #roleBadgeContainer {
+            justify-content: center !important;
+            padding: 0.75rem 0 !important;
+        }
+        aside.collapsed-sidebar .p-5,
+        aside.collapsed-sidebar .px-4,
+        aside.collapsed-sidebar .p-4,
+        aside.collapsed-sidebar .px-3 {
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+        }
+        aside.collapsed-sidebar #sidebar_nama_sekolah,
+        aside.collapsed-sidebar #sidebar_kod_sekolah {
+            display: none !important;
+        }
+        aside.collapsed-sidebar #sidebar_lencana,
+        aside.collapsed-sidebar #sidebar_lencana_icon {
+            width: 2.25rem !important;
+            height: 2.25rem !important;
+            margin: 0 auto !important;
+        }
+
       /* CSS Tambahan Untuk Jadual Pilihan Cetak QR & Paparan RFID */
         @media print {
             body * { visibility: hidden !important; }
@@ -235,114 +267,122 @@
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 min-h-screen flex flex-col md:flex-row antialiased selection:bg-emerald-200">
 
-   <!-- Sidebar / Navigation -->
-<aside class="w-full md:w-64 bg-slate-900 text-white flex-shrink-0 z-30 shadow-xl flex flex-col no-print">
+  <!-- Sidebar / Navigation -->
+<aside id="mainSidebar" class="w-full md:w-64 bg-slate-900 text-white flex-shrink-0 z-30 shadow-xl flex flex-col no-print transition-all duration-300">
     <!-- Logo & Branding -->
     <div class="p-5 flex items-center justify-between border-b border-slate-800">
-        <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-emerald-500/30">
+        <div class="flex items-center space-x-3 min-w-0">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-emerald-500/30 shrink-0">
                 <i class="fa-solid font-bold fa-utensils"></i>
             </div>
-            <div>
+            <div class="sidebar-text transition-all duration-300 truncate">
                 <h1 class="font-bold text-lg leading-tight tracking-wide text-white">e-RMT Sekolah</h1>
                 <p class="text-[10px] text-emerald-400 font-medium flex items-center gap-1">
                     <i class="fa-solid fa-cloud text-[9px]"></i> Terhubung Supabase
                 </p>
             </div>
         </div>
-        <button id="mobileMenuBtn" class="md:hidden text-slate-400 hover:text-white focus:outline-none">
-            <i class="fa-solid fa-bars text-xl"></i>
-        </button>
+        <!-- Butang Toggle Sidebar (PC) & Menu Mobile -->
+        <div class="flex items-center gap-1 shrink-0">
+            <button onclick="toggleSidebarCollapse()" class="hidden md:flex text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition" title="Kuncup/Kembang Sidebar">
+                <i id="collapseBtnIcon" class="fa-solid fa-chevron-left text-sm"></i>
+            </button>
+            <button id="mobileMenuBtn" class="md:hidden text-slate-400 hover:text-white focus:outline-none p-1.5">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+        </div>
     </div>
 
-    <!-- Role Badge Display -->
+    <!-- Role Badge Display (Kemaskini Kuncup) -->
     <div class="px-4 pt-4 pb-2">
-        <label class="text-[10px] uppercase tracking-wider font-semibold text-slate-400 block mb-1">Status Mod Akses</label>
-        <div id="roleBadgeContainer" class="bg-slate-800 text-xs rounded-xl p-3 border border-slate-700 flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-                <span id="roleBadgeIcon" class="w-2.5 h-2.5 rounded-full bg-blue-400"></span>
-                <span id="roleBadgeText" class="font-semibold text-slate-200">Akses Awam / Ibu Bapa</span>
+        <label class="sidebar-text text-[10px] uppercase tracking-wider font-semibold text-slate-400 block mb-1">Status Mod Akses</label>
+        <div id="roleBadgeContainer" class="bg-slate-800 text-xs rounded-xl p-3 border border-slate-700 flex items-center justify-between transition-all duration-300">
+            <div class="flex items-center space-x-2 min-w-0">
+                <span id="roleBadgeIcon" class="w-2.5 h-2.5 rounded-full bg-blue-400 shrink-0"></span>
+                <span id="roleBadgeText" class="sidebar-text font-semibold text-slate-200 truncate">Akses Awam / Ibu Bapa</span>
             </div>
         </div>
     </div>
 
-    <!-- Menu Navigation Links -->
+  <!-- Menu Navigation Links (Kalis Kuncup) -->
     <nav id="navMenu" class="hidden md:block flex-1 px-3 py-3 space-y-1 overflow-y-auto custom-scrollbar">
         <!-- Tab Awam -->
-        <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 text-white shadow-md shadow-emerald-900/30">
-            <i class="fa-solid fa-chart-pie w-5 text-center"></i>
-            <span>Dashboard Utama</span>
+        <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 text-white shadow-md shadow-emerald-900/30" title="Dashboard Utama">
+            <i class="fa-solid fa-chart-pie w-5 text-center shrink-0"></i>
+            <span class="sidebar-text transition-all duration-300">Dashboard Utama</span>
         </a>
-        <a href="#" onclick="switchTab('kehadiran')" id="nav-kehadiran" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
-            <i class="fa-solid fa-qrcode w-5 text-center"></i>
-            <span>Semakan Kehadiran</span>
+        <a href="#" onclick="switchTab('kehadiran')" id="nav-kehadiran" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition" title="Semakan Kehadiran">
+            <i class="fa-solid fa-qrcode w-5 text-center shrink-0"></i>
+            <span class="sidebar-text transition-all duration-300">Semakan Kehadiran</span>
         </a>
-        <a href="#" onclick="switchTab('menu')" id="nav-menu" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
-            <i class="fa-solid fa-utensils w-5 text-center"></i>
-            <span>Menu RMT Mingguan</span>
+        <a href="#" onclick="switchTab('menu')" id="nav-menu" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition" title="Menu RMT Mingguan">
+            <i class="fa-solid fa-utensils w-5 text-center shrink-0"></i>
+            <span class="sidebar-text transition-all duration-300">Menu RMT Mingguan</span>
         </a>
         
         <!-- Tab Awam Senarai Murid RMT -->
-        <a href="#" onclick="switchTab('senarai-murid-awam'); loadSenaraiMuridAwam();" id="nav-senarai-murid-awam" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
-            <i class="fa-solid fa-user-graduate w-5 text-center"></i>
-            <span>Senarai Murid Penerima RMT</span>
+        <a href="#" onclick="switchTab('senarai-murid-awam'); loadSenaraiMuridAwam();" id="nav-senarai-murid-awam" class="nav-item flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition" title="Senarai Murid Penerima RMT">
+            <i class="fa-solid fa-user-graduate w-5 text-center shrink-0"></i>
+            <span class="sidebar-text transition-all duration-300">Senarai Murid Penerima RMT</span>
         </a>
         
         <!-- Tab Pengurusan Data Murid (Khusus Admin) -->
-        <a href="#" onclick="handleAdminTabClick('pengurusan-murid')" id="nav-pengurusan-murid" class="nav-item admin-only hidden flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
-            <div class="flex items-center space-x-3">
-                <i class="fa-solid fa-users-gear w-5 text-center text-emerald-400"></i>
-                <span>Pengurusan Data Murid</span>
+        <a href="#" onclick="handleAdminTabClick('pengurusan-murid')" id="nav-pengurusan-murid" class="nav-item admin-only hidden flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition" title="Pengurusan Data Murid">
+            <div class="flex items-center space-x-3 min-w-0">
+                <i class="fa-solid fa-users-gear w-5 text-center text-emerald-400 shrink-0"></i>
+                <span class="sidebar-text transition-all duration-300 truncate">Pengurusan Data Murid</span>
             </div>
-            <span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded uppercase font-bold">Admin</span>
+            <span class="sidebar-badge-tag text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded uppercase font-bold shrink-0">Admin</span>
         </a>
 
         <!-- Tab Pengurusan RMT (Khusus Admin) -->
-        <a href="#" onclick="handleAdminTabClick('pengurusan-rmt')" id="nav-pengurusan-rmt" class="nav-item admin-only hidden flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
-            <div class="flex items-center space-x-3">
-                <i class="fa-solid fa-user-tie w-5 text-center text-emerald-400"></i>
-                <span>Pengurusan RMT</span>
+        <a href="#" onclick="handleAdminTabClick('pengurusan-rmt')" id="nav-pengurusan-rmt" class="nav-item admin-only hidden flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition" title="Pengurusan RMT">
+            <div class="flex items-center space-x-3 min-w-0">
+                <i class="fa-solid fa-user-tie w-5 text-center text-emerald-400 shrink-0"></i>
+                <span class="sidebar-text transition-all duration-300 truncate">Pengurusan RMT</span>
             </div>
-            <span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded uppercase font-bold">Admin</span>
+            <span class="sidebar-badge-tag text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded uppercase font-bold shrink-0">Admin</span>
         </a>
 
         <!-- Tab Laporan khusus Admin/PK HEM (LAST TAB) -->
-        <a href="#" onclick="handleAdminTabClick('laporan')" id="nav-laporan" class="nav-item admin-only hidden flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
-            <div class="flex items-center space-x-3">
-                <i class="fa-solid fa-file-invoice w-5 text-center text-emerald-400"></i>
-                <span>Laporan & Tuntutan</span>
+        <a href="#" onclick="handleAdminTabClick('laporan')" id="nav-laporan" class="nav-item admin-only hidden flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition" title="Laporan & Tuntutan">
+            <div class="flex items-center space-x-3 min-w-0">
+                <i class="fa-solid fa-file-invoice w-5 text-center text-emerald-400 shrink-0"></i>
+                <span class="sidebar-text transition-all duration-300 truncate">Laporan & Tuntutan</span>
             </div>
-            <span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded uppercase font-bold">Admin</span>
+            <span class="sidebar-badge-tag text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded uppercase font-bold shrink-0">Admin</span>
         </a>
     </nav>
 
-<!-- School Info Footer & Login Button -->
-    <div class="p-4 border-t border-slate-800 bg-slate-950/50 space-y-3">
-        <div id="authButtonSection">
-            <button onclick="openLoginModal()" id="loginSideBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/40">
-                <i class="fa-solid fa-right-to-bracket"></i> Log Masuk Admin / Guru
-            </button>
-            <button onclick="logoutAdmin()" id="logoutSideBtn" class="hidden w-full bg-slate-800 hover:bg-rose-950 text-rose-300 hover:text-rose-200 border border-slate-700 font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i> Log Keluar Mod Admin
-            </button>
+   <!-- School Info Footer & Login Button (Kalis Kuncup) -->
+<div class="p-4 border-t border-slate-800 bg-slate-950/50 space-y-3">
+    <div id="authButtonSection">
+        <button onclick="openLoginModal()" id="loginSideBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/40" title="Log Masuk Admin / Guru">
+            <i class="fa-solid fa-right-to-bracket shrink-0"></i> 
+            <span class="sidebar-text transition-all duration-300">Log Masuk Admin / Guru</span>
+        </button>
+        <button onclick="logoutAdmin()" id="logoutSideBtn" class="hidden w-full bg-slate-800 hover:bg-rose-950 text-rose-300 hover:text-rose-200 border border-slate-700 font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2" title="Log Keluar Mod Admin">
+            <i class="fa-solid fa-arrow-right-from-bracket shrink-0"></i> 
+            <span class="sidebar-text transition-all duration-300">Log Keluar Mod Admin</span>
+        </button>
+    </div>
+
+    <!-- BANNER SEKOLAH DINAMIK (LENCANA BESAR & JELAS) -->
+    <div class="flex items-center space-x-3 pt-3 border-t border-slate-800/80">
+        <!-- Img Lencana Dinamik -->
+        <img id="sidebar_lencana" src="" alt="Lencana Sekolah" class="w-12 h-12 object-contain rounded-xl bg-white/10 p-1 shadow-md shrink-0 hidden">
+        
+        <!-- Icon Fallback jika lencana tiada -->
+        <div id="sidebar_lencana_icon" class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-emerald-400 text-base shrink-0 shadow-inner">
+            <i class="fa-solid fa-school"></i>
         </div>
 
-      <!-- BANNER SEKOLAH DINAMIK (LENCANA BESAR & JELAS) -->
-        <div class="flex items-center space-x-3 pt-3 border-t border-slate-800/80">
-            <!-- Img Lencana Dinamik (Dibesarkan ke w-14 h-14) -->
-            <img id="sidebar_lencana" src="" alt="Lencana Sekolah" class="w-14 h-14 object-contain rounded-xl bg-white/10 p-1 shadow-md shrink-0 hidden">
-            
-            <!-- Icon Fallback jika lencana tiada (Dibesarkan) -->
-            <div id="sidebar_lencana_icon" class="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center text-emerald-400 text-lg shrink-0 shadow-inner">
-                <i class="fa-solid fa-school"></i>
-            </div>
-
-            <div class="truncate min-w-0">
-                <p id="sidebar_nama_sekolah" class="text-xs font-bold text-white truncate uppercase tracking-wide">MEMUATKAN...</p>
-                <p id="sidebar_kod_sekolah" class="text-[10px] text-emerald-400 font-medium mt-0.5">Kod Sekolah: -</p>
-            </div>
+        <div class="sidebar-text truncate min-w-0 transition-all duration-300">
+            <p id="sidebar_nama_sekolah" class="text-xs font-bold text-white truncate uppercase tracking-wide">MEMUATKAN...</p>
+            <p id="sidebar_kod_sekolah" class="text-[10px] text-emerald-400 font-medium mt-0.5">Kod Sekolah: -</p>
         </div>
     </div>
+</div>
 </aside>
     <!-- Main Content Container -->
     <main class="flex-1 flex flex-col min-w-0 overflow-y-auto custom-scrollbar h-screen no-print">
@@ -2822,6 +2862,47 @@ function setSystemTheme(themeName) {
             const savedTheme = localStorage.getItem('selectedRmtTheme') || 'emerald';
             setSystemTheme(savedTheme);
         }
+
+
+	// ==========================================
+        // MODUL KUNCUP / KEMBANG SIDEBAR (COLLAPSIBLE)
+        // ==========================================
+        function toggleSidebarCollapse() {
+            const sidebar = document.getElementById('mainSidebar');
+            const icon = document.getElementById('collapseBtnIcon');
+            
+            if (!sidebar) return;
+
+            sidebar.classList.toggle('collapsed-sidebar');
+
+            const isCollapsed = sidebar.classList.contains('collapsed-sidebar');
+
+            // Tukar ikon butang anak panah (< atau >)
+            if (icon) {
+                if (isCollapsed) {
+                    icon.className = 'fa-solid fa-chevron-right text-sm';
+                } else {
+                    icon.className = 'fa-solid fa-chevron-left text-sm';
+                }
+            }
+
+            // Simpan status kuncup dalam localStorage
+            localStorage.setItem('sidebarCollapsedState', isCollapsed ? 'true' : 'false');
+        }
+
+        function loadSavedSidebarState() {
+            const isCollapsed = localStorage.getItem('sidebarCollapsedState') === 'true';
+            const sidebar = document.getElementById('mainSidebar');
+            const icon = document.getElementById('collapseBtnIcon');
+
+            if (isCollapsed && sidebar) {
+                sidebar.classList.add('collapsed-sidebar');
+                if (icon) icon.className = 'fa-solid fa-chevron-right text-sm';
+            }
+        }
+	
+
+	
 let attendanceChartInstance = null;
 
 async function initCharts() {
@@ -5226,6 +5307,7 @@ function initSupabaseRealtime() {
 document.addEventListener('DOMContentLoaded', () => {
     // 🟢 Panggil fungsi muat tema tersimpan
     loadSavedTheme();
+    loadSavedSidebarState();
 
     if (typeof loadPengurusanRMTData === 'function') loadPengurusanRMTData();
     if (typeof updateDynamicDates === 'function') updateDynamicDates();
