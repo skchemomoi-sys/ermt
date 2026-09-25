@@ -19,18 +19,18 @@
     <!-- QRCode.js Generator Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
    
-    <script>
+   <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
                         brand: {
-                            50: '#ecfdf5',
-                            100: '#d1fae5',
-                            500: '#10b981',
-                            600: '#059669',
-                            700: '#047857',
-                            800: '#065f46',
+                            50: 'var(--brand-50)',
+                            100: 'var(--brand-100)',
+                            500: 'var(--brand-500)',
+                            600: 'var(--brand-600)',
+                            700: 'var(--brand-700)',
+                            800: 'var(--brand-800)',
                         }
                     },
                     fontFamily: {
@@ -41,6 +41,42 @@
         }
     </script>
     <style>
+        /* --- TETAPAN PEMBOLEHUBAH TEMA WARNA DINAMIK --- */
+        :root {
+            --brand-50: #ecfdf5;
+            --brand-100: #d1fae5;
+            --brand-500: #10b981;
+            --brand-600: #059669;
+            --brand-700: #047857;
+            --brand-800: #065f46;
+            --theme-color: #059669;
+        }
+
+        /* Class Pilihan Warna Tema */
+        body.theme-emerald {
+            --brand-50: #ecfdf5; --brand-100: #d1fae5; --brand-500: #10b981;
+            --brand-600: #059669; --brand-700: #047857; --brand-800: #065f46;
+            --theme-color: #059669;
+        }
+
+        body.theme-purple {
+            --brand-50: #faf5ff; --brand-100: #f3e8ff; --brand-500: #a855f7;
+            --brand-600: #9333ea; --brand-700: #7e22ce; --brand-800: #6b21a8;
+            --theme-color: #9333ea;
+        }
+
+        body.theme-blue {
+            --brand-50: #eff6ff; --brand-100: #dbeafe; --brand-500: #3b82f6;
+            --brand-600: #2563eb; --brand-700: #1d4ed8; --brand-800: #1e40af;
+            --theme-color: #2563eb;
+        }
+
+        body.theme-rose {
+            --brand-50: #fff1f2; --brand-100: #ffe4e6; --brand-500: #f43f5e;
+            --brand-600: #e11d48; --brand-700: #be123c; --brand-800: #9f1239;
+            --theme-color: #e11d48;
+        }
+
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -291,19 +327,19 @@
             </button>
         </div>
 
-        <!-- BANNER SEKOLAH DINAMIK (DENGAN LENCANA) -->
-        <div class="flex items-center space-x-3 pt-2 border-t border-slate-800/80">
-            <!-- Img Lencana Dinamik (Menggantikan ikon sekolah statik) -->
-            <img id="sidebar_lencana" src="" alt="Lencana" class="w-8 h-8 object-contain rounded-md bg-white/10 p-0.5 hidden">
+      <!-- BANNER SEKOLAH DINAMIK (LENCANA BESAR & JELAS) -->
+        <div class="flex items-center space-x-3 pt-3 border-t border-slate-800/80">
+            <!-- Img Lencana Dinamik (Dibesarkan ke w-14 h-14) -->
+            <img id="sidebar_lencana" src="" alt="Lencana Sekolah" class="w-14 h-14 object-contain rounded-xl bg-white/10 p-1 shadow-md shrink-0 hidden">
             
-            <!-- Icon Fallback jika lencana tiada -->
-            <div id="sidebar_lencana_icon" class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 text-xs shrink-0">
+            <!-- Icon Fallback jika lencana tiada (Dibesarkan) -->
+            <div id="sidebar_lencana_icon" class="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center text-emerald-400 text-lg shrink-0 shadow-inner">
                 <i class="fa-solid fa-school"></i>
             </div>
 
-            <div class="truncate">
-                <p id="sidebar_nama_sekolah" class="text-xs font-semibold text-slate-200 truncate uppercase">MEMUATKAN...</p>
-                <p id="sidebar_kod_sekolah" class="text-[10px] text-slate-400">Kod Sekolah: -</p>
+            <div class="truncate min-w-0">
+                <p id="sidebar_nama_sekolah" class="text-xs font-bold text-white truncate uppercase tracking-wide">MEMUATKAN...</p>
+                <p id="sidebar_kod_sekolah" class="text-[10px] text-emerald-400 font-medium mt-0.5">Kod Sekolah: -</p>
             </div>
         </div>
     </div>
@@ -321,10 +357,35 @@
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span id="dbStatusText">Supabase Online</span>
                 </div>
-                <div class="bg-slate-100 text-slate-700 text-xs px-3 py-1.5 rounded-full font-medium flex items-center gap-2">
+               
+              <div class="bg-slate-100 text-slate-700 text-xs px-3 py-1.5 rounded-full font-medium flex items-center gap-2">
                     <i class="fa-regular fa-calendar text-emerald-600"></i>
                     <span id="header-date-badge">Memuatkan tarikh...</span>
                 </div>
+
+                <!-- PEMILIH TEMA WARNA (BARU) -->
+                <div class="relative">
+                    <button onclick="toggleThemeDropdown()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs px-3 py-1.5 rounded-full font-medium flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-palette text-emerald-600"></i>
+                        <span>Tema</span>
+                    </button>
+                    <div id="themeDropdown" class="hidden absolute right-0 mt-2 w-44 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 z-50 no-print">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase px-2 py-1">Pilih Warna Tema</p>
+                        <button onclick="setSystemTheme('emerald')" class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs text-slate-700 hover:bg-emerald-50 transition font-medium">
+                            <span class="w-3.5 h-3.5 rounded-full bg-emerald-500"></span> Hijau Emerald
+                        </button>
+                        <button onclick="setSystemTheme('purple')" class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs text-slate-700 hover:bg-purple-50 transition font-medium">
+                            <span class="w-3.5 h-3.5 rounded-full bg-purple-600"></span> Ungu Violet
+                        </button>
+                        <button onclick="setSystemTheme('blue')" class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs text-slate-700 hover:bg-blue-50 transition font-medium">
+                            <span class="w-3.5 h-3.5 rounded-full bg-blue-600"></span> Biru Laut
+                        </button>
+                        <button onclick="setSystemTheme('rose')" class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs text-slate-700 hover:bg-rose-50 transition font-medium">
+                            <span class="w-3.5 h-3.5 rounded-full bg-rose-600"></span> Merah Mawar
+                        </button>
+                    </div>
+                </div>
+
                 <button onclick="openLoginModal()" id="topLoginBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition flex items-center gap-2 shadow">
                     <i class="fa-solid fa-lock text-xs"></i> Log Masuk Guru RMT
                 </button>
@@ -2687,6 +2748,80 @@ function renderWeeklyMenu() {
             document.getElementById('actionModal').classList.add('hidden');
         }
 
+
+	// ==========================================
+        // MODUL PENUKAR TEMA WARNA DINAMIK
+        // ==========================================
+        function toggleThemeDropdown() {
+            const dropdown = document.getElementById('themeDropdown');
+            if (dropdown) dropdown.classList.toggle('hidden');
+        }
+
+       
+function setSystemTheme(themeName) {
+            // Pemetaan warna mengikut tema
+            const themeColors = {
+                emerald: { main: '#059669', light: '#ecfdf5', border: '#a7f3d0', dark: '#047857' },
+                purple:  { main: '#9333ea', light: '#faf5ff', border: '#e9d5ff', dark: '#7e22ce' },
+                blue:    { main: '#2563eb', light: '#eff6ff', border: '#bfdbfe', dark: '#1d4ed8' },
+                rose:    { main: '#e11d48', light: '#fff1f2', border: '#fecdd3', dark: '#be123c' }
+            };
+
+            const colors = themeColors[themeName] || themeColors.emerald;
+
+            // 1. Simpan pilihan dalam memori pelayar
+            localStorage.setItem('selectedRmtTheme', themeName);
+
+            // 2. Buang style tag tema lama jika wujud
+            let oldStyle = document.getElementById('dynamic-theme-style');
+            if (oldStyle) oldStyle.remove();
+
+            // 3. Suntik CSS Baharu untuk menukar warna elemen secara langsung
+            const style = document.createElement('style');
+            style.id = 'dynamic-theme-style';
+            style.innerHTML = `
+                /* Tukar Warna Latar Belakang Utama */
+                .bg-emerald-600, .bg-emerald-500, #navMenu .bg-emerald-600 { 
+                    background-color: ${colors.main} !important; 
+                }
+                .hover\\:bg-emerald-700:hover, .hover\\:bg-emerald-500:hover { 
+                    background-color: ${colors.dark} !important; 
+                }
+
+                /* Tukar Warna Latar Belakang Ringan (Badges/Kad) */
+                .bg-emerald-50, .bg-emerald-100, .bg-emerald-500\\/20 { 
+                    background-color: ${colors.light} !important; 
+                }
+
+                /* Tukar Warna Teks */
+                .text-emerald-600, .text-emerald-700, .text-emerald-500, .text-emerald-400, .text-emerald-300 { 
+                    color: ${colors.main} !important; 
+                }
+
+                /* Tukar Warna Sempadan (Border) */
+                .border-emerald-500, .border-emerald-300, .border-emerald-200, .border-emerald-100 { 
+                    border-color: ${colors.border} !important; 
+                }
+
+                /* Banner Utama Dashboard & Butang */
+                .from-emerald-600 { --tw-gradient-from: ${colors.main} !important; }
+                .to-teal-700 { --tw-gradient-to: ${colors.dark} !important; }
+            `;
+            document.head.appendChild(style);
+
+            // 4. Sembunyikan tetingkap dropdown
+            const dropdown = document.getElementById('themeDropdown');
+            if (dropdown) dropdown.classList.add('hidden');
+
+            // 5. Kemaskini semula carta jika wujud
+            if (typeof initCharts === 'function') initCharts();
+            if (typeof loadImbanganNutrisi === 'function') loadImbanganNutrisi();
+        }
+
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('selectedRmtTheme') || 'emerald';
+            setSystemTheme(savedTheme);
+        }
 let attendanceChartInstance = null;
 
 async function initCharts() {
@@ -5089,6 +5224,9 @@ function initSupabaseRealtime() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 🟢 Panggil fungsi muat tema tersimpan
+    loadSavedTheme();
+
     if (typeof loadPengurusanRMTData === 'function') loadPengurusanRMTData();
     if (typeof updateDynamicDates === 'function') updateDynamicDates();
     loadImbanganNutrisi(); 
