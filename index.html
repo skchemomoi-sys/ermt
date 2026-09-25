@@ -357,7 +357,7 @@
    <!-- School Info Footer & Login Button (Kalis Kuncup) -->
 <div class="p-4 border-t border-slate-800 bg-slate-950/50 space-y-3">
     <div id="authButtonSection">
-        <button onclick="openLoginModal()" id="loginSideBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/40" title="Log Masuk Admin / Guru">
+       <button onclick="openLoginModal()" id="loginSideBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2 shadow-md" title="Log Masuk Admin / Guru">
             <i class="fa-solid fa-right-to-bracket shrink-0"></i> 
             <span class="sidebar-text transition-all duration-300">Log Masuk Admin / Guru</span>
         </button>
@@ -409,21 +409,52 @@
                         <i class="fa-solid fa-palette text-emerald-600"></i>
                         <span>Tema</span>
                     </button>
-                    <div id="themeDropdown" class="hidden absolute right-0 mt-2 w-44 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 z-50 no-print">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase px-2 py-1">Pilih Warna Tema</p>
-                        <button onclick="setSystemTheme('emerald')" class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs text-slate-700 hover:bg-emerald-50 transition font-medium">
-                            <span class="w-3.5 h-3.5 rounded-full bg-emerald-500"></span> Hijau Emerald
-                        </button>
-                        <button onclick="setSystemTheme('purple')" class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs text-slate-700 hover:bg-purple-50 transition font-medium">
-                            <span class="w-3.5 h-3.5 rounded-full bg-purple-600"></span> Ungu Violet
-                        </button>
-                        <button onclick="setSystemTheme('blue')" class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs text-slate-700 hover:bg-blue-50 transition font-medium">
-                            <span class="w-3.5 h-3.5 rounded-full bg-blue-600"></span> Biru Laut
-                        </button>
-                        <button onclick="setSystemTheme('rose')" class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs text-slate-700 hover:bg-rose-50 transition font-medium">
-                            <span class="w-3.5 h-3.5 rounded-full bg-rose-600"></span> Merah Mawar
-                        </button>
-                    </div>
+                 	
+			<!-- DROPDOWN PILIHAN WARNA TEMA (8 PILIHAN WARNA) -->
+<div id="themeDropdown" class="hidden absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl border border-slate-100 py-2 z-50 transition-all max-h-80 overflow-y-auto custom-scrollbar">
+    <p class="px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">Pilih Warna Tema</p>
+    
+    <button onclick="setSystemTheme('emerald')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition">
+        <span class="w-3.5 h-3.5 rounded-full shrink-0 shadow-sm" style="background-color: #059669 !important;"></span>
+        <span class="font-medium">Hijau Emerald</span>
+    </button>
+    
+    <button onclick="setSystemTheme('teal')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition">
+        <span class="w-3.5 h-3.5 rounded-full shrink-0 shadow-sm" style="background-color: #0d9488 !important;"></span>
+        <span class="font-medium">Teal Moden</span>
+    </button>
+
+    <button onclick="setSystemTheme('blue')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition">
+        <span class="w-3.5 h-3.5 rounded-full shrink-0 shadow-sm" style="background-color: #2563eb !important;"></span>
+        <span class="font-medium">Biru Laut</span>
+    </button>
+
+    <button onclick="setSystemTheme('indigo')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition">
+        <span class="w-3.5 h-3.5 rounded-full shrink-0 shadow-sm" style="background-color: #4f46e5 !important;"></span>
+        <span class="font-medium">Indigo Gelap</span>
+    </button>
+
+    <button onclick="setSystemTheme('purple')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition">
+        <span class="w-3.5 h-3.5 rounded-full shrink-0 shadow-sm" style="background-color: #9333ea !important;"></span>
+        <span class="font-medium">Ungu Violet</span>
+    </button>
+    
+    <button onclick="setSystemTheme('rose')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition">
+        <span class="w-3.5 h-3.5 rounded-full shrink-0 shadow-sm" style="background-color: #e11d48 !important;"></span>
+        <span class="font-medium">Merah Mawar</span>
+    </button>
+
+    <button onclick="setSystemTheme('amber')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition">
+        <span class="w-3.5 h-3.5 rounded-full shrink-0 shadow-sm" style="background-color: #d97706 !important;"></span>
+        <span class="font-medium">Kuning Emas</span>
+    </button>
+
+    <button onclick="setSystemTheme('slate')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition">
+        <span class="w-3.5 h-3.5 rounded-full shrink-0 shadow-sm" style="background-color: #475569 !important;"></span>
+        <span class="font-medium">Kelabu Premium</span>
+    </button>
+</div>
+
                 </div>
 
                 <button onclick="openLoginModal()" id="topLoginBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition flex items-center gap-2 shadow">
@@ -603,38 +634,38 @@
     </div>
 </div>
 </div>
-    <!-- Today's Menu Highlight Banner (Versi Kemas & Dinamik) -->
-    <div class="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
-        <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div>
-                <div class="flex items-center space-x-2">
-                    <span id="menu-day-title" class="bg-emerald-800/60 backdrop-blur text-emerald-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
-                        MENU HARI INI (MEMUATKAN...)
-                    </span>
-                    <span class="bg-white/20 text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1">
-                        <i class="fa-solid fa-circle text-[8px] text-emerald-300"></i> Terpelihara Halal
-                    </span>
-                </div>
-                
-                <h3 id="menu-today-food" class="text-2xl font-bold mt-3 flex items-center gap-2 flex-wrap">
-                    Memuatkan menu...
-                </h3>
-                
-                <p class="text-emerald-100 text-sm mt-1">
-                    Disediakan oleh: <span id="menu-canteen-name" class="font-semibold text-white">Memuatkan...</span>
-                </p>
+   <!-- Today's Menu Highlight Banner (Versi Solid Dynamic Theme) -->
+<div id="todayMenuHighlight" class="bg-emerald-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden transition-all duration-300">
+    <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+            <div class="flex items-center space-x-2">
+                <span id="menu-day-title" class="bg-white/20 backdrop-blur text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
+                    MENU HARI INI (MEMUATKAN...)
+                </span>
+                <span class="bg-white/20 text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1">
+                    <i class="fa-solid fa-circle text-[8px] text-white"></i> Terpelihara Halal
+                </span>
             </div>
-            <div class="flex flex-wrap items-center gap-3">
-                <button onclick="switchTab('kehadiran')" class="bg-white text-emerald-800 hover:bg-emerald-50 px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow">
-                    <i class="fa-solid fa-search"></i> Semak Senarai Murid
-                </button>
-                <button onclick="switchTab('menu')" class="bg-emerald-800/50 hover:bg-emerald-800 text-white px-4 py-2.5 rounded-xl text-xs font-medium transition">
-                    Jadual Mingguan
-                </button>
-            </div>
+            
+            <h3 id="menu-today-food" class="text-2xl font-bold mt-3 flex items-center gap-2 flex-wrap">
+                Memuatkan menu...
+            </h3>
+            
+            <p class="text-white/90 text-sm mt-1">
+                Disediakan oleh: <span id="menu-canteen-name" class="font-semibold text-white">Memuatkan...</span>
+            </p>
         </div>
-        <i class="fa-solid fa-bowl-rice text-9xl absolute -bottom-6 -right-6 text-white/10 pointer-events-none"></i>
+        <div class="flex flex-wrap items-center gap-3">
+            <button onclick="switchTab('kehadiran')" class="bg-white text-slate-800 hover:bg-slate-100 px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow">
+                <i class="fa-solid fa-search"></i> Semak Senarai Murid
+            </button>
+            <button onclick="switchTab('menu')" class="bg-black/20 hover:bg-black/30 text-white px-4 py-2.5 rounded-xl text-xs font-medium transition">
+                Jadual Mingguan
+            </button>
+        </div>
     </div>
+    <i class="fa-solid fa-bowl-rice text-9xl absolute -bottom-6 -right-6 text-white/10 pointer-events-none"></i>
+</div>
 </section>
 
     <!-- TAB 2: SEMAKAN KEHADIRAN MURID -->
@@ -2397,31 +2428,29 @@ function renderAdminStudentTable(data) {
         tbody.appendChild(tr);
     });
 }
-
-    // --- FUNGSI CETAK SENARAI KEHADIRAN (DINAMIK MENGIKUT SUPABASE) ---
+	
+   	// --- FUNGSI CETAK SENARAI KEHADIRAN (TAB KEKAL TERBUKA WALAUPUN CANCEL) ---
 function printAttendanceReport() {
     const selectedDate = document.getElementById('attendanceDatePicker')?.value || getLocalDateString();
     const selectedClass = document.getElementById('filterClassSelect')?.value || 'ALL';
     const selectedStatus = document.getElementById('filterStatusSelect')?.value || 'ALL';
 
-    // Dapatkan maklumat sekolah dinamik dari Supabase (fallback ke nilai asas jika tiada)
     const config = window.pengurusanRMTConfig || {};
     const namaSekolah = config.nama_sekolah || 'SK FELDA CHEMOMOI';
     const lencanaUrl = config.lencana_url || '';
 
-    // Bina tag HTML lencana jika wujud URL
-    const lencanaHtml = lencanaUrl 
+    const lencanaHtml = 
+        lencanaUrl 
         ? `<img src="${lencanaUrl}" style="height: 55px; max-width: 120px; object-fit: contain; margin-bottom: 6px;">` 
         : '';
 
-    // Dapatkan label nama kelas untuk header
     const classSelectElem = document.getElementById('filterClassSelect');
     let classText = 'Semua Kelas (Tahun 1 - 6)';
     if (classSelectElem && classSelectElem.selectedIndex !== -1) {
         classText = classSelectElem.options[classSelectElem.selectedIndex].text;
     }
 
-    // 1. Tapis data murid secara spesifik mengikut KELAS & STATUS
+    // 1. TAPIS DATA
     let filteredList = studentsData.filter(s => {
         const matchClass = (selectedClass === 'ALL' || !selectedClass) 
             ? true 
@@ -2439,7 +2468,26 @@ function printAttendanceReport() {
         return matchClass && matchStatus;
     });
 
-    // 2. Bina baris jadual HTML
+    // 2. SUSUN DATA 3 TINGKAT (STATUS -> KELAS -> NAMA A-Z)
+    filteredList.sort((a, b) => {
+        const attendedA = isStudentAttended(a.id);
+        const attendedB = isStudentAttended(b.id);
+
+        if (attendedA !== attendedB) {
+            return attendedA ? -1 : 1; 
+        }
+
+        const kelasA = (a.kelas || '').toString().toLowerCase();
+        const kelasB = (b.kelas || '').toString().toLowerCase();
+        const compKelas = kelasA.localeCompare(kelasB, undefined, { numeric: true, sensitivity: 'base' });
+        if (compKelas !== 0) return compKelas;
+
+        const namaA = (a.nama || '').toString().toLowerCase();
+        const namaB = (b.nama || '').toString().toLowerCase();
+        return namaA.localeCompare(namaB, undefined, { sensitivity: 'base' });
+    });
+
+    // 3. BINA BARIS JADUAL HTML
     let rowsHtml = '';
     if (filteredList.length === 0) {
         rowsHtml = `<tr><td colspan="4" style="text-align:center; padding: 12px; color: #888;">Tiada rekod murid ditemui untuk kelas/status ini.</td></tr>`;
@@ -2463,7 +2511,7 @@ function printAttendanceReport() {
         });
     }
 
-    // 3. Jana tetingkap cetakan
+    // 4. JANA TETINGKAP CETAKAN & KEKALKAN TAB TERBUKA
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
         alert("Sila benarkan Pop-up pada browser untuk mencetak.");
@@ -2521,9 +2569,10 @@ function printAttendanceReport() {
 
     printWindow.document.close();
     printWindow.focus();
+
+    // 🟢 HANYA PANGGIL CETAK SAHAJA, DIBUANG printWindow.close();
     setTimeout(() => {
         printWindow.print();
-        printWindow.close();
     }, 500);
 }
 
@@ -2797,63 +2846,91 @@ function renderWeeklyMenu() {
             if (dropdown) dropdown.classList.toggle('hidden');
         }
 
-       
-function setSystemTheme(themeName) {
-            // Pemetaan warna mengikut tema
+     
+	function setSystemTheme(themeName) {
             const themeColors = {
                 emerald: { main: '#059669', light: '#ecfdf5', border: '#a7f3d0', dark: '#047857' },
                 purple:  { main: '#9333ea', light: '#faf5ff', border: '#e9d5ff', dark: '#7e22ce' },
                 blue:    { main: '#2563eb', light: '#eff6ff', border: '#bfdbfe', dark: '#1d4ed8' },
-                rose:    { main: '#e11d48', light: '#fff1f2', border: '#fecdd3', dark: '#be123c' }
+                rose:    { main: '#e11d48', light: '#fff1f2', border: '#fecdd3', dark: '#be123c' },
+                teal:    { main: '#0d9488', light: '#f0fdfa', border: '#99f6e4', dark: '#0f766e' },
+                amber:   { main: '#d97706', light: '#fffbeb', border: '#fde68a', dark: '#b45309' },
+                indigo:  { main: '#4f46e5', light: '#eef2ff', border: '#c7d2fe', dark: '#4338ca' },
+                slate:   { main: '#475569', light: '#f8fafc', border: '#cbd5e1', dark: '#334155' }
             };
 
             const colors = themeColors[themeName] || themeColors.emerald;
 
-            // 1. Simpan pilihan dalam memori pelayar
             localStorage.setItem('selectedRmtTheme', themeName);
 
-            // 2. Buang style tag tema lama jika wujud
             let oldStyle = document.getElementById('dynamic-theme-style');
             if (oldStyle) oldStyle.remove();
 
-            // 3. Suntik CSS Baharu untuk menukar warna elemen secara langsung
             const style = document.createElement('style');
             style.id = 'dynamic-theme-style';
             style.innerHTML = `
-                /* Tukar Warna Latar Belakang Utama */
-                .bg-emerald-600, .bg-emerald-500, #navMenu .bg-emerald-600 { 
+                /* 1. SAMAKAN WARNA UNTUK TAB, BUTANG & LOGO SIDEBAR ATAS KIRI */
+                #navMenu .bg-emerald-600,
+                #topLoginBtn,
+                #loginSideBtn,
+                button.bg-emerald-600,
+                .bg-emerald-600,
+                /* 🟢 IKON LOGO E-RMT ATAS KIRI */
+                aside .bg-emerald-600,
+                aside .bg-emerald-500,
+                aside div:has(> .fa-utensils) { 
                     background-color: ${colors.main} !important; 
+                    background-image: none !important;
+                    opacity: 1 !important;
                 }
-                .hover\\:bg-emerald-700:hover, .hover\\:bg-emerald-500:hover { 
+
+                /* 2. BUTANG LOG MASUK MODAL */
+                #loginModal button[type="submit"],
+                #loginModal .bg-emerald-600,
+                #loginModal .bg-emerald-500 {
+                    background-color: ${colors.main} !important;
+                    background-image: none !important;
+                }
+                
+                /* 3. HOVER STATUS BUTANG */
+                #loginSideBtn:hover,
+                #topLoginBtn:hover,
+                #loginModal button:hover,
+                .hover\\:bg-emerald-700:hover, 
+                .hover\\:bg-emerald-500:hover { 
                     background-color: ${colors.dark} !important; 
                 }
 
-                /* Tukar Warna Latar Belakang Ringan (Badges/Kad) */
+                /* 4. BANNER MENU HARI INI */
+                div:has(> #menu-today-food),
+                div:has(> #menu-day-title) {
+                    background: ${colors.main} !important;
+                    background-color: ${colors.main} !important;
+                    background-image: none !important;
+                }
+
+                /* 5. LATAR BELAKANG RINGAN (BADGES & KAD) */
                 .bg-emerald-50, .bg-emerald-100, .bg-emerald-500\\/20 { 
                     background-color: ${colors.light} !important; 
                 }
 
-                /* Tukar Warna Teks */
+                /* 6. WARNA TEKS UTAMA */
                 .text-emerald-600, .text-emerald-700, .text-emerald-500, .text-emerald-400, .text-emerald-300 { 
                     color: ${colors.main} !important; 
                 }
 
-                /* Tukar Warna Sempadan (Border) */
-                .border-emerald-500, .border-emerald-300, .border-emerald-200, .border-emerald-100 { 
-                    border-color: ${colors.border} !important; 
+                /* 7. GARISAN BORDER MODAL & KAD */
+                .border-emerald-500, .border-emerald-300, .border-emerald-200, .border-emerald-100,
+                #loginModal *,
+                #loginModal div { 
+                    border-color: ${colors.main} !important; 
                 }
-
-                /* Banner Utama Dashboard & Butang */
-                .from-emerald-600 { --tw-gradient-from: ${colors.main} !important; }
-                .to-teal-700 { --tw-gradient-to: ${colors.dark} !important; }
             `;
             document.head.appendChild(style);
 
-            // 4. Sembunyikan tetingkap dropdown
             const dropdown = document.getElementById('themeDropdown');
             if (dropdown) dropdown.classList.add('hidden');
 
-            // 5. Kemaskini semula carta jika wujud
             if (typeof initCharts === 'function') initCharts();
             if (typeof loadImbanganNutrisi === 'function') loadImbanganNutrisi();
         }
