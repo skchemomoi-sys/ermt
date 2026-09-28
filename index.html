@@ -124,41 +124,42 @@
         }
 
       /* CSS Tambahan Untuk Jadual Pilihan Cetak QR & Paparan RFID */
-        @media print {
-            body * { visibility: hidden !important; }
-            #printableCardSection, #printableCardSection * { visibility: visible !important; }
-            #printableCardSection { 
-                position: absolute !important; 
-                left: 0 !important; 
-                top: 0 !important; 
-                width: 100% !important; 
-                padding: 0 !important;
-                margin: 0 !important;
-                background: white !important;
-            }
-            .no-print { display: none !important; }
+       
+	@media print {
+    body * { visibility: hidden !important; }
+    #printableCardSection, #printableCardSection * { visibility: visible !important; }
+    #printableCardSection { 
+        position: absolute !important; 
+        left: 0 !important; 
+        top: 0 !important; 
+        width: 100% !important; 
+        padding: 0 !important;
+        margin: 0 !important;
+        background: white !important;
+    }
+    .no-print { display: none !important; }
 
-            /* Grid Cetakan A4 Landscape / Portrait (Susun 2 Kolum Sebelah-Mensebelah) */
-            #qrCardsGrid {
-                display: grid !important;
-                grid-template-columns: repeat(2, 85.6mm) !important;
-                grid-auto-rows: 53.9mm !important;
-                gap: 6mm 8mm !important;
-                justify-content: center !important;
-                padding-top: 5mm !important;
-            }
+    /* Grid Cetakan A4 Portrait (Susun 3-4 Kolum Kad Matrik Menegak) */
+    #qrCardsGrid {
+        display: grid !important;
+        grid-template-columns: repeat(3, 53.9mm) !important;
+        grid-auto-rows: 85.6mm !important;
+        gap: 5mm 6mm !important;
+        justify-content: center !important;
+        padding-top: 5mm !important;
+    }
 
-            .rfid-card {
-                width: 85.6mm !important;
-                height: 53.9mm !important;
-                box-sizing: border-box !important;
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-                border: 1.5px solid #059669 !important;
-                box-shadow: none !important;
-                background: white !important;
-            }
-        }
+    .rfid-card {
+        width: 53.9mm !important;
+        height: 85.6mm !important;
+        box-sizing: border-box !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        border: 1.5px solid #059669 !important;
+        box-shadow: none !important;
+        background: white !important;
+    }
+}
 
       /* --- STYLES FOR CIRCULAR NEON LOGIN MODAL (DARK SLATE THEME) --- */
         .circle-login-card {
@@ -1901,83 +1902,93 @@ async function onCameraScanSuccess(decodedText) {
             generateSelectedQRCards();
         }
 
-        // 3. Penjanaan Kad RFID Bagi Murid Terpilih (QR 72px & Nama Besar)
-        function generateSelectedQRCards() {
-            if (selectedStudentIdsForQR.size === 0) {
-                alert("Sila pilih sekurang-kurangnya seorang murid untuk dicetak.");
-                return;
+        // ==========================================
+	// PENJANAAN KAD QR RMT FORMAT KAD MATRIK (DENGAN RUANG TEBUK LUBANG)
+	// ==========================================
+function generateSelectedQRCards() {
+    if (selectedStudentIdsForQR.size === 0) {
+        alert("Sila pilih sekurang-kurangnya seorang murid untuk dicetak.");
+        return;
+    }
+
+    closeQRSelectionModal();
+
+    const grid = document.getElementById('qrCardsGrid');
+    grid.innerHTML = "";
+
+    // Ambil Nama Sekolah Dinamik dari Supabase/Config
+    const config = window.pengurusanRMTConfig || {};
+    const sidebarText = document.getElementById('sidebar_nama_sekolah')?.innerText?.trim();
+    const namaSekolahDinamik = config.nama_sekolah || sidebarText || 'SK FELDA CHEMOMOI';
+
+    const targetStudents = studentsData.filter(s => selectedStudentIdsForQR.has(s.id));
+
+    targetStudents.forEach(s => {
+        const card = document.createElement('div');
+        // Kad format matrik menegak
+        card.className = "rfid-card bg-white border-2 border-emerald-600 rounded-xl p-2.5 flex flex-col justify-between items-center text-center shadow-sm relative overflow-hidden";
+        card.style.width = "53.9mm";
+        card.style.height = "85.6mm";
+        card.style.boxSizing = "border-box";
+
+        const qrId = `qr-${s.id}`;
+        
+        card.innerHTML = `
+            <!-- Indikator Panduan Tebuk Lubang Lanyard (Visual Guide) -->
+            <div class="w-full flex justify-center pt-0.5 pb-1">
+                <div class="w-7 h-1.5 border border-dashed border-slate-300 rounded-full bg-slate-50" title="Ruang Tebuk Lubang Kad"></div>
+            </div>
+
+            <!-- Header Kad Matrik (Diturunkan sedikit untuk memberi ruang tebuk lubang) -->
+            <div class="w-full text-center border-b border-slate-200 pb-1">
+                <p class="text-[7px] font-extrabold text-emerald-800 tracking-wider uppercase leading-none">KEMENTERIAN PENDIDIKAN MALAYSIA</p>
+                <h3 class="text-[9px] font-extrabold text-slate-900 uppercase tracking-tight leading-tight mt-1 truncate" title="${namaSekolahDinamik}">
+                    ${namaSekolahDinamik}
+                </h3>
+                <span class="inline-block bg-emerald-600 text-white text-[6.5px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-widest mt-1">
+                    PAS RMT MURID
+                </span>
+            </div>
+
+            <!-- Petak Kod QR (Tengah Kad) -->
+            <div class="my-auto p-1 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-center shadow-inner">
+                <div id="${qrId}"></div>
+            </div>
+
+            <!-- Maklumat Murid (Bawah Kad) -->
+            <div class="w-full text-center pt-1 border-t border-slate-200">
+                <p class="text-[7.5px] font-extrabold text-slate-500 uppercase tracking-wider leading-none mb-0.5">MURID RMT</p>
+                <h4 class="font-extrabold text-slate-900 text-[10px] leading-tight uppercase break-words line-clamp-2 px-0.5" title="${s.nama_murid || s.nama}">
+                    ${s.nama_murid || s.nama}
+                </h4>
+                <p class="text-[8.5px] font-bold text-emerald-700 mt-0.5">
+                    KELAS: ${s.kelas || '-'}
+                </p>
+                <p class="text-[7.5px] text-slate-600 font-mono font-bold leading-none mt-1">
+                    MYKID: ${s.mykid || s.nokp || s.id}
+                </p>
+            </div>
+        `;
+        grid.appendChild(card);
+
+        // Penjanaan Kod QR 76px x 76px (Saiz seimbang dengan margin atas baharu)
+        setTimeout(() => {
+            const qrContainer = document.getElementById(qrId);
+            if (qrContainer) {
+                qrContainer.innerHTML = "";
+                new QRCode(qrContainer, {
+                    text: s.mykid || String(s.id),
+                    width: 76,
+                    height: 76,
+                    correctLevel: QRCode.CorrectLevel.H
+                });
             }
+        }, 50);
+    });
 
-            closeQRSelectionModal();
-
-            const grid = document.getElementById('qrCardsGrid');
-            grid.innerHTML = "";
-
-            const targetStudents = studentsData.filter(s => selectedStudentIdsForQR.has(s.id));
-
-            targetStudents.forEach(s => {
-                const card = document.createElement('div');
-                card.className = "rfid-card bg-white border-2 border-emerald-600 rounded-xl p-2.5 flex items-center justify-between shadow-sm relative overflow-hidden";
-                card.style.width = "85.6mm";
-                card.style.height = "53.9mm";
-                card.style.boxSizing = "border-box";
-
-                const qrId = `qr-${s.id}`;
-                
-                card.innerHTML = `
-                    <div class="flex flex-col justify-between h-full w-full pr-2 min-w-0">
-                        <div>
-                            <!-- Badge Header -->
-                            <div class="flex items-center gap-1">
-                                <span class="bg-emerald-700 text-white text-[8.5px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider leading-none">
-                                    PAS RMT SEKOLAH
-                                </span>
-                            </div>
-                            
-                            <!-- Nama Murid (Besar & Ditebalkan) -->
-                            <h4 class="font-extrabold text-slate-900 text-[12px] leading-tight mt-2 uppercase break-words line-clamp-2" title="${s.nama_murid || s.nama}">
-                                ${s.nama_murid || s.nama}
-                            </h4>
-                            
-                            <!-- Kelas -->
-                            <p class="text-[10px] font-bold text-slate-700 mt-1">
-                                Kelas: <span class="text-emerald-800">${s.kelas || '-'}</span>
-                            </p>
-                        </div>
-
-                        <!-- Footer MyKid / ID -->
-                        <div class="pt-1 border-t border-slate-200">
-                            <p class="text-[8.5px] text-slate-600 font-mono font-bold leading-none">
-                                MYKID: <strong class="text-slate-800">${s.mykid || s.id}</strong>
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Kontainer Kod QR Bersaiz Optimal (72px x 72px) -->
-                    <div class="flex-shrink-0 flex items-center justify-center p-1 bg-slate-50 rounded-lg border border-slate-200">
-                        <div id="${qrId}"></div>
-                    </div>
-                `;
-                grid.appendChild(card);
-
-                // Penjanaan Kod QR 72px (Tahap Ketepatan Imbasan Tinggi: H)
-                setTimeout(() => {
-                    const qrContainer = document.getElementById(qrId);
-                    if (qrContainer) {
-                        qrContainer.innerHTML = "";
-                        new QRCode(qrContainer, {
-                            text: s.mykid || String(s.id),
-                            width: 72,
-                            height: 72,
-                            correctLevel: QRCode.CorrectLevel.H
-                        });
-                    }
-                }, 50);
-            });
-
-            document.getElementById('printableCardSection').classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+    document.getElementById('printableCardSection').classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
         // TAMBAH FUNGSI BAHARU INI DI SINI:
         function closePrintableQRCards() {
