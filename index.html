@@ -1585,7 +1585,6 @@
             }
         }
 
-
 // ==========================================
 // FUNGSI TUKAR STATUS KEHADIRAN INDIVIDU (KEKALKAN TAPISAN KELAS)
 // ==========================================
@@ -1645,17 +1644,12 @@ async function toggleStatusKehadiranMurid(muridId, statusSemasa) {
             initCharts();
         }
 
-        // 3. 🟢 PAKSA JADUAL MENJALANKAN TAPISAN SEMASA (KEKALKAN KELAS DIPILIH)
-        const classFilterSelect = document.getElementById('classFilterSelect') || 
-                                  document.getElementById('filterKelas') || 
-                                  document.querySelector('select[onchange*="filter"]');
+        // 3. Kekalkan tapisan kelas/carian semasa
+        filterStudents();
 
-        if (classFilterSelect) {
-            classFilterSelect.dispatchEvent(new Event('change'));
-        } else if (typeof filterStudents === 'function') {
-            filterStudents();
-        } else {
-            renderStudentTable(studentsData);
+        // 4. Kemaskini dropdown imbasan simulasi jika wujud
+        if (typeof populateScanDropdown === 'function') {
+            populateScanDropdown();
         }
 
     } catch (err) {
@@ -1664,27 +1658,26 @@ async function toggleStatusKehadiranMurid(muridId, statusSemasa) {
     }
 }
 
+// --- MUAT KEHADIRAN MENGIKUT TARIKH DIPILIH ---
+async function loadAttendanceForSelectedDate() {
+    const dateInput = document.getElementById('attendanceDatePicker');
+    const selectedDate = (dateInput && dateInput.value) ? dateInput.value : getLocalDateString();
 
-        // --- MUAT KEHADIRAN MENGIKUT TARIKH DIPILIH ---
-        async function loadAttendanceForSelectedDate() {
-            const dateInput = document.getElementById('attendanceDatePicker');
-            const selectedDate = (dateInput && dateInput.value) ? dateInput.value : getLocalDateString();
+    try {
+        const { data: attList, error } = await db
+            .from('kehadiran_rmt')
+            .select('*')
+            .eq('tarikh', selectedDate);
 
-            try {
-                const { data: attList, error } = await db
-                    .from('kehadiran_rmt')
-                    .select('*')
-                    .eq('tarikh', selectedDate);
+        if (error) throw error;
 
-                if (error) throw error;
+        attendanceDataToday = attList || [];
+        refreshAllViews();
 
-                attendanceDataToday = attList || [];
-                refreshAllViews();
-
-            } catch (err) {
-                console.error("Ralat memuat data kehadiran:", err);
-            }
-        }
+    } catch (err) {
+        console.error("Ralat memuat data kehadiran:", err);
+    }
+}
 
       // --- CAMERA QR SCANNER LOGIC ---
         function openCameraScannerModal() {
@@ -2183,7 +2176,14 @@ function switchTab(tabId) {
 }
 
 function refreshAllViews() {
-    renderStudentTable(studentsData);
+    // 🟢 TUKAR: Gantikan renderStudentTable(studentsData) kepada filterStudents() 
+    // supaya tapisan kelas & carian dikekalkan apabila data segar semula
+    if (typeof filterStudents === 'function') {
+        filterStudents();
+    } else {
+        renderStudentTable(studentsData);
+    }
+
     renderAdminStudentTable(studentsData);
     populateScanDropdown();
     updateTopStats();
@@ -2209,7 +2209,6 @@ function refreshAllViews() {
         loadSenaraiMuridAwam();
     }
 }
-
 function renderAdminStudentTable(data) {
     const tbody = document.getElementById('adminStudentTableBody');
     if (!tbody) return; // Selamat jika elemen tiada
@@ -2715,23 +2714,46 @@ async function markStudentAttendance(studentId) {
             }
         }
 
-        function filterStudents() {
-            const searchVal = document.getElementById('searchStudentInput').value.toLowerCase();
-            const classVal = document.getElementById('filterClassSelect').value;
-            const statusVal = document.getElementById('filterStatusSelect').value;
+       function filterStudents() {
+    const searchInput = document.getElementById('searchStudentInput');
+    const classSelect = document.getElementById('filterClassSelect');
+    const statusSelect = document.getElementById('filterStatusSelect');
 
-            const filtered = studentsData.filter(s => {
-                const matchesSearch = s.nama.toLowerCase().includes(searchVal) || (s.mykid && s.mykid.toLowerCase().includes(searchVal));
-                const matchesClass = classVal === 'ALL' || s.kelas === classVal;
-                
-                const attended = isStudentAttended(s.id);
-                const matchesStatus = statusVal === 'ALL' || (statusVal === 'TAKEN' && attended) || (statusVal === 'PENDING' && !attended);
-                
-                return matchesSearch && matchesClass && matchesStatus;
-            });
+    const searchVal = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    const classVal = classSelect ? classSelect.value.trim() : 'ALL';
+    const statusVal = statusSelect ? statusSelect.value : 'ALL';
 
-            renderStudentTable(filtered);
+    const filtered = studentsData.filter(s => {
+        // 1. Carian Teks (Nama atau MyKid)
+        const nama = (s.nama || s.nama_murid || '').toLowerCase();
+        const mykid = (s.mykid || s.nokp || '').toLowerCase();
+        const matchesSearch = !searchVal || nama.includes(searchVal) || mykid.includes(searchVal);
+
+        // 2. Tapisan Kelas (Pemberihan Toleransi Jarak & Huruf)
+        let matchesClass = false;
+        if (classVal === 'ALL' || !classVal) {
+            matchesClass = true;
+        } else {
+            const studentKelas = (s.kelas || '').toString().toLowerCase().replace(/\s+/g, '');
+            const selectedKelas = classVal.toLowerCase().replace(/\s+/g, '');
+            
+            // Semak padanan penuh ATAU padanan awalan (cth: "3a" padan dengan "3azkiya")
+            matchesClass = (studentKelas === selectedKelas) || 
+                           studentKelas.includes(selectedKelas) || 
+                           selectedKelas.includes(studentKelas);
         }
+
+        // 3. Tapisan Status Kehadiran
+        const attended = isStudentAttended(s.id);
+        const matchesStatus = (statusVal === 'ALL') || 
+                              (statusVal === 'TAKEN' && attended) || 
+                              (statusVal === 'PENDING' && !attended);
+
+        return matchesSearch && matchesClass && matchesStatus;
+    });
+
+    renderStudentTable(filtered);
+}
 
       function updateTopStats() {
     const total = studentsData ? studentsData.length : 0;
@@ -5381,11 +5403,27 @@ function initSupabaseRealtime() {
         async (payload) => {
             console.log('Perubahan data dikesan dari peranti lain!', payload);
             
-            if (typeof loadDataFromSupabase === 'function') {
-                await loadDataFromSupabase();
-            } else if (typeof loadAttendanceForSelectedDate === 'function') {
-                await loadAttendanceForSelectedDate();
-                if (typeof refreshAllViews === 'function') refreshAllViews();
+            // Dapatkan tarikh yang sedang dipilih pada UI
+            const dateInput = document.getElementById('attendanceDatePicker');
+            const selectedDate = (dateInput && dateInput.value) ? dateInput.value : getLocalDateString();
+            
+            // Tarik rekod kehadiran baharu secara senyap
+            const { data: attList } = await client
+                .from('kehadiran_rmt')
+                .select('*')
+                .eq('tarikh', selectedDate);
+
+            if (attList) {
+                attendanceDataToday = attList;
+                
+                // Kemaskini statistik di atas & kekalkan tapisan kelas semasa!
+                updateTopStats();
+                if (typeof filterStudents === 'function') {
+                    filterStudents();
+                }
+                if (typeof populateScanDropdown === 'function') {
+                    populateScanDropdown();
+                }
             }
         }
       )
