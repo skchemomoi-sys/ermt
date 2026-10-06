@@ -745,7 +745,7 @@
 
                                 <div>
                                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Kelas:</label>
-                                    <select id="filterClassSelect" onchange="filterStudents()" class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl p-2 outline-none focus:ring-2 focus:ring-emerald-500">
+                                   <select id="filterClassSelect" onchange="filterStudents(); populateScanDropdown();" class="w-full bg-slate-50 border border-slate-200 text-xs rounded-xl p-2 outline-none focus:ring-2 focus:ring-emerald-500">
                                         <option value="ALL">Semua Kelas (Tahun 1 - 6)</option>
                                         <!-- Tahun 1 -->
                                         <option value="1 Azkiya">Tahun 1 Azkiya</option>
@@ -2586,20 +2586,42 @@ function printAttendanceReport() {
     }, 500);
 }
 
-        function populateScanDropdown() {
-            const select = document.getElementById('scanStudentSelect');
-            select.innerHTML = '';
-            
-            const unAttendedList = studentsData.filter(s => !isStudentAttended(s.id));
+   function populateScanDropdown() {
+    const select = document.getElementById('scanStudentSelect');
+    if (!select) return;
+    select.innerHTML = '';
 
-            unAttendedList.forEach(s => {
-                select.innerHTML += `<option value="${s.id}">${s.nama} (${s.kelas})</option>`;
-            });
+    // Ambil nilai kelas yang sedang dipilih daripada filterClassSelect
+    const classSelect = document.getElementById('filterClassSelect');
+    const classVal = classSelect ? classSelect.value.trim() : 'ALL';
 
-            if (unAttendedList.length === 0) {
-                select.innerHTML = `<option value="">Semua murid telah mengambil makanan hari ini</option>`;
-            }
+    // 1. Tapis murid yang BELUM ambil makanan
+    let unAttendedList = studentsData.filter(s => !isStudentAttended(s.id));
+
+    // 2. Tapis mengikut KELAS yang sedang dipilih (jika bukan 'ALL')
+    if (classVal !== 'ALL' && classVal !== '') {
+        unAttendedList = unAttendedList.filter(s => {
+            const studentKelas = (s.kelas || '').toString().toLowerCase().replace(/\s+/g, '');
+            const selectedKelas = classVal.toLowerCase().replace(/\s+/g, '');
+            return (studentKelas === selectedKelas) || 
+                   studentKelas.includes(selectedKelas) || 
+                   selectedKelas.includes(studentKelas);
+        });
+    }
+
+    // 3. Masukkan senarai nama ke dalam dropdown
+    unAttendedList.forEach(s => {
+        select.innerHTML += `<option value="${s.id}">${s.nama} (${s.kelas})</option>`;
+    });
+
+    if (unAttendedList.length === 0) {
+        if (classVal !== 'ALL' && classVal !== '') {
+            select.innerHTML = `<option value="">Semua murid kelas ini telah mengambil makanan</option>`;
+        } else {
+            select.innerHTML = `<option value="">Semua murid telah mengambil makanan hari ini</option>`;
         }
+    }
+}
 
       async function triggerQRScan() {
     const studentId = document.getElementById('scanStudentSelect').value;
